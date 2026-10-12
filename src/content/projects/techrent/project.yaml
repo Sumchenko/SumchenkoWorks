@@ -1,0 +1,306 @@
+# ТехРент — источник: репозиторий github.com/Sumchenko/techrent (SUMMARY.md, CLAUDE.md, sa-docs/, миграции и код).
+code: P—02
+order: 2
+demo: false
+featured: true
+title: { ru: "ТехРент", en: "TechRent" }
+summary:
+  ru: CRM для аренды спецтехники — бронирование с проверкой доступности, календарь парка, платежи, права менеджеров и журнал действий.
+  en: A CRM for construction equipment rental — booking with availability checks, a fleet calendar, payments, manager permissions and an audit log.
+category: sa
+status: wip
+year: 2026
+period: '2026.06 → 2026.10'
+role:
+  ru: Аналитика, проектирование, разработка в Claude Code (дипломный проект)
+  en: Analysis, design, development with Claude Code (graduation project)
+tech: [go, postgres, react, typescript, zustand, docker, nginx, openapi, bpmn]
+cover: d-tr-components
+links:
+  repo: https://github.com/Sumchenko/techrent
+  docs: artifacts
+
+problem:
+  ru: У небольших компаний есть своя техника — экскаваторы, краны, самосвалы, — и часть времени она простаивает. Сдавать её выгодно, но аренду ведут в таблицах и на бумаге. Одну машину легко пообещать двум клиентам или отдать технику из ремонта, а кто сколько должен, приходится выяснять вручную. Тяжёлая учётная система для этого слишком дорога и долга во внедрении.
+  en: Small companies own equipment — excavators, cranes, dump trucks — and part of the time it sits idle. Renting it out pays, but rentals are tracked in spreadsheets and on paper. It is easy to promise one machine to two customers or hand over one that is under repair, and who owes what has to be worked out by hand. A heavyweight ERP is too expensive and too slow to roll out for this.
+overview:
+  ru: ТехРент заменяет таблицы простым веб-сервисом для менеджеров. Система сама проверяет, свободна ли техника на нужные даты, считает стоимость аренды по ставкам, следит за оплатой и показывает должников. Администратор приглашает менеджеров по ссылке и выдаёт им права по разделам, а каждое изменение попадает в журнал.
+  en: TechRent replaces spreadsheets with a simple web service for managers. The system checks whether equipment is free on the requested dates, calculates the rental price from the rates, tracks payments and shows who owes money. The administrator invites managers by link and grants them per-module permissions, and every change goes into an audit log.
+purpose:
+  ru: Дипломный проект, который сейчас проходит пилот в компании с собственным парком техники. Я вёл его как аналитик и архитектор — требования, модель данных, API, ролевая модель, — а код писал в Claude Code пошагово, с проверкой каждого шага. Отдельно разобрал главную фичу, бронирование, сквозным кейсом и принял реализацию по коду — так нашлись 11 расхождений с требованиями.
+  en: A graduation project now in a pilot at a company with its own equipment fleet. I ran it as the analyst and architect — requirements, data model, API, role model — and wrote the code with Claude Code step by step, reviewing every step. I documented the key feature, booking, as an end-to-end case and accepted the implementation against the code, which surfaced 11 mismatches with the requirements.
+goals:
+  - { ru: "Не допустить двойного бронирования и аренды неисправной техники", en: "Prevent double booking and renting out broken equipment" }
+  - { ru: "Видеть занятость всего парка на месяц за одну минуту", en: "See the whole fleet's availability for a month in a minute" }
+  - { ru: "Считать стоимость и долги без ручных расчётов", en: "Calculate prices and debts without manual maths" }
+  - { ru: "Давать менеджерам ровно те права, которые им нужны", en: "Give managers exactly the permissions they need" }
+features:
+  - { ru: "Каталог техники: ставки за день и час, статусы, фото, периоды обслуживания", en: "Equipment catalogue: daily and hourly rates, statuses, photos, maintenance periods" }
+  - { ru: "Клиенты (юрлица и физлица) и их объекты-стройплощадки", en: "Customers (companies and individuals) and their construction sites" }
+  - { ru: "Бронирование с проверкой доступности и расчётом стоимости", en: "Booking with availability checks and price calculation" }
+  - { ru: "Календарь занятости — диаграмма Ганта «техника × дни»", en: "Availability calendar — a Gantt chart of equipment × days" }
+  - { ru: "Платежи с частичной оплатой и защитой от переплаты", en: "Payments with partial payment and overpayment protection" }
+  - { ru: "Финансовая сводка за период и список должников", en: "Financial summary for a period and a list of debtors" }
+  - { ru: "Приглашение менеджеров по ссылке и права по модулям", en: "Manager invitations by link and per-module permissions" }
+  - { ru: "Журнал действий: кто, что и когда изменил, данные до и после", en: "Audit log: who changed what and when, with before and after data" }
+requirements:
+  - { id: FR-01, type: FR, priority: Must, text: { ru: "Одна техника не может быть занята двумя неотменёнными заказами на пересекающиеся даты — даже при одновременных запросах.", en: "One piece of equipment cannot have two active orders with overlapping dates — even under concurrent requests." } }
+  - { id: FR-02, type: FR, priority: Must, text: { ru: "Сломанную технику забронировать нельзя (422), технику на обслуживании — в его даты (409).", en: "Broken equipment cannot be booked (422); equipment under maintenance cannot be booked for those dates (409)." } }
+  - { id: FR-03, type: FR, priority: Must, text: { ru: "Стоимость: несколько дней — ставка за день × дни включительно, один день — ставка за час × часы.", en: "Price: several days — daily rate × days inclusive; a single day — hourly rate × hours." } }
+  - { id: FR-04, type: FR, priority: Must, text: { ru: "Сумма платежей по заказу не может превысить сумму заказа.", en: "Payments on an order cannot exceed the order total." } }
+  - { id: FR-05, type: FR, priority: Must, text: { ru: "Номер заказа ТР-год-NNN уникален и не повторяется после удаления заказа.", en: "The order number ТР-year-NNN is unique and never reused after an order is deleted." } }
+  - { id: FR-06, type: FR, priority: Should, text: { ru: "Менеджер видит и меняет только разделы, открытые ему администратором.", en: "A manager sees and changes only the modules the administrator opened to them." } }
+  - { id: NFR-01, type: NFR, priority: Must, text: { ru: "Целостность на уровне БД: CHECK, UNIQUE, внешние ключи и ограничение EXCLUDE.", en: "Integrity at the database level: CHECK, UNIQUE, foreign keys and an EXCLUDE constraint." } }
+  - { id: NFR-02, type: NFR, priority: Must, text: { ru: "Каждое создание, изменение и удаление пишется в журнал; сбой журнала не отменяет операцию.", en: "Every create, update and delete is logged; a logging failure does not roll back the operation." } }
+  - { id: NFR-03, type: NFR, priority: Should, text: { ru: "Вся система поднимается одной командой docker compose up.", en: "The whole system starts with a single docker compose up." } }
+scenarios:
+  - title: { ru: "Бронирование техники", en: "Booking equipment" }
+    actor: { ru: "Менеджер", en: "Manager" }
+    steps:
+      - { ru: "Находит свободную технику в календаре и отмечает даты", en: "Finds free equipment in the calendar and marks the dates" }
+      - { ru: "Форма подставляет ставки и считает сумму, менеджер выбирает клиента и объект", en: "The form fills in the rates and calculates the total; the manager picks the customer and site" }
+      - { ru: "Сервер в одной транзакции проверяет поломку, обслуживание и занятость", en: "In one transaction the server checks breakdowns, maintenance and overlaps" }
+      - { ru: "Заказ получает номер ТР-2026-015, событие попадает в журнал", en: "The order gets number ТР-2026-015 and the event goes into the audit log" }
+  - title: { ru: "Приглашение менеджера", en: "Inviting a manager" }
+    actor: { ru: "Администратор", en: "Administrator" }
+    steps:
+      - { ru: "Создаёт менеджера и отмечает разделы и действия, которые ему доступны", en: "Creates a manager and ticks the modules and actions they may use" }
+      - { ru: "Получает одноразовую ссылку на 7 дней и передаёт её", en: "Gets a one-time link valid for 7 days and passes it on" }
+      - { ru: "Менеджер сам задаёт пароль — администратор его не видит", en: "The manager sets their own password — the administrator never sees it" }
+      - { ru: "Права попадают в токен при входе, меню показывает только разрешённое", en: "Permissions go into the token at sign-in; the menu shows only what is allowed" }
+stages:
+  - period: { ru: "Шаги 1–3", en: "Steps 1–3" }
+    title: { ru: "Основа", en: "Foundation" }
+    text: { ru: "Docker Compose, Go API на Chi, миграции, встроенные в бинарник, JWT и роли.", en: "Docker Compose, a Go API on Chi, migrations embedded in the binary, JWT and roles." }
+  - period: { ru: "Шаги 4–7", en: "Steps 4–7" }
+    title: { ru: "Учёт", en: "Core records" }
+    text: { ru: "Каталог техники, клиенты и объекты, заказы с расчётом стоимости, платежи.", en: "Equipment catalogue, customers and sites, orders with pricing, payments." }
+  - period: { ru: "Шаги 8–11", en: "Steps 8–11" }
+    title: { ru: "Контроль", en: "Control" }
+    text: { ru: "Журнал действий, календарь Ганта, обслуживание техники, статусы заказов по датам.", en: "Audit log, Gantt calendar, equipment maintenance, date-derived order statuses." }
+  - period: { ru: "Шаги 12–14", en: "Steps 12–14" }
+    title: { ru: "Персонал и финансы", en: "Staff and finance" }
+    text: { ru: "Панели деталей, приглашения и права менеджеров, финансовая сводка и должники.", en: "Detail panels, manager invitations and permissions, financial summary and debtors." }
+  - period: { ru: "Приёмка", en: "Acceptance" }
+    title: { ru: "Кейс и пилот", en: "Case and pilot" }
+    text: { ru: "Сквозной кейс «Бронирование», 11 замечаний по коду и отзывам пилота; исправлены все три высоких и повтор номеров.", en: "The end-to-end booking case, 11 findings from the code and pilot feedback; all three high-severity ones and repeated numbers fixed." }
+  - period: { ru: "Далее", en: "Next" }
+    title: { ru: "Уведомления и документы", en: "Notifications and documents" }
+    text: { ru: "Уведомления в Telegram, договор, счёт и акт в PDF, аналитика загрузки парка.", en: "Telegram notifications, contract, invoice and certificate in PDF, fleet utilisation analytics." }
+challenges:
+  - title: { ru: "Двойное бронирование при одновременных запросах", en: "Double booking under concurrent requests" }
+    text: { ru: "Проверка и запись шли отдельными запросами. Теперь — одна транзакция с блокировкой строки техники, а в БД ограничение EXCLUDE: из 10 одновременных запросов проходит один, остальные получают 409.", en: "The check and the write were separate queries. Now it is one transaction that locks the equipment row, plus an EXCLUDE constraint in the database: of 10 concurrent requests one succeeds and the rest get 409." }
+  - title: { ru: "В форме была видна только часть техники", en: "The form showed only part of the fleet" }
+    text: { ru: "Пилотный заказчик с 24 машинами не нашёл нужную: сервер молча обрезал список до 20. Явная ошибка 400 вместо подмены и поле выбора с серверным поиском.", en: "The pilot customer with 24 machines could not find one: the server silently cut the list to 20. An explicit 400 instead of the silent clamp and a picker with server-side search." }
+  - title: { ru: "Номер заказа мог повториться", en: "Order numbers could repeat" }
+    text: { ru: "COUNT + 1 выдавал занятый номер после удаления заказа. Таблица-счётчик по годам: номер выдаётся в транзакции заказа, не повторяется и не оставляет пропусков.", en: "COUNT + 1 handed out a taken number after a deletion. A per-year counter table: the number is issued inside the order transaction, never repeats and leaves no gaps." }
+  - title: { ru: "Статус заказа зависит от сегодняшней даты", en: "Order status depends on today's date" }
+    text: { ru: "В БД хранятся только «запланирован» и «отменён», а «активен» и «завершён» вычисляются в SQL при чтении — без ночных задач и рассинхронизации.", en: "The database stores only planned and cancelled; active and completed are computed in SQL on read — no nightly jobs and no drift." }
+results:
+  text:
+    ru: Работающая CRM из 14 шагов — около 5,5 тысячи строк Go и 6,5 тысячи строк TypeScript, — которая проходит пилот в реальной компании. Сквозной кейс бронирования, OpenAPI, BPMN и словарь данных; из 11 замечаний аналитика исправлены все три высоких и повтор номеров, гонки проверены одновременными запросами.
+    en: A working CRM built in 14 steps — about 5,500 lines of Go and 6,500 lines of TypeScript — now in a pilot at a real company. An end-to-end booking case, OpenAPI, BPMN and a data dictionary; of 11 analyst findings all three high-severity ones and repeated numbers are fixed, and the races are verified with concurrent requests.
+  state:
+    ru: Дальше — права на изменение и отмену заказа на сервере, уведомления в Telegram и документы в PDF.
+    en: Next — server-side checks for order edit and cancel permissions, Telegram notifications and PDF documents.
+
+architecture:
+  diagram: d-tr-components
+  text:
+    ru: Три контейнера в Docker Compose. Nginx раздаёт React-приложение и проксирует /api на Go-сервис. Внутри сервиса — слои handler → service → repository, связанные через интерфейсы. Бизнес-правила живут в сервисе, а инварианты, которые нельзя нарушить ни одним путём записи, держит PostgreSQL.
+    en: Three containers in Docker Compose. Nginx serves the React app and proxies /api to the Go service. Inside the service there are handler → service → repository layers wired through interfaces. Business rules live in the service, while invariants that no write path may break are enforced by PostgreSQL.
+  flows: [d-booking-flow, d-booking-seq]
+dataModel:
+  diagram: d-tr-erd
+  text:
+    ru: Заказ ссылается на клиента, объект, технику и менеджера через внешние ключи с ON DELETE SET NULL — история заказов переживает удаление справочников. Ставки копируются в заказ, поэтому смена ставок техники не меняет оформленные суммы.
+    en: An order references the customer, site, equipment and manager through foreign keys with ON DELETE SET NULL, so order history survives deletions from reference tables. Rates are copied into the order, so changing an equipment rate does not alter existing totals.
+api:
+  endpoints:
+    - { method: GET, path: '/api/v1/calendar?from&to', text: { ru: "Занятость техники за период, сгруппированная по машинам", en: "Equipment availability for a period, grouped by machine" } }
+    - { method: POST, path: /api/v1/orders, text: { ru: "Забронировать технику: 201, 400, 409 (занята, обслуживание), 422 (сломана)", en: "Book equipment: 201, 400, 409 (taken, maintenance), 422 (broken)" } }
+    - { method: PUT, path: '/api/v1/orders/{id}', text: { ru: "Изменить заказ; сам заказ из проверки конфликтов исключается", en: "Update an order; the order itself is excluded from the conflict check" } }
+    - { method: PATCH, path: '/api/v1/orders/{id}/status', text: { ru: "Отменить заказ — принимается только cancelled", en: "Cancel an order — only cancelled is accepted" } }
+    - { method: POST, path: /api/v1/payments, text: { ru: "Принять платёж; переплата — 422 внутри той же транзакции", en: "Record a payment; overpayment is a 422 inside the same transaction" } }
+    - { method: GET, path: '/api/v1/finance/summary?period', text: { ru: "Сводка за месяц, квартал или год и текущие долги клиентов", en: "Summary for a month, quarter or year plus current customer debts" } }
+    - { method: POST, path: /api/v1/users, text: { ru: "Пригласить менеджера: ссылка на 7 дней и права по модулям", en: "Invite a manager: a 7-day link and per-module permissions" } }
+    - { method: GET, path: /api/v1/audit, text: { ru: "Журнал действий с данными до и после (только администратор)", en: "Audit log with before and after data (administrator only)" } }
+  integrations:
+    - name: Nginx → Go API
+      protocol: HTTP · REST JSON
+      text: { ru: "Nginx раздаёт сборку React и проксирует /api и /uploads на сервис.", en: "Nginx serves the React build and proxies /api and /uploads to the service." }
+    - name: JWT
+      protocol: Bearer
+      text: { ru: "Access-токен на 1 час и refresh на 7 дней; права менеджера лежат в токене.", en: "A 1-hour access token and a 7-day refresh token; manager permissions live in the token." }
+    - name: { ru: "Telegram (планируется)", en: "Telegram (planned)" }
+      protocol: Bot API
+      text: { ru: "Уведомления о создании и отмене заказа; поле telegram_chat_id уже есть.", en: "Notifications on order creation and cancellation; the telegram_chat_id field already exists." }
+decisions:
+  - title: { ru: "Статусы заказа вычисляются по датам", en: "Order statuses are derived from dates" }
+    choice: { ru: "В БД только planned и cancelled, остальное — CASE WHEN в каждом SELECT.", en: "The database stores only planned and cancelled; the rest is a CASE WHEN in every SELECT." }
+    why: { ru: "Статус всегда актуален в момент чтения, не нужна фоновая задача, которая может упасть.", en: "The status is always current at read time, with no background job that could fail." }
+    alternatives: { ru: "Хранить все статусы и обновлять их ночным заданием.", en: "Store every status and update them with a nightly job." }
+  - title: { ru: "Блокировка строки техники плюс EXCLUDE", en: "Equipment row lock plus EXCLUDE" }
+    choice: { ru: "SELECT … FOR UPDATE на технике в транзакции заказа и ограничение-исключение по диапазону дат.", en: "SELECT … FOR UPDATE on the equipment row inside the order transaction, and an exclusion constraint on the date range." }
+    why: { ru: "Блокировка даёт понятный 409 и сериализует бронь и обслуживание; EXCLUDE страхует любой путь записи.", en: "The lock yields a clear 409 and serialises booking and maintenance; EXCLUDE guards every write path." }
+    alternatives: { ru: "Только проверка в коде — пропускает гонки.", en: "A check in code only — lets races through." }
+  - title: { ru: "Права менеджера в JWT", en: "Manager permissions in the JWT" }
+    pros:
+      - { ru: "Нет запроса к БД на каждый запрос", en: "No database query per request" }
+      - { ru: "Сервис остаётся stateless", en: "The service stays stateless" }
+    cons:
+      - { ru: "Изменённые права действуют после следующего входа — до часа", en: "Changed permissions apply after the next sign-in — up to an hour" }
+  - title: { ru: "Инвайт-ссылка вместо временного пароля", en: "Invite link instead of a temporary password" }
+    choice: { ru: "32-байтный токен из crypto/rand на 7 дней; пароль менеджер задаёт сам.", en: "A 32-byte token from crypto/rand valid for 7 days; the manager sets the password." }
+    why: { ru: "Пароль не передаётся в мессенджерах, и администратор его не знает.", en: "The password is never sent over messengers and the administrator never knows it." }
+  - title: { ru: "Таблица-счётчик номеров", en: "A counter table for numbers" }
+    choice: { ru: "order_counters по годам, upsert внутри транзакции заказа.", en: "order_counters per year, upserted inside the order transaction." }
+    why: { ru: "MAX + 1 повторяет номер удалённого заказа, SEQUENCE оставляет пропуски — для договоров и счетов недопустимо и то и другое.", en: "MAX + 1 reuses a deleted order's number and a SEQUENCE leaves gaps — neither is acceptable for contracts and invoices." }
+
+diagrams:
+  - id: d-tr-components
+    kind: components
+    title: { ru: "Компоненты ТехРента", en: "TechRent components" }
+    nodes:
+      - { id: web, label: WEB, sub: react · vite, x: 0, y: 0, w: 2, d: 2, h: 1 }
+      - { id: nginx, label: NGINX, sub: spa · /api · /uploads, x: 6, y: 0, w: 2, d: 2, h: 0.5 }
+      - { id: api, label: GO API, sub: chi · jwt · rbac, x: 6, y: 6, w: 2, d: 2, h: 1 }
+      - { id: pg, label: POSTGRES, sub: exclude · check · fk, x: 12, y: 6, w: 2, d: 2, h: 1 }
+      - { id: files, label: UPLOADS, sub: { ru: "фото техники", en: "equipment photos" }, x: 6, y: 12, w: 2, d: 1, h: 0.5 }
+      - { id: tg, label: TELEGRAM, sub: { ru: "планируется", en: "planned" }, x: 0, y: 6, w: 2, d: 1, h: 0.5 }
+    links: [[web, nginx], [nginx, api], [api, pg], [api, files], [api, tg]]
+    notes:
+      web: { ru: "React + TypeScript. Zustand хранит сессию, Axios сам обновляет токен, Гант на чистом CSS.", en: "React + TypeScript. Zustand keeps the session, Axios refreshes the token, the Gantt chart is plain CSS." }
+      nginx: { ru: "Раздаёт сборку, отдаёт index.html на любой маршрут SPA, проксирует /api и /uploads.", en: "Serves the build, returns index.html for any SPA route, proxies /api and /uploads." }
+      api: { ru: "Go 1.24: handler → service → repository через интерфейсы. Миграции встроены в бинарник и запускаются при старте.", en: "Go 1.24: handler → service → repository through interfaces. Migrations are embedded in the binary and run on start." }
+      pg: { ru: "PostgreSQL 16: ограничение EXCLUDE от двойной брони, CHECK на суммы и даты, счётчик номеров.", en: "PostgreSQL 16: an EXCLUDE constraint against double booking, CHECKs on amounts and dates, a number counter." }
+      files: { ru: "Том Docker с фотографиями техники.", en: "A Docker volume with equipment photos." }
+      tg: { ru: "Уведомления о заказах — следующий шаг, поле для chat_id уже в схеме.", en: "Order notifications are the next step; the chat_id field is already in the schema." }
+  - id: d-booking-flow
+    kind: flow
+    title: { ru: "Бронирование техники", en: "Booking equipment" }
+    steps:
+      - { lane: { ru: "МЕНЕДЖЕР", en: "MANAGER" }, title: { ru: "Найти свободную технику", en: "Find free equipment" }, text: { ru: "Календарь показывает заказы и обслуживание; сломанной техники в нём нет.", en: "The calendar shows orders and maintenance; broken equipment is hidden." } }
+      - { lane: { ru: "МЕНЕДЖЕР", en: "MANAGER" }, title: { ru: "Заполнить заказ", en: "Fill in the order" }, text: { ru: "Ставки подставляются из техники, сумма считается сама, клиент и объект — из базы.", en: "Rates come from the equipment, the total is calculated, customer and site come from the database." } }
+      - { lane: { ru: "СИСТЕМА", en: "SYSTEM" }, title: { ru: "Проверить даты", en: "Check the dates" }, text: { ru: "Формат YYYY-MM-DD и конец не раньше начала, иначе 400.", en: "Format YYYY-MM-DD and end not before start, otherwise 400." } }
+      - { lane: { ru: "СИСТЕМА", en: "SYSTEM" }, title: { ru: "Проверить доступность", en: "Check availability" }, text: { ru: "Сломана — 422; обслуживание или занята на эти даты — 409.", en: "Broken — 422; maintenance or already booked for these dates — 409." } }
+      - { lane: { ru: "СИСТЕМА", en: "SYSTEM" }, title: { ru: "Сохранить", en: "Save" }, text: { ru: "Номер ТР-год-NNN, статус «Запланирован», запись в журнал.", en: "Number ТР-year-NNN, status Planned, an audit log entry." } }
+      - { lane: { ru: "МЕНЕДЖЕР", en: "MANAGER" }, title: { ru: "Подтвердить клиенту", en: "Confirm to the customer" }, text: { ru: "Сообщает номер заказа и даты; при отказе подбирает другие даты или технику.", en: "Passes on the order number and dates; on refusal picks other dates or equipment." } }
+  - id: d-booking-seq
+    kind: flow
+    title: { ru: "Запрос POST /orders через слои", en: "POST /orders through the layers" }
+    steps:
+      - { lane: MIDDLEWARE, title: { ru: "Проверить токен", en: "Check the token" }, text: { ru: "Подпись и срок JWT, id, роль и права кладутся в context. Нет токена — 401.", en: "JWT signature and expiry; id, role and permissions go into the context. No token — 401." } }
+      - { lane: SERVICE, title: { ru: "Разобрать даты", en: "Parse the dates" }, text: { ru: "Строго time.DateOnly до любых проверок.", en: "Strictly time.DateOnly before any checks." } }
+      - { lane: REPOSITORY, title: { ru: "Заблокировать технику", en: "Lock the equipment" }, text: { ru: "BEGIN; SELECT статус и обслуживание … FOR UPDATE — запросы на одну машину встают в очередь.", en: "BEGIN; SELECT status and maintenance … FOR UPDATE — requests for one machine queue up." } }
+      - { lane: SERVICE, title: { ru: "Проверить доступность", en: "Check availability" }, text: { ru: "Поломка, обслуживание, пересечение с неотменёнными заказами.", en: "Breakdown, maintenance, overlap with active orders." } }
+      - { lane: POSTGRES, title: { ru: "Номер и запись", en: "Number and insert" }, text: { ru: "Upsert в order_counters, INSERT … RETURNING с вычисленным статусом. EXCLUDE — последняя страховка.", en: "Upsert into order_counters, INSERT … RETURNING with the computed status. EXCLUDE is the last safeguard." } }
+      - { lane: HANDLER, title: { ru: "Ответ и журнал", en: "Response and audit" }, text: { ru: "COMMIT, 201 с заказом; событие CREATE в журнал, его сбой ответ не меняет.", en: "COMMIT, 201 with the order; a CREATE event in the log, whose failure does not change the response." } }
+  - id: d-tr-erd
+    kind: erd
+    title: { ru: "Модель данных", en: "Data model" }
+    entities:
+      - { id: users, name: USERS, fields: [[id, uuid, PK], [email, varchar, UK], [role, 'admin|manager'], [permissions, jsonb], [status, 'active|pending'], [invite_token, varchar, UK]] }
+      - { id: equipment, name: EQUIPMENT, fields: [[id, uuid, PK], [name, varchar], [category, varchar], [status, enum], [daily_rate, numeric], [hourly_rate, numeric], [maintenance_from, date], [maintenance_to, date]] }
+      - { id: photos, name: EQUIPMENT_PHOTOS, fields: [[id, uuid, PK], [equipment_id, uuid, FK], [url, varchar], [is_primary, bool]] }
+      - { id: clients, name: CLIENTS, fields: [[id, uuid, PK], [type, 'legal|individual'], [name, varchar], [inn, varchar], [phone, varchar]] }
+      - { id: objects, name: OBJECTS, fields: [[id, uuid, PK], [client_id, uuid, FK], [name, varchar], [address, text], [is_active, bool]] }
+      - { id: orders, name: ORDERS, fields: [[id, uuid, PK], [number, varchar, UK], [equipment_id, uuid, FK], [client_id, uuid, FK], [object_id, uuid, FK], [manager_id, uuid, FK], [status, 'planned|cancelled'], [start_date, date], [end_date, date], [total_amount, numeric], [paid_amount, numeric], [payment_status, enum]] }
+      - { id: payments, name: PAYMENTS, fields: [[id, uuid, PK], [order_id, uuid, FK], [amount, numeric], [method, enum], [created_by, uuid, FK]] }
+      - { id: audit, name: AUDIT_LOG, fields: [[id, bigserial, PK], [user_id, uuid, FK], [action, varchar], [entity_type, varchar], [old_data, jsonb], [new_data, jsonb]] }
+    relations: [[equipment, photos, '1 : N'], [equipment, orders, '1 : N'], [clients, objects, '1 : N'], [clients, orders, '1 : N'], [objects, orders, '1 : N'], [users, orders, '1 : N'], [orders, payments, '1 : N'], [users, payments, '1 : N'], [users, audit, '1 : N']]
+  - id: d-tr-booking-erd
+    kind: erd
+    title: { ru: "Таблицы бронирования", en: "Booking tables" }
+    entities:
+      - { id: equipment, name: EQUIPMENT, fields: [[id, uuid, PK], [status, enum], [maintenance_from, date], [maintenance_to, date]] }
+      - { id: orders, name: ORDERS, fields: [[id, uuid, PK], [number, varchar, UK], [equipment_id, uuid, FK], [status, 'planned|cancelled'], [start_date, date], [end_date, date], [daily_rate, numeric], [hourly_rate, numeric], [hours, int], [total_amount, numeric]] }
+      - { id: counters, name: ORDER_COUNTERS, fields: [[year, int, PK], [last_value, int]] }
+      - { id: audit, name: AUDIT_LOG, fields: [[id, bigserial, PK], [entity_id, varchar], [action, varchar], [old_data, jsonb], [new_data, jsonb]] }
+    relations: [[equipment, orders, '1 : N'], [orders, audit, '1 : N']]
+
+# Артефакты: документы — artifacts/<id>.ru.md и .en.md, остальное — файлы в artifacts/
+artifacts:
+  - id: case-booking
+    code: SRS-01
+    type: srs
+    view: doc
+    updated: '2026.10'
+    title: { ru: "Кейс: бронирование техники", en: "Case: booking equipment" }
+    summary: { ru: "Сквозной кейс от потребности до задачи на разработку: User Stories, Use Case с исключениями, процесс, API, модель данных, тикет и чек-лист тестирования.", en: "An end-to-end case from the need to the development ticket: user stories, use cases with exceptions, the process, API, data model, the ticket and a test checklist." }
+  - id: review-booking
+    code: NOTE-01
+    type: note
+    view: doc
+    updated: '2026.10'
+    title: { ru: "Замечания аналитика: 11 расхождений", en: "Analyst findings: 11 mismatches" }
+    summary: { ru: "Что нашлось при приёмке по коду и в отзывах пилотного заказчика: сценарий, риск, предложение и что исправлено.", en: "What the code review and pilot feedback surfaced: scenario, risk, proposal and what was fixed." }
+  - id: dd-booking
+    code: DD-01
+    type: erd
+    view: doc
+    updated: '2026.10'
+    title: { ru: "Словарь данных: бронирование", en: "Data dictionary: booking" }
+    summary: { ru: "Поля, ограничения и бизнес-смысл таблиц заказа, техники, клиентов, пользователей и журнала; вычисляемые поля API и индексы.", en: "Fields, constraints and business meaning of the order, equipment, customer, user and audit tables; computed API fields and indexes." }
+  - id: openapi-booking
+    code: API-01
+    type: openapi
+    view: code
+    file: booking-openapi.yaml
+    updated: '2026.10'
+    title: { ru: "OpenAPI 3.0: бронирование", en: "OpenAPI 3.0: booking" }
+    summary: { ru: "Календарь и заказы: схемы, примеры и все коды ответов. Открывается в editor.swagger.io.", en: "Calendar and orders: schemas, examples and every response code. Opens in editor.swagger.io." }
+  - id: bpmn-booking
+    code: BPMN-01
+    type: bpmn
+    view: code
+    file: booking.bpmn
+    updated: '2026.10'
+    title: { ru: "BPMN 2.0: бронирование", en: "BPMN 2.0: booking" }
+    summary: { ru: "Пул компании с дорожками «Менеджер» и «Система», клиент — отдельный пул, ошибки — граничными событиями. Открывается в demo.bpmn.io.", en: "The company pool with Manager and System lanes, the customer as a separate pool, errors as boundary events. Opens in demo.bpmn.io." }
+  - id: sql-orders
+    code: SQL-01
+    type: db
+    view: code
+    file: orders.sql
+    updated: '2026.10'
+    title: { ru: "Миграции заказов", en: "Order migrations" }
+    summary: { ru: "Таблица заказов, переход на вычисляемые статусы, ограничение EXCLUDE от двойной брони и счётчик номеров.", en: "The orders table, the move to computed statuses, an EXCLUDE constraint against double booking and the number counter." }
+  - id: erd-techrent
+    code: ERD-01
+    type: erd
+    view: erd
+    diagram: d-tr-erd
+    updated: '2026.10'
+    title: { ru: "Модель данных", en: "Data model" }
+    summary: { ru: "Восемь таблиц: техника, клиенты, объекты, заказы, платежи, пользователи и журнал.", en: "Eight tables: equipment, customers, sites, orders, payments, users and the audit log." }
+  - id: erd-booking
+    code: ERD-02
+    type: erd
+    view: erd
+    diagram: d-tr-booking-erd
+    updated: '2026.10'
+    title: { ru: "Таблицы бронирования", en: "Booking tables" }
+    summary: { ru: "Что участвует в брони: техника, заказ, счётчик номеров и журнал.", en: "What booking touches: equipment, the order, the number counter and the audit log." }
+  - id: adr-techrent
+    code: ADR-01
+    type: other
+    view: doc
+    updated: '2026.10'
+    title: { ru: "Журнал архитектурных решений", en: "Architecture decision log" }
+    summary: { ru: "Решения по шагам разработки: от стека и миграций до блокировок, счётчика номеров и пагинации.", en: "Decisions by development step: from the stack and migrations to locks, the number counter and pagination." }
+  - id: c4-techrent
+    code: C4-01
+    type: arch
+    view: components
+    diagram: d-tr-components
+    updated: '2026.10'
+    title: { ru: "Схема компонентов", en: "Component diagram" }
+    summary: { ru: "React-приложение, Nginx, Go API, PostgreSQL, файлы и будущий Telegram.", en: "The React app, Nginx, the Go API, PostgreSQL, file storage and the planned Telegram integration." }
+  - id: sa-portfolio
+    code: REF-01
+    type: note
+    view: link
+    href: https://github.com/Sumchenko/SA-Portfolio/tree/main/sa-docs-Techrent
+    title: { ru: "Аналитика ТехРента на GitHub", en: "TechRent analysis on GitHub" }
+    summary: { ru: "Исходники кейса в репозитории SA-Portfolio: контекстная, Use Case, Sequence и ER-диаграммы в Mermaid (GitHub их отрисовывает).", en: "Case sources in the SA-Portfolio repository: context, use case, sequence and ER diagrams in Mermaid (rendered by GitHub)." }

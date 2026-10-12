@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  id="Definitions_OrderBooking"
+                  targetNamespace="http://techrent.local/bpmn/order-booking"
+                  exporter="hand-written"
+                  exporterVersion="1.0">
+
+  <bpmn:error id="Error_Unavailable" name="Техника недоступна" errorCode="EQUIPMENT_UNAVAILABLE" />
+  <bpmn:error id="Error_Save" name="Ошибка сохранения" errorCode="SAVE_FAILED" />
+  <bpmn:message id="Message_Request" name="Заявка на аренду" />
+
+  <bpmn:collaboration id="Collaboration_OrderBooking">
+    <bpmn:participant id="Participant_Client" name="Клиент-арендатор" />
+    <bpmn:participant id="Participant_Company" name="Компания-арендодатель" processRef="Process_OrderBooking" />
+    <bpmn:messageFlow id="MessageFlow_Request" name="Заявка: техника и даты" sourceRef="Participant_Client" targetRef="StartEvent_Request" />
+    <bpmn:messageFlow id="MessageFlow_Decline" name="Отказ" sourceRef="EndEvent_Declined" targetRef="Participant_Client" />
+    <bpmn:messageFlow id="MessageFlow_Confirm" name="Номер заказа и даты" sourceRef="Task_Confirm" targetRef="Participant_Client" />
+  </bpmn:collaboration>
+
+  <bpmn:process id="Process_OrderBooking" name="Бронирование техники" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_Manager" name="Менеджер">
+        <bpmn:flowNodeRef>StartEvent_Request</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CheckCalendar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Free</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Declined</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_FillForm</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Fix</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Confirm</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Booked</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_System" name="Система ТехРент">
+        <bpmn:flowNodeRef>Task_ValidateDates</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_DatesOk</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CheckEquipment</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Boundary_Unavailable</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Save</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Boundary_SaveError</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_SaveError</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Audit</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- Менеджер -->
+    <bpmn:startEvent id="StartEvent_Request" name="Получена заявка клиента">
+      <bpmn:outgoing>Flow_01</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_Request" messageRef="Message_Request" />
+    </bpmn:startEvent>
+
+    <bpmn:userTask id="Task_CheckCalendar" name="Проверить занятость в календаре">
+      <bpmn:documentation>Календарь занятости: техника × дни месяца. Сломанная техника не показывается, отменённые заказы не занимают даты.</bpmn:documentation>
+      <bpmn:incoming>Flow_01</bpmn:incoming>
+      <bpmn:outgoing>Flow_02</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_Free" name="Есть свободная техника?">
+      <bpmn:incoming>Flow_02</bpmn:incoming>
+      <bpmn:outgoing>Flow_03</bpmn:outgoing>
+      <bpmn:outgoing>Flow_04</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:endEvent id="EndEvent_Declined" name="Клиенту отказано">
+      <bpmn:incoming>Flow_03</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MED_Declined" />
+    </bpmn:endEvent>
+
+    <bpmn:userTask id="Task_FillForm" name="Заполнить форму заказа">
+      <bpmn:documentation>Клиент, объект, техника, даты, водитель. Ставки подставляются из карточки техники, сумма считается автоматически: daily_rate × дни или hourly_rate × часы для одного дня. Сумму можно изменить вручную.</bpmn:documentation>
+      <bpmn:incoming>Flow_04</bpmn:incoming>
+      <bpmn:outgoing>Flow_05</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_Fix" name="Исправить заказ: даты или техника">
+      <bpmn:documentation>Менеджер видит причину отказа (400, 409 или 422) и согласует с клиентом другие даты или другую технику.</bpmn:documentation>
+      <bpmn:incoming>Flow_07</bpmn:incoming>
+      <bpmn:incoming>Flow_09</bpmn:incoming>
+      <bpmn:outgoing>Flow_10</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_Confirm" name="Сообщить клиенту номер заказа">
+      <bpmn:incoming>Flow_14</bpmn:incoming>
+      <bpmn:outgoing>Flow_15</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:endEvent id="EndEvent_Booked" name="Техника забронирована">
+      <bpmn:incoming>Flow_15</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- Система -->
+    <bpmn:serviceTask id="Task_ValidateDates" name="Проверить даты">
+      <bpmn:documentation>Даты заполнены (ErrMissingDates) и end_date не раньше start_date (ErrInvalidDateRange). Нарушение → HTTP 400.</bpmn:documentation>
+      <bpmn:incoming>Flow_05</bpmn:incoming>
+      <bpmn:incoming>Flow_10</bpmn:incoming>
+      <bpmn:outgoing>Flow_06</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:exclusiveGateway id="Gateway_DatesOk" name="Даты корректны?">
+      <bpmn:incoming>Flow_06</bpmn:incoming>
+      <bpmn:outgoing>Flow_07</bpmn:outgoing>
+      <bpmn:outgoing>Flow_08</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:serviceTask id="Task_CheckEquipment" name="Проверить доступность техники">
+      <bpmn:documentation>По порядку: статус broken → 422 ErrEquipmentBroken; пересечение с периодом обслуживания → 409 ErrEquipmentMaintenance; пересечение с неотменённым заказом → 409 ErrEquipmentConflict. Если техника не указана, проверка пропускается.</bpmn:documentation>
+      <bpmn:incoming>Flow_08</bpmn:incoming>
+      <bpmn:outgoing>Flow_11</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:boundaryEvent id="Boundary_Unavailable" name="Техника недоступна (409 / 422)" attachedToRef="Task_CheckEquipment">
+      <bpmn:outgoing>Flow_09</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="EED_Unavailable" errorRef="Error_Unavailable" />
+    </bpmn:boundaryEvent>
+
+    <bpmn:serviceTask id="Task_Save" name="Присвоить номер и сохранить заказ">
+      <bpmn:documentation>Номер ТР-год-NNN. Заказ сохраняется со status = planned, payment_status = unpaid.</bpmn:documentation>
+      <bpmn:incoming>Flow_11</bpmn:incoming>
+      <bpmn:outgoing>Flow_13</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:boundaryEvent id="Boundary_SaveError" name="Сбой БД (500)" attachedToRef="Task_Save">
+      <bpmn:outgoing>Flow_12</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="EED_SaveError" errorRef="Error_Save" />
+    </bpmn:boundaryEvent>
+
+    <bpmn:endEvent id="EndEvent_SaveError" name="Заказ не создан">
+      <bpmn:incoming>Flow_12</bpmn:incoming>
+      <bpmn:errorEventDefinition id="EED_SaveErrorEnd" errorRef="Error_Save" />
+    </bpmn:endEvent>
+
+    <bpmn:serviceTask id="Task_Audit" name="Записать событие в журнал">
+      <bpmn:documentation>audit_log: CREATE, пользователь, IP, данные заказа. Ошибка записи не отменяет заказ.</bpmn:documentation>
+      <bpmn:incoming>Flow_13</bpmn:incoming>
+      <bpmn:outgoing>Flow_14</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <!-- Потоки -->
+    <bpmn:sequenceFlow id="Flow_01" sourceRef="StartEvent_Request" targetRef="Task_CheckCalendar" />
+    <bpmn:sequenceFlow id="Flow_02" sourceRef="Task_CheckCalendar" targetRef="Gateway_Free" />
+    <bpmn:sequenceFlow id="Flow_03" name="Нет" sourceRef="Gateway_Free" targetRef="EndEvent_Declined" />
+    <bpmn:sequenceFlow id="Flow_04" name="Да" sourceRef="Gateway_Free" targetRef="Task_FillForm" />
+    <bpmn:sequenceFlow id="Flow_05" sourceRef="Task_FillForm" targetRef="Task_ValidateDates" />
+    <bpmn:sequenceFlow id="Flow_06" sourceRef="Task_ValidateDates" targetRef="Gateway_DatesOk" />
+    <bpmn:sequenceFlow id="Flow_07" name="Нет (400)" sourceRef="Gateway_DatesOk" targetRef="Task_Fix" />
+    <bpmn:sequenceFlow id="Flow_08" name="Да" sourceRef="Gateway_DatesOk" targetRef="Task_CheckEquipment" />
+    <bpmn:sequenceFlow id="Flow_09" sourceRef="Boundary_Unavailable" targetRef="Task_Fix" />
+    <bpmn:sequenceFlow id="Flow_10" name="Отправить повторно" sourceRef="Task_Fix" targetRef="Task_ValidateDates" />
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="Task_CheckEquipment" targetRef="Task_Save" />
+    <bpmn:sequenceFlow id="Flow_12" sourceRef="Boundary_SaveError" targetRef="EndEvent_SaveError" />
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_Save" targetRef="Task_Audit" />
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="Task_Audit" targetRef="Task_Confirm" />
+    <bpmn:sequenceFlow id="Flow_15" sourceRef="Task_Confirm" targetRef="EndEvent_Booked" />
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_OrderBooking">
+
+      <!-- Пулы и дорожки -->
+      <bpmndi:BPMNShape id="Participant_Client_di" bpmnElement="Participant_Client" isHorizontal="true">
+        <dc:Bounds x="160" y="40" width="1560" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_Company_di" bpmnElement="Participant_Company" isHorizontal="true">
+        <dc:Bounds x="160" y="130" width="1560" height="500" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Manager_di" bpmnElement="Lane_Manager" isHorizontal="true">
+        <dc:Bounds x="190" y="130" width="1530" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_System_di" bpmnElement="Lane_System" isHorizontal="true">
+        <dc:Bounds x="190" y="380" width="1530" height="250" />
+      </bpmndi:BPMNShape>
+
+      <!-- Менеджер -->
+      <bpmndi:BPMNShape id="StartEvent_Request_di" bpmnElement="StartEvent_Request">
+        <dc:Bounds x="232" y="237" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="208" y="280" width="84" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckCalendar_di" bpmnElement="Task_CheckCalendar">
+        <dc:Bounds x="310" y="215" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Free_di" bpmnElement="Gateway_Free" isMarkerVisible="true">
+        <dc:Bounds x="475" y="230" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="458" y="287" width="84" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Declined_di" bpmnElement="EndEvent_Declined">
+        <dc:Bounds x="482" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="524" y="156" width="70" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_FillForm_di" bpmnElement="Task_FillForm">
+        <dc:Bounds x="570" y="215" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Fix_di" bpmnElement="Task_Fix">
+        <dc:Bounds x="960" y="215" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Confirm_di" bpmnElement="Task_Confirm">
+        <dc:Bounds x="1460" y="215" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Booked_di" bpmnElement="EndEvent_Booked">
+        <dc:Bounds x="1632" y="237" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1610" y="280" width="80" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Система -->
+      <bpmndi:BPMNShape id="Task_ValidateDates_di" bpmnElement="Task_ValidateDates">
+        <dc:Bounds x="720" y="465" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_DatesOk_di" bpmnElement="Gateway_DatesOk" isMarkerVisible="true">
+        <dc:Bounds x="855" y="480" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="838" y="537" width="84" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckEquipment_di" bpmnElement="Task_CheckEquipment">
+        <dc:Bounds x="960" y="465" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Boundary_Unavailable_di" bpmnElement="Boundary_Unavailable">
+        <dc:Bounds x="1002" y="447" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1044" y="410" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Save_di" bpmnElement="Task_Save">
+        <dc:Bounds x="1140" y="465" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Boundary_SaveError_di" bpmnElement="Boundary_SaveError">
+        <dc:Bounds x="1182" y="527" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1110" y="560" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_SaveError_di" bpmnElement="EndEvent_SaveError">
+        <dc:Bounds x="1182" y="582" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1226" y="593" width="80" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Audit_di" bpmnElement="Task_Audit">
+        <dc:Bounds x="1310" y="465" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Потоки управления -->
+      <bpmndi:BPMNEdge id="Flow_01_di" bpmnElement="Flow_01">
+        <di:waypoint x="268" y="255" />
+        <di:waypoint x="310" y="255" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02_di" bpmnElement="Flow_02">
+        <di:waypoint x="430" y="255" />
+        <di:waypoint x="475" y="255" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03_di" bpmnElement="Flow_03">
+        <di:waypoint x="500" y="230" />
+        <di:waypoint x="500" y="188" />
+        <bpmndi:BPMNLabel><dc:Bounds x="506" y="203" width="22" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04_di" bpmnElement="Flow_04">
+        <di:waypoint x="525" y="255" />
+        <di:waypoint x="570" y="255" />
+        <bpmndi:BPMNLabel><dc:Bounds x="538" y="237" width="15" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_05_di" bpmnElement="Flow_05">
+        <di:waypoint x="630" y="295" />
+        <di:waypoint x="630" y="505" />
+        <di:waypoint x="720" y="505" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06_di" bpmnElement="Flow_06">
+        <di:waypoint x="840" y="505" />
+        <di:waypoint x="855" y="505" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07_di" bpmnElement="Flow_07">
+        <di:waypoint x="880" y="480" />
+        <di:waypoint x="880" y="255" />
+        <di:waypoint x="960" y="255" />
+        <bpmndi:BPMNLabel><dc:Bounds x="886" y="400" width="52" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_08_di" bpmnElement="Flow_08">
+        <di:waypoint x="905" y="505" />
+        <di:waypoint x="960" y="505" />
+        <bpmndi:BPMNLabel><dc:Bounds x="924" y="487" width="15" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09_di" bpmnElement="Flow_09">
+        <di:waypoint x="1020" y="447" />
+        <di:waypoint x="1020" y="295" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10_di" bpmnElement="Flow_10">
+        <di:waypoint x="1020" y="215" />
+        <di:waypoint x="1020" y="175" />
+        <di:waypoint x="780" y="175" />
+        <di:waypoint x="780" y="465" />
+        <bpmndi:BPMNLabel><dc:Bounds x="850" y="157" width="104" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11_di" bpmnElement="Flow_11">
+        <di:waypoint x="1080" y="505" />
+        <di:waypoint x="1140" y="505" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12_di" bpmnElement="Flow_12">
+        <di:waypoint x="1200" y="563" />
+        <di:waypoint x="1200" y="582" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13">
+        <di:waypoint x="1260" y="505" />
+        <di:waypoint x="1310" y="505" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14_di" bpmnElement="Flow_14">
+        <di:waypoint x="1430" y="505" />
+        <di:waypoint x="1520" y="505" />
+        <di:waypoint x="1520" y="295" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15_di" bpmnElement="Flow_15">
+        <di:waypoint x="1580" y="255" />
+        <di:waypoint x="1632" y="255" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Потоки сообщений -->
+      <bpmndi:BPMNEdge id="MessageFlow_Request_di" bpmnElement="MessageFlow_Request">
+        <di:waypoint x="250" y="100" />
+        <di:waypoint x="250" y="237" />
+        <bpmndi:BPMNLabel><dc:Bounds x="256" y="160" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_Decline_di" bpmnElement="MessageFlow_Decline">
+        <di:waypoint x="500" y="152" />
+        <di:waypoint x="500" y="100" />
+        <bpmndi:BPMNLabel><dc:Bounds x="506" y="112" width="34" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_Confirm_di" bpmnElement="MessageFlow_Confirm">
+        <di:waypoint x="1520" y="215" />
+        <di:waypoint x="1520" y="100" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1526" y="150" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

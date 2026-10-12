@@ -54,6 +54,7 @@ technologies:
   - { id: supabase, label: Supabase, group: { ru: "Данные", en: "Data" } }
   - { id: github-actions, label: GitHub Actions, group: { ru: "Инфраструктура", en: "Infrastructure" } }
   - { id: caddy, label: Caddy, group: { ru: "Инфраструктура", en: "Infrastructure" } }
+  - { id: nginx, label: Nginx, group: { ru: "Инфраструктура", en: "Infrastructure" } }
 
 artifactTypes:
   - { id: srs, code: SRS, label: { ru: "ТЗ и требования", en: "Specs and requirements" } }

@@ -1,0 +1,583 @@
+openapi: 3.0.3
+info:
+  title: ТехРент - API бронирования техники
+  version: 1.0.0
+  description: |
+    Эндпоинты фичи «Бронирование техники»: просмотр занятости, создание,
+    изменение и отмена заказа.
+
+    Все эндпоинты требуют JWT access-токен в заголовке `Authorization: Bearer <token>`.
+    Токен выдаётся `POST /api/v1/auth/login` и действует 1 час.
+
+    Формат ошибок: `{"error": "<текст>"}`.
+
+    Даты в запросах - строка `YYYY-MM-DD`. В ответах даты заказа приходят
+    как дата-время (`2026-10-10T00:00:00Z`).
+
+    Пометка ⚠ - расхождение требования и реализации, см. «Замечания аналитика» в README кейса.
+servers:
+  - url: http://localhost:8081/api/v1
+    description: Локальный запуск (Docker Compose)
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Календарь
+    description: Занятость техники
+  - name: Заказы
+    description: Бронирование техники
+
+paths:
+  /calendar:
+    get:
+      tags: [Календарь]
+      summary: Занятость техники за период
+      description: |
+        Возвращает всю технику, кроме техники со статусом `broken`, с неотменёнными
+        заказами, которые пересекаются с периодом [from, to], и с периодом обслуживания.
+        Отменённые заказы не возвращаются.
+      operationId: getCalendar
+      parameters:
+        - name: from
+          in: query
+          required: true
+          description: Начало периода (включительно)
+          schema: { type: string, format: date, example: "2026-10-01" }
+        - name: to
+          in: query
+          required: true
+          description: Конец периода (включительно)
+          schema: { type: string, format: date, example: "2026-10-31" }
+      responses:
+        "200":
+          description: Техника с заказами за период
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CalendarResponse" }
+              example:
+                from: "2026-10-01"
+                to: "2026-10-31"
+                equipment:
+                  - equipment_id: "00000000-0000-0000-0002-000000000001"
+                    equipment_name: "Экскаватор-погрузчик JCB 3CX"
+                    category: "Экскаваторы"
+                    maintenance_from: null
+                    maintenance_to: null
+                    orders:
+                      - order_id: "6f1c2b1e-3a4d-4c55-9a1e-2b7d8f9e0a11"
+                        order_number: "ТР-2026-015"
+                        client_name: "ООО «СтройМонтаж»"
+                        status: "planned"
+                        start_date: "2026-10-10T00:00:00Z"
+                        end_date: "2026-10-12T00:00:00Z"
+                  - equipment_id: "00000000-0000-0000-0002-000000000002"
+                    equipment_name: "Автокран КС-55713"
+                    category: "Краны"
+                    maintenance_from: "2026-10-14"
+                    maintenance_to: "2026-10-16"
+                    orders: []
+        "400":
+          description: Не передан `from` или `to`, либо дата не в формате YYYY-MM-DD
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+              examples:
+                missing:
+                  value: { error: "from and to query params are required" }
+                badFrom:
+                  value: { error: "invalid from date (YYYY-MM-DD)" }
+                badTo:
+                  value: { error: "invalid to date (YYYY-MM-DD)" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500":
+          description: Ошибка при чтении из БД
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+              example: { error: "failed to load calendar" }
+
+  /orders:
+    post:
+      tags: [Заказы]
+      summary: Создать заказ (забронировать технику)
+      description: |
+        Доступно всем авторизованным пользователям.
+
+        Если указан `equipment_id`, проверки выполняются по порядку:
+        1. статус техники `broken` → 422;
+        2. пересечение дат с периодом обслуживания техники → 409;
+        3. пересечение с другим неотменённым заказом той же техники → 409 (даты включительно).
+
+        Номер заказа (`ТР-<год>-<NNN>`) генерирует сервер. `total_amount` сохраняется
+        в том виде, в каком пришёл: его рассчитывает форма заказа.
+
+        Проверка доступности и запись выполняются в одной транзакции с блокировкой
+        строки техники; в БД дополнительно стоит ограничение EXCLUDE (З-1 исправлено).
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/OrderInput" }
+            examples:
+              multiDay:
+                summary: Многодневная аренда (посуточный расчёт)
+                value:
+                  client_id: "00000000-0000-0000-0003-000000000001"
+                  object_id: "00000000-0000-0000-0004-000000000001"
+                  equipment_id: "00000000-0000-0000-0002-000000000001"
+                  driver_name: "Петров Иван"
+                  driver_phone: "+7 900 123-45-67"
+                  start_date: "2026-10-10"
+                  end_date: "2026-10-12"
+                  daily_rate: 15000
+                  hourly_rate: 2500
+                  hours: null
+                  total_amount: 45000
+                  notes: "Работы по котловану"
+              singleDay:
+                summary: Однодневная аренда (почасовой расчёт)
+                value:
+                  client_id: "00000000-0000-0000-0003-000000000001"
+                  object_id: null
+                  equipment_id: "00000000-0000-0000-0002-000000000001"
+                  driver_name: null
+                  driver_phone: null
+                  start_date: "2026-10-20"
+                  end_date: "2026-10-20"
+                  daily_rate: 15000
+                  hourly_rate: 2500
+                  hours: 8
+                  total_amount: 20000
+                  notes: null
+      responses:
+        "201":
+          description: Заказ создан
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Order" }
+              examples:
+                order: { $ref: "#/components/examples/OrderExample" }
+        "400":
+          description: |
+            Невалидный JSON, не заполнены даты или `end_date` раньше `start_date`.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+              examples:
+                invalidBody:
+                  value: { error: "invalid request body" }
+                missingDates:
+                  summary: ErrMissingDates
+                  value: { error: "start_date and end_date are required" }
+                invalidRange:
+                  summary: ErrInvalidDateRange
+                  value: { error: "end_date must be >= start_date" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "409": { $ref: "#/components/responses/EquipmentUnavailable" }
+        "422": { $ref: "#/components/responses/EquipmentBroken" }
+        "500":
+          description: |
+            Сбой БД. Также сейчас возвращается, когда техника с таким `equipment_id`
+            не найдена, UUID некорректен или
+            `total_amount` отрицательный (нарушение CHECK) - см. З-5, З-8.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+              example: { error: "failed to create order" }
+
+  /orders/{id}:
+    parameters:
+      - $ref: "#/components/parameters/OrderId"
+    get:
+      tags: [Заказы]
+      summary: Карточка заказа
+      operationId: getOrder
+      responses:
+        "200":
+          description: Заказ
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Order" }
+              examples:
+                order: { $ref: "#/components/examples/OrderExample" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/OrderNotFound" }
+        "500":
+          description: Сбой БД или некорректный UUID в пути
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+              example: { error: "failed to get order" }
+    put:
+      tags: [Заказы]
+      summary: Изменить заказ
+      description: |
+        Полная замена редактируемых полей: передаётся весь объект `OrderInput`.
+        Проверки техники - те же, что при создании, но текущий заказ исключается
+        из поиска конфликтов.
+
+        Доступно всем авторизованным. ⚠ Право `orders.edit` сервером не проверяется (З-4).
+        ⚠ Проверки выполняются, даже если техника и даты не менялись (З-7).
+        ⚠ `payment_status` не пересчитывается при изменении `total_amount` (З-6).
+      operationId: updateOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/OrderInput" }
+      responses:
+        "200":
+          description: Заказ изменён
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Order" }
+        "400":
+          description: Невалидный JSON, не заполнены даты или `end_date` раньше `start_date`
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+              examples:
+                invalidBody:
+                  value: { error: "invalid request body" }
+                missingDates:
+                  value: { error: "start_date and end_date are required" }
+                invalidRange:
+                  value: { error: "end_date must be >= start_date" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/OrderNotFound" }
+        "409": { $ref: "#/components/responses/EquipmentUnavailable" }
+        "422": { $ref: "#/components/responses/EquipmentBroken" }
+        "500":
+          description: Сбой БД, техника не найдена или некорректный UUID
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+              example: { error: "failed to update order" }
+
+  /orders/{id}/status:
+    parameters:
+      - $ref: "#/components/parameters/OrderId"
+    patch:
+      tags: [Заказы]
+      summary: Отменить заказ
+      description: |
+        Единственное допустимое значение - `cancelled`. Остальные статусы
+        (`planned`, `active`, `completed`) система вычисляет по датам.
+        После отмены даты техники освобождаются.
+
+        Требование: доступно `admin` и менеджеру с правом `orders.cancel`.
+        ⚠ Сейчас сервер право не проверяет, и отмена доступна всем авторизованным (З-4).
+      operationId: cancelOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/OrderStatusInput" }
+            example: { status: "cancelled" }
+      responses:
+        "200":
+          description: Заказ отменён
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Order" }
+        "400":
+          description: Невалидный JSON или статус, отличный от `cancelled`
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+              examples:
+                invalidBody:
+                  value: { error: "invalid request body" }
+                invalidStatus:
+                  summary: ErrInvalidOrderStatus
+                  value: { error: "invalid status value" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403":
+          description: |
+            ⚠ Требование, в текущей реализации не возвращается (З-4):
+            у менеджера нет права `orders.cancel`.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+              example: { error: "forbidden" }
+        "404": { $ref: "#/components/responses/OrderNotFound" }
+        "500":
+          description: Сбой БД
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+              example: { error: "failed to update status" }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Access-токен (HS256, 1 час). В claims: `user_id`, `email`, `role`
+        (`admin` | `manager`), `perms` - права менеджера по модулям.
+
+  parameters:
+    OrderId:
+      name: id
+      in: path
+      required: true
+      description: UUID заказа
+      schema: { type: string, format: uuid }
+
+  responses:
+    Unauthorized:
+      description: |
+        Нет заголовка `Authorization: Bearer`, токен просрочен или подпись неверна.
+        Frontend в этом случае обновляет токен через `/auth/refresh` и повторяет запрос.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          example: { error: "unauthorized" }
+    OrderNotFound:
+      description: Заказ с таким id не найден (ErrOrderNotFound)
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          example: { error: "order not found" }
+    EquipmentUnavailable:
+      description: |
+        Техника недоступна на выбранные даты:
+        - `ErrEquipmentMaintenance` - даты пересекаются с периодом обслуживания;
+        - `ErrEquipmentConflict` - техника занята другим неотменённым заказом.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          examples:
+            maintenance:
+              summary: ErrEquipmentMaintenance
+              value: { error: "equipment is in maintenance for this period" }
+            booked:
+              summary: ErrEquipmentConflict
+              value: { error: "equipment already booked for this period" }
+    EquipmentBroken:
+      description: Техника в статусе `broken` (ErrEquipmentBroken)
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          example: { error: "broken equipment cannot be added to an order" }
+
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          description: Текст ошибки
+
+    OrderInput:
+      type: object
+      required: [start_date, end_date]
+      properties:
+        client_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Клиент-арендатор. Не обязателен
+        object_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Объект (стройплощадка) клиента. Не обязателен, принадлежность клиенту не проверяется
+        equipment_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Бронируемая техника. Если не указана, проверки доступности не выполняются
+        manager_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Ответственный менеджер. Форма его не передаёт (З-9)
+        driver_name:
+          type: string
+          nullable: true
+          maxLength: 255
+          description: ФИО водителя (машиниста)
+        driver_phone:
+          type: string
+          nullable: true
+          maxLength: 50
+          description: Телефон водителя
+        start_date:
+          type: string
+          format: date
+          description: Первый день аренды (включительно), YYYY-MM-DD
+          example: "2026-10-10"
+        end_date:
+          type: string
+          format: date
+          description: Последний день аренды (включительно), не раньше start_date
+          example: "2026-10-12"
+        daily_rate:
+          type: number
+          format: double
+          minimum: 0
+          default: 0
+          description: Ставка за день на момент оформления, ₽
+        hourly_rate:
+          type: number
+          format: double
+          nullable: true
+          minimum: 0
+          description: Ставка за час, ₽. Используется при однодневной аренде
+        hours:
+          type: integer
+          nullable: true
+          minimum: 1
+          description: Количество часов при однодневной аренде
+        total_amount:
+          type: number
+          format: double
+          minimum: 0
+          default: 0
+          description: |
+            Итоговая сумма, ₽. Рассчитывает форма: daily_rate × дни, или
+            hourly_rate × hours для одного дня. Менеджер может изменить вручную.
+        notes:
+          type: string
+          nullable: true
+          description: Примечание (многострочный текст)
+
+    OrderStatusInput:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [cancelled]
+
+    Order:
+      type: object
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        number:
+          type: string
+          readOnly: true
+          description: Номер заказа ТР-<год>-<NNN>, генерируется сервером
+          example: "ТР-2026-015"
+        client_id: { type: string, format: uuid, nullable: true }
+        client_name:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Вычисляемое - clients.name
+        object_id: { type: string, format: uuid, nullable: true }
+        object_name:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Вычисляемое - objects.name
+        equipment_id: { type: string, format: uuid, nullable: true }
+        equipment_name:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Вычисляемое - equipment.name
+        manager_id: { type: string, format: uuid, nullable: true }
+        manager_name:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Вычисляемое - users.full_name
+        driver_name: { type: string, nullable: true }
+        driver_phone: { type: string, nullable: true }
+        status:
+          type: string
+          readOnly: true
+          enum: [planned, active, completed, cancelled]
+          description: |
+            Вычисляемый эффективный статус:
+            cancelled - заказ отменён;
+            planned - сегодня раньше start_date;
+            completed - сегодня позже end_date;
+            active - сегодня между датами включительно.
+        start_date: { type: string, format: date-time, example: "2026-10-10T00:00:00Z" }
+        end_date: { type: string, format: date-time, example: "2026-10-12T00:00:00Z" }
+        daily_rate: { type: number, format: double }
+        hourly_rate: { type: number, format: double, nullable: true }
+        hours: { type: integer, nullable: true }
+        total_amount: { type: number, format: double }
+        paid_amount:
+          type: number
+          format: double
+          readOnly: true
+          description: Сумма платежей по заказу, пересчитывается при операциях с платежами
+        payment_status:
+          type: string
+          readOnly: true
+          enum: [unpaid, partial, paid]
+        notes: { type: string, nullable: true }
+        created_at: { type: string, format: date-time, readOnly: true }
+        updated_at: { type: string, format: date-time, readOnly: true }
+
+    CalendarOrderItem:
+      type: object
+      properties:
+        order_id: { type: string, format: uuid }
+        order_number: { type: string, example: "ТР-2026-015" }
+        client_name: { type: string, nullable: true }
+        status:
+          type: string
+          enum: [planned, active, completed]
+          description: Вычисляемый статус. Отменённые заказы в календарь не попадают
+        start_date: { type: string, format: date-time }
+        end_date: { type: string, format: date-time }
+
+    CalendarEquipmentRow:
+      type: object
+      properties:
+        equipment_id: { type: string, format: uuid }
+        equipment_name: { type: string }
+        category: { type: string, description: "Пустая строка, если категория не указана" }
+        maintenance_from: { type: string, format: date, nullable: true }
+        maintenance_to: { type: string, format: date, nullable: true }
+        orders:
+          type: array
+          items: { $ref: "#/components/schemas/CalendarOrderItem" }
+
+    CalendarResponse:
+      type: object
+      properties:
+        from: { type: string, format: date }
+        to: { type: string, format: date }
+        equipment:
+          type: array
+          items: { $ref: "#/components/schemas/CalendarEquipmentRow" }
+
+  examples:
+    OrderExample:
+      value:
+        id: "6f1c2b1e-3a4d-4c55-9a1e-2b7d8f9e0a11"
+        number: "ТР-2026-015"
+        client_id: "00000000-0000-0000-0003-000000000001"
+        client_name: "ООО «СтройМонтаж»"
+        object_id: "00000000-0000-0000-0004-000000000001"
+        object_name: "ЖК «Северный», корпус 2"
+        equipment_id: "00000000-0000-0000-0002-000000000001"
+        equipment_name: "Экскаватор-погрузчик JCB 3CX"
+        manager_id: null
+        manager_name: null
+        driver_name: "Петров Иван"
+        driver_phone: "+7 900 123-45-67"
+        status: "planned"
+        start_date: "2026-10-10T00:00:00Z"
+        end_date: "2026-10-12T00:00:00Z"
+        daily_rate: 15000
+        hourly_rate: 2500
+        hours: null
+        total_amount: 45000
+        paid_amount: 0
+        payment_status: "unpaid"
+        notes: "Работы по котловану"
+        created_at: "2026-09-29T10:15:00Z"
+        updated_at: "2026-09-29T10:15:00Z"
