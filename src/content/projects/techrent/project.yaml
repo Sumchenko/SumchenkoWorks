@@ -235,6 +235,54 @@ artifacts:
     updated: '2026.10'
     title: { ru: "Замечания аналитика: 11 расхождений", en: "Analyst findings: 11 mismatches" }
     summary: { ru: "Что нашлось при приёмке по коду и в отзывах пилотного заказчика: сценарий, риск, предложение и что исправлено.", en: "What the code review and pilot feedback surfaced: scenario, risk, proposal and what was fixed." }
+  - id: screen-calendar
+    code: UI-01
+    type: ui
+    view: image
+    file: screen-calendar.png
+    updated: '2026.10'
+    title: { ru: "Календарь занятости", en: "Availability calendar" }
+    summary: { ru: "Диаграмма Ганта «техника × дни» за сентябрь: заказы по статусам и период обслуживания бульдозера жёлтой полосой.", en: "A Gantt chart of equipment × days for September: orders by status and a bulldozer maintenance period as a yellow bar." }
+  - id: screen-order-conflict
+    code: UI-02
+    type: ui
+    view: image
+    file: screen-order-conflict.png
+    updated: '2026.10'
+    title: { ru: "Конфликт брони в форме заказа", en: "Booking conflict in the order form" }
+    summary: { ru: "Попытка сдвинуть заказ на даты, когда техника уже занята: сервер вернул 409, форма показывает понятную причину.", en: "Moving an order onto dates when the equipment is already taken: the server returned 409 and the form explains why." }
+  - id: screen-order-detail
+    code: UI-03
+    type: ui
+    view: image
+    file: screen-order-detail.png
+    updated: '2026.10'
+    title: { ru: "Карточка заказа", en: "Order details" }
+    summary: { ru: "Заказ с частичной оплатой: даты, ставка, сумма, долг, водитель и действия по правам пользователя.", en: "An order with partial payment: dates, rate, total, debt, driver and actions according to the user’s permissions." }
+  - id: screen-finance
+    code: UI-04
+    type: ui
+    view: image
+    file: screen-finance.png
+    updated: '2026.10'
+    title: { ru: "Финансовая сводка", en: "Financial summary" }
+    summary: { ru: "Выставлено, оплачено и долг, статусы и способы оплаты, должники с телефонами для звонка.", en: "Invoiced, paid and outstanding, payment statuses and methods, debtors with phone numbers to call." }
+  - id: screen-staff-perms
+    code: UI-05
+    type: ui
+    view: image
+    file: screen-staff-perms.png
+    updated: '2026.10'
+    title: { ru: "Права менеджера", en: "Manager permissions" }
+    summary: { ru: "Доступ по разделам и действиям: «Изменить», «Удалить», «Отменить заказ». Права попадают в токен при входе.", en: "Access by module and action: Edit, Delete, Cancel order. Permissions go into the token at sign-in." }
+  - id: screen-audit
+    code: UI-06
+    type: ui
+    view: image
+    file: screen-audit.png
+    updated: '2026.10'
+    title: { ru: "Журнал действий", en: "Audit log" }
+    summary: { ru: "Кто, что и когда изменил: отмена заказа раскрыта с данными до и после.", en: "Who changed what and when: an order cancellation expanded with before and after data." }
   - id: dd-booking
     code: DD-01
     type: erd

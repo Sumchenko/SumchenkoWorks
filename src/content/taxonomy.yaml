@@ -67,3 +67,4 @@ artifactTypes:
   - { id: note, code: NOTE, label: { ru: "Заметки и исследования", en: "Notes and research" } }
   - { id: other, code: ADR, label: { ru: "Архитектурные решения", en: "Architecture decisions" } }
   - { id: db, code: SQL, label: { ru: "Схемы БД и миграции", en: "Database schemas and migrations" } }
+  - { id: ui, code: UI, label: { ru: "Экраны интерфейса", en: "Interface screens" } }

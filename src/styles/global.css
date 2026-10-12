@@ -86,6 +86,11 @@ main { flex: 1; outline: none; }
 .sw-doc img { max-width: 100%; height: auto; border: 1px solid var(--line); }
 .sw-doc hr { border-top: 1px dashed var(--line); }
 
+/* ---------- Окно: шапка на месте, прокручивается только тело ---------- */
+.sw-dialog { display: flex; flex-direction: column; overflow: hidden; }
+.sw-dialog__head, .sw-dialog__foot { flex: none; }
+.sw-dialog__body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+
 /* ---------- Окно артефакта на телефоне ---------- */
 @media (max-width: 640px) {
   .sw-dialog-overlay { padding: 8px; align-items: end; }

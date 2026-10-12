@@ -206,7 +206,7 @@ export default function ProjectBody({ vm }: { vm: ProjectBodyVM }) {
       ) : null}
 
       <Dialog open={!!docA} onClose={closeDoc} label={docA ? T.artifactLabel(docA.code) : ''} title={docA?.title} closeLabel={L.close} width={1040}>
-        {docA ? <div style={{ maxHeight: '72vh', overflow: 'auto', paddingRight: 4 }}><ArtifactViewer a={docA} lang={lang} /></div> : null}
+        {docA ? <ArtifactViewer a={docA} lang={lang} /> : null}
       </Dialog>
     </div>
   );

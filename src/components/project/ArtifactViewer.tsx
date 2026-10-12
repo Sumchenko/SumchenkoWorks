@@ -71,7 +71,9 @@ export function ArtifactViewer({ a, lang }: { a: ArtifactVM; lang: Lang }) {
       ) : null}
       {a.view === 'image' && a.src ? (
         <figure style={{ margin: 0, border: '1px solid var(--line)', background: 'var(--surface)', padding: 16 }}>
-          <img src={a.src} alt={a.title} style={{ maxWidth: '100%', maxHeight: '60vh', margin: '0 auto', objectFit: 'contain' }} />
+          <a href={a.src} target="_blank" rel="noopener" style={{ display: 'block', cursor: 'zoom-in' }}>
+            <img src={a.src} alt={a.title} style={{ maxWidth: '100%', maxHeight: '60vh', margin: '0 auto', objectFit: 'contain' }} />
+          </a>
         </figure>
       ) : null}
       {a.view === 'pdf' && a.src ? <iframe src={a.src} title={a.title} style={{ width: '100%', height: '60vh', border: '1px solid var(--line)', background: 'var(--surface)' }} /> : null}
