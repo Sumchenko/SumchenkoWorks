@@ -18,9 +18,10 @@ categories:
       ru: Архитектура программных решений и документация, по которой можно строить.
       en: Software architecture and documentation you can actually build from.
 
-# Вид бейджа задаётся в коде: live — контур, wip — мигающая точка, concept — пунктир, archive — серый.
+# Вид бейджа задаётся в коде: live и done — контур, wip — мигающая точка, concept — пунктир, archive — серый.
 statuses:
   - { id: live, label: Production }
+  - { id: done, label: { ru: "Готов", en: "Completed" } }
   - { id: wip, label: { ru: "В работе", en: "In progress" } }
   - { id: concept, label: { ru: "Концепт", en: "Concept" } }
   - { id: archive, label: { ru: "Архив", en: "Archive" } }
@@ -54,6 +55,7 @@ technologies:
   - { id: supabase, label: Supabase, group: { ru: "Данные", en: "Data" } }
   - { id: github-actions, label: GitHub Actions, group: { ru: "Инфраструктура", en: "Infrastructure" } }
   - { id: caddy, label: Caddy, group: { ru: "Инфраструктура", en: "Infrastructure" } }
+  - { id: grafana, label: Grafana, group: { ru: "Инфраструктура", en: "Infrastructure" } }
   - { id: nginx, label: Nginx, group: { ru: "Инфраструктура", en: "Infrastructure" } }
   - { id: aiogram, label: aiogram / Telegram, group: { ru: "Сервер", en: "Backend" } }
   - { id: whisper, label: Whisper, group: AI }

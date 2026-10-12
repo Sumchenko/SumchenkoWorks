@@ -1,0 +1,281 @@
+# Website Health Monitor — источник: github.com/Sumchenko/Health-checker и локальная рабочая копия (CLAUDE.md с планом и журналом, код, миграции).
+code: P—04
+order: 4
+demo: false
+featured: false
+title: Website Health Monitor
+summary:
+  ru: Сервис на Go, который круглосуточно проверяет, что мои проекты живы и действительно работают, — с веб-интерфейсом, API и историей в PostgreSQL.
+  en: A Go service that checks around the clock that my projects are up and actually working — with a web UI, an API and history in PostgreSQL.
+category: dev
+status: wip
+year: 2026
+period: '2026.01 → …'
+role:
+  ru: Постановка, архитектура, разработка на Go с Claude Code
+  en: Requirements, architecture, Go development with Claude Code
+tech: [go, postgres, docker, github-actions, grafana]
+cover: d-hc-components
+links:
+  repo: https://github.com/Sumchenko/Health-checker
+  docs: artifacts
+
+problem:
+  ru: Ссылки на пет-проекты уходят работодателям, и нельзя, чтобы по ссылке открылся упавший сервис. Проекты живут на VPS и бесплатных хостингах — они засыпают, отвечают с холодным стартом, а бесплатная база Supabase замирает после недели без запросов. Узнавать о падении от рекрутера — поздно.
+  en: Links to my pet projects go to employers, and a link must never open a dead service. The projects live on a VPS and free hosting — they fall asleep, respond after a cold start, and a free Supabase database pauses after a week without requests. Learning about an outage from a recruiter is too late.
+overview:
+  ru: Монитор по расписанию проверяет каждую цель — не только код ответа, но и ключевое слово на странице, — пишет результат в PostgreSQL и показывает сводку «всё зелёное / что-то упало» с аптаймом за сутки. Цели добавляются, меняются и отключаются в веб-интерфейсе или через API и подхватываются без перезапуска.
+  en: The monitor checks every target on a schedule — not just the response code but also a keyword on the page — writes the result to PostgreSQL and shows an "all green / something is down" summary with 24-hour uptime. Targets are added, changed and disabled in the web UI or via the API and are picked up without a restart.
+purpose:
+  ru: Первую версию я написал в январе как учебный проект на Go. В октябре вернулся к нему с новой целью — следить за проектами из этого портфолио — провёл аудит, нашёл 10 проблем и составил план из 7 этапов. Код пишется в Claude Code по этому плану с журналом решений; три этапа готовы.
+  en: I wrote the first version in January as a Go learning project. In October I came back to it with a new goal — watching the projects in this portfolio — ran an audit, found 10 issues and drew up a 7-stage plan. The code is written with Claude Code along that plan with a decision log; three stages are done.
+goals:
+  - { ru: "Узнавать о падении раньше работодателя", en: "Learn about an outage before an employer does" }
+  - { ru: "Проверять, что проект работает, а не просто отвечает", en: "Check that a project works, not just that it responds" }
+  - { ru: "Добавлять и отключать проекты без пересборки", en: "Add and disable projects without rebuilding" }
+  - { ru: "Держать бесплатные сервисы активными", en: "Keep free-tier services awake" }
+features:
+  - { ru: "Проверка кода ответа и ключевого слова", en: "Response code and keyword checks" }
+  - { ru: "Свои интервал, таймаут и заголовки у цели", en: "Per-target interval, timeout and headers" }
+  - { ru: "Изменения применяются на лету", en: "Changes apply on the fly" }
+  - { ru: "Веб-интерфейс со сводкой и аптаймом за 24 ч", en: "Web UI with a summary and 24-hour uptime" }
+  - { ru: "JSON API для целей", en: "JSON API for targets" }
+  - { ru: "Basic Auth и защита от CSRF", en: "Basic Auth and CSRF protection" }
+  - { ru: "Встроенные миграции PostgreSQL", en: "Embedded PostgreSQL migrations" }
+  - { ru: "Docker, healthcheck и CI с тестами", en: "Docker, a healthcheck and CI with tests" }
+requirements:
+  - { id: FR-01, type: FR, priority: Must, text: { ru: "Цель «жива», если ответ пришёл с ожидаемым кодом (по умолчанию любой 2xx после редиректов) и, если задано, содержит ключевое слово.", en: "A target is up if the response has the expected code (any 2xx after redirects by default) and, if set, contains the keyword." } }
+  - { id: FR-02, type: FR, priority: Must, text: { ru: "Добавление, изменение и отключение цели применяются без перезапуска сервиса.", en: "Adding, changing and disabling a target apply without restarting the service." } }
+  - { id: FR-03, type: FR, priority: Must, text: { ru: "Одна цель никогда не проверяется параллельно сама с собой.", en: "A target is never checked in parallel with itself." } }
+  - { id: FR-04, type: FR, priority: Must, text: { ru: "Интервал не меньше 30 с, таймаут не больше 120 с и меньше интервала.", en: "Interval at least 30 s; timeout at most 120 s and less than the interval." } }
+  - { id: FR-05, type: FR, priority: Should, text: { ru: "Уведомления в Telegram о падении и восстановлении — без спама.", en: "Telegram alerts on outage and recovery — without spam." } }
+  - { id: NFR-01, type: NFR, priority: Must, text: { ru: "Остановка или деплой сервиса не порождают ложных падений.", en: "Stopping or deploying the service produces no false outages." } }
+  - { id: NFR-02, type: NFR, priority: Must, text: { ru: "Интерфейс и API — только с паролем; /healthz открыт для внешнего мониторинга.", en: "UI and API require a password; /healthz is open for external monitoring." } }
+  - { id: NFR-03, type: NFR, priority: Must, text: { ru: "Схема БД меняется только новыми миграциями; старые данные переносятся.", en: "The DB schema changes only through new migrations; old data is carried over." } }
+scenarios:
+  - title: { ru: "Проект упал", en: "A project goes down" }
+    actor: { ru: "Владелец", en: "Owner" }
+    steps:
+      - { ru: "Проверка не нашла ключевое слово: страница отдала 200, но это заглушка с ошибкой", en: "A check does not find the keyword: the page returned 200 but it is an error stub" }
+      - { ru: "Результат с причиной записывается в health_checks", en: "The result with the reason is written to health_checks" }
+      - { ru: "В интерфейсе цель поднимается наверх списка красной, сводка — «1 упал»", en: "In the UI the target moves to the top in red; the summary says \"1 down\"" }
+      - { ru: "После этапа 5 — сообщение в Telegram и ещё одно при восстановлении", en: "After stage 5 — a Telegram message, and another on recovery" }
+  - title: { ru: "Новый проект в портфолио", en: "A new portfolio project" }
+    actor: { ru: "Владелец", en: "Owner" }
+    steps:
+      - { ru: "Добавляет цель в форме: адрес, ключевое слово, таймаут на холодный старт", en: "Adds a target in the form: URL, keyword, a timeout for cold starts" }
+      - { ru: "Сервер проверяет настройки и сохраняет цель", en: "The server validates the settings and saves the target" }
+      - { ru: "Планировщик сразу запускает проверки — без перезапуска", en: "The scheduler starts checking right away — no restart" }
+stages:
+  - period: '2026.01'
+    title: { ru: "Первая версия", en: "First version" }
+    text: { ru: "Проверки по списку в коде, PostgreSQL, Docker, CI с тестами, вывод в Grafana.", en: "Checks from a list in code, PostgreSQL, Docker, CI with tests, Grafana output." }
+  - period: '2026.10'
+    title: { ru: "Этап 0: аудит и план", en: "Stage 0: audit and plan" }
+    text: { ru: "Новая цель — мониторинг портфолио; 10 найденных проблем и план из 7 этапов.", en: "A new goal — monitoring the portfolio; 10 issues found and a 7-stage plan." }
+  - period: '2026.10'
+    title: { ru: "Этапы 1–2: ядро и цели в БД", en: "Stages 1–2: core and targets in the DB" }
+    text: { ru: "Логика статусов, таймауты, миграции, pgx, корректная остановка; таблица целей, ключевое слово, заголовки, подхват на лету.", en: "Status logic, timeouts, migrations, pgx, graceful shutdown; a targets table, keywords, headers, live reload." }
+  - period: '2026.10'
+    title: { ru: "Этап 3: интерфейс и API", en: "Stage 3: UI and API" }
+    text: { ru: "Веб-интерфейс без JS-фреймворков, JSON API, валидация, Basic Auth, защита от CSRF, /healthz.", en: "A web UI without JS frameworks, a JSON API, validation, Basic Auth, CSRF protection, /healthz." }
+  - period: { ru: "Далее", en: "Next" }
+    title: { ru: "Этапы 4–7", en: "Stages 4–7" }
+    text: { ru: "Grafana как код, уведомления в Telegram, качество и CI, деплой на VPS с внешним мониторингом самого чекера.", en: "Grafana as code, Telegram alerts, quality and CI, deployment to the VPS with external monitoring of the checker itself." }
+challenges:
+  - title: { ru: "«Отвечает» не значит «работает»", en: "\"Responds\" is not \"works\"" }
+    text: { ru: "Упавшее приложение может отдавать 200 со страницей ошибки. Поэтому у цели есть ключевое слово, которое ищется в первом мегабайте ответа.", en: "A broken app may return 200 with an error page. So a target has a keyword searched for in the first megabyte of the response." }
+  - title: { ru: "Ложные падения при деплое", en: "False outages on deploy" }
+    text: { ru: "Проверки, прерванные остановкой сервиса или изменением цели, отбрасываются, а обработчик дописывает все результаты до закрытия канала.", en: "Checks interrupted by a service stop or a target change are discarded, and the processor writes every result before the channel closes." }
+  - title: { ru: "Изменения целей без рестарта", en: "Target changes without a restart" }
+    text: { ru: "Горутина на цель и семафор вместо пула воркеров: планировщик сверяет список с БД и точечно запускает, останавливает или перезапускает проверки.", en: "A goroutine per target plus a semaphore instead of a worker pool: the scheduler reconciles the list with the DB and starts, stops or restarts checks precisely." }
+  - title: { ru: "Basic Auth и CSRF", en: "Basic Auth and CSRF" }
+    text: { ru: "Браузер сам подставляет Basic Auth в запросы с чужих сайтов. Формы и API закрыты http.CrossOriginProtection из Go 1.25.", en: "Browsers attach Basic Auth to requests from other sites by themselves. Forms and the API are guarded by http.CrossOriginProtection from Go 1.25." }
+results:
+  text:
+    ru: Готовы три этапа из семи — около 3 200 строк Go вместе с 34 тестами, включая интеграционные на PostgreSQL. Сервис проверяет цели, применяет изменения на лету и показывает сводку с аптаймом.
+    en: Three of seven stages are done — about 3,200 lines of Go including 34 tests, integration ones on PostgreSQL among them. The service checks targets, applies changes on the fly and shows a summary with uptime.
+  state:
+    ru: Дальше — дашборд Grafana из репозитория, уведомления в Telegram и деплой на VPS рядом с проектами, за которыми он следит.
+    en: Next — a Grafana dashboard from the repository, Telegram alerts and deployment to the VPS next to the projects it watches.
+
+architecture:
+  diagram: d-hc-components
+  text:
+    ru: Один бинарник на Go. Планировщик держит по горутине на цель, общий лимит одновременных проверок задаёт семафор. Результаты идут через канал в обработчик и сохраняются в PostgreSQL; веб-интерфейс и API работают с той же базой и сообщают планировщику об изменениях.
+    en: A single Go binary. The scheduler keeps a goroutine per target, and a semaphore caps concurrent checks. Results go through a channel to the processor and are saved to PostgreSQL; the web UI and API work with the same database and notify the scheduler of changes.
+  flows: [d-hc-check, d-hc-reload]
+dataModel:
+  diagram: d-hc-erd
+  text:
+    ru: NULL в настройках цели означает «значение по умолчанию». Адрес хранится в каждой проверке намеренно — история показывает, что проверялось тогда. Удаление цели удаляет её историю; чтобы сохранить историю, цель отключают.
+    en: NULL in target settings means "use the default". The URL is stored with every check on purpose — the history shows what was checked at the time. Deleting a target deletes its history; to keep it, the target is disabled instead.
+api:
+  endpoints:
+    - { method: GET, path: /healthz, text: { ru: "Без пароля: пинг базы, 200 или 503 — для Docker и внешнего мониторинга", en: "No password: database ping, 200 or 503 — for Docker and external monitoring" } }
+    - { method: GET, path: /api/targets, text: { ru: "Цели со статусом: up, down, pending или disabled, последняя проверка, аптайм за 24 ч", en: "Targets with status: up, down, pending or disabled, last check, 24-hour uptime" } }
+    - { method: POST, path: /api/targets, text: { ru: "Создать цель: 201, неизвестные поля — 400, ошибки валидации — 422", en: "Create a target: 201, unknown fields — 400, validation errors — 422" } }
+    - { method: PUT, path: '/api/targets/{id}', text: { ru: "Заменить цель целиком; планировщик применяет сразу", en: "Replace a target entirely; the scheduler applies it at once" } }
+    - { method: DELETE, path: '/api/targets/{id}', text: { ru: "Удалить цель вместе с историей", en: "Delete a target with its history" } }
+  integrations:
+    - name: PostgreSQL
+      protocol: pgx/v5 · pgxpool
+      text: { ru: "Встроенные миграции с advisory-блокировкой, история проверок и цели.", en: "Embedded migrations with an advisory lock, check history and targets." }
+    - name: Grafana
+      protocol: SQL
+      text: { ru: "Графики аптайма и времени ответа; на этапе 4 — дашборд как код и read-only пользователь.", en: "Uptime and response-time charts; stage 4 brings a dashboard as code and a read-only user." }
+    - name: { ru: "Telegram (этап 5)", en: "Telegram (stage 5)" }
+      protocol: Bot API
+      text: { ru: "Падение после N неудачных проверок подряд и восстановление.", en: "Down after N consecutive failures, and recovery." }
+decisions:
+  - title: { ru: "Горутина на цель и семафор", en: "A goroutine per target and a semaphore" }
+    choice: { ru: "Каждая цель проверяется в своей горутине последовательно, общий лимит — семафор.", en: "Each target is checked sequentially in its own goroutine; a semaphore sets the overall limit." }
+    why: { ru: "Цель не проверяется параллельно сама с собой, а добавить, остановить или перезапустить одну цель просто.", en: "A target is never checked in parallel with itself, and adding, stopping or restarting one target is simple." }
+    alternatives: { ru: "Пул воркеров с очередью задач — больше каналов и сложнее остановка.", en: "A worker pool with a job queue — more channels and a harder shutdown." }
+  - title: { ru: "Свои миграции на embed", en: "Own migrations on embed" }
+    choice: { ru: "Около 100 строк вместо goose или golang-migrate; миграции внутри бинарника, применяются при старте.", en: "About 100 lines instead of goose or golang-migrate; migrations live in the binary and run on start." }
+    why: { ru: "Нет лишних зависимостей, а база, созданная первой версией, мигрировала без потери данных.", en: "No extra dependencies, and the database created by the first version migrated without data loss." }
+  - title: { ru: "Интерфейс на html/template", en: "UI on html/template" }
+    pros:
+      - { ru: "Один бинарник, нет сборки фронтенда", en: "One binary, no frontend build" }
+      - { ru: "Единственный JS — подтверждение удаления", en: "The only JS is a delete confirmation" }
+    cons:
+      - { ru: "Обновление списка — перезагрузкой страницы раз в 30 с", en: "The list refreshes by reloading the page every 30 s" }
+  - title: { ru: "Список целей перечитывается, а не слушается", en: "The target list is re-read, not listened to" }
+    choice: { ru: "Раз в 10 с и сразу после изменения через API, вместо LISTEN/NOTIFY.", en: "Every 10 s and right after an API change, instead of LISTEN/NOTIFY." }
+    why: { ru: "Проще и переживает переподключение к базе.", en: "Simpler, and survives a database reconnect." }
+
+diagrams:
+  - id: d-hc-components
+    kind: components
+    title: { ru: "Компоненты монитора", en: "Monitor components" }
+    nodes:
+      - { id: web, label: WEB · API, sub: basic auth · csrf, x: 0, y: 0, w: 2, d: 2, h: 0.5 }
+      - { id: sched, label: SCHEDULER, sub: { ru: "горутина на цель", en: "goroutine per target" }, x: 6, y: 0, w: 2, d: 2, h: 1 }
+      - { id: sites, label: { ru: "ПРОЕКТЫ", en: "PROJECTS" }, sub: http(s), x: 12, y: 0, w: 2, d: 2, h: 1 }
+      - { id: pg, label: POSTGRES, sub: targets · health_checks, x: 0, y: 6, w: 2, d: 2, h: 1 }
+      - { id: proc, label: PROCESSOR, sub: { ru: "сохранение", en: "saving" }, x: 6, y: 6, w: 2, d: 1, h: 0.5 }
+      - { id: graf, label: GRAFANA, sub: { ru: "графики", en: "charts" }, x: 0, y: 12, w: 2, d: 1, h: 0.5 }
+    links: [[web, sched], [sched, sites], [web, pg], [sched, proc], [proc, pg], [pg, graf]]
+    notes:
+      web: { ru: "Список целей со статусом и аптаймом, формы, JSON API; после изменения просит планировщик перечитать цели.", en: "Target list with status and uptime, forms, JSON API; after a change it asks the scheduler to reload targets." }
+      sched: { ru: "Сверяет горутины со списком целей в БД; лимит одновременных проверок — семафор.", en: "Reconciles goroutines with the target list in the DB; a semaphore caps concurrent checks." }
+      sites: { ru: "Проекты портфолио: проверяется код ответа и ключевое слово в теле.", en: "Portfolio projects: the response code and a keyword in the body are checked." }
+      pg: { ru: "Цели и история проверок; встроенные миграции.", en: "Targets and check history; embedded migrations." }
+      proc: { ru: "Получает результаты из канала и пишет их в базу до самого закрытия канала.", en: "Receives results from the channel and writes them to the database until the channel closes." }
+      graf: { ru: "Аптайм, время ответа и история падений.", en: "Uptime, response time and outage history." }
+  - id: d-hc-check
+    kind: flow
+    title: { ru: "Одна проверка", en: "One check" }
+    steps:
+      - { lane: SCHEDULER, title: { ru: "Пора проверять", en: "Time to check" }, text: { ru: "Тикер цели с её интервалом или значением по умолчанию.", en: "The target's ticker with its interval or the default." } }
+      - { lane: SCHEDULER, title: { ru: "Взять слот", en: "Take a slot" }, text: { ru: "Семафор ограничивает одновременные проверки (WORKERS).", en: "A semaphore limits concurrent checks (WORKERS)." } }
+      - { lane: WORKER, title: { ru: "Запрос", en: "Request" }, text: { ru: "GET с заголовками цели и таймаутом через контекст.", en: "GET with the target's headers and a context timeout." } }
+      - { lane: WORKER, title: { ru: "Вердикт", en: "Verdict" }, text: { ru: "Ожидаемый код и ключевое слово в первом мегабайте; тело вычитывается для keep-alive.", en: "Expected code and the keyword in the first megabyte; the body is drained for keep-alive." } }
+      - { lane: PROCESSOR, title: { ru: "Сохранить", en: "Save" }, text: { ru: "Код, время ответа и причина ошибки; прерванные остановкой неудачи отбрасываются.", en: "Code, response time and error reason; failures interrupted by shutdown are discarded." } }
+      - { lane: WEB, title: { ru: "Показать", en: "Show" }, text: { ru: "Упавшие сверху, аптайм за 24 ч.", en: "Down targets first, 24-hour uptime." } }
+  - id: d-hc-reload
+    kind: flow
+    title: { ru: "Изменение цели на лету", en: "Changing a target on the fly" }
+    steps:
+      - { lane: { ru: "ВЛАДЕЛЕЦ", en: "OWNER" }, title: { ru: "Изменить цель", en: "Edit a target" }, text: { ru: "Форма или PUT /api/targets/{id}.", en: "The form or PUT /api/targets/{id}." } }
+      - { lane: WEB, title: { ru: "Проверить", en: "Validate" }, text: { ru: "Ошибки — 422 с сохранением ввода.", en: "Errors — 422 with the input kept." } }
+      - { lane: POSTGRES, title: { ru: "Сохранить", en: "Save" }, text: { ru: "updated_at обновляется.", en: "updated_at is bumped." } }
+      - { lane: SCHEDULER, title: "Reload", text: { ru: "Неблокирующий запрос; несколько вызовов схлопываются в один.", en: "A non-blocking request; several calls collapse into one." } }
+      - { lane: SCHEDULER, title: Reconcile, text: { ru: "Новые — запустить, удалённые и выключенные — остановить, изменённые — перезапустить.", en: "New — start, deleted and disabled — stop, changed — restart." } }
+  - id: d-hc-erd
+    kind: erd
+    title: { ru: "Модель данных", en: "Data model" }
+    entities:
+      - { id: targets, name: TARGETS, fields: [[id, serial, PK], [name, text], [url, text], [expected_status, 'int?'], [keyword, 'text?'], [headers, jsonb], [interval_seconds, 'int?'], [timeout_seconds, 'int?'], [enabled, bool], [updated_at, timestamptz]] }
+      - { id: checks, name: HEALTH_CHECKS, fields: [[id, serial, PK], [target_id, int, FK], [url, text], [is_up, bool], [status_code, 'int?'], [response_time_ms, int], [error, 'text?'], [checked_at, timestamptz]] }
+      - { id: mig, name: SCHEMA_MIGRATIONS, fields: [[version, int, PK], [name, text], [applied_at, timestamptz]] }
+    relations: [[targets, checks, '1 : N']]
+
+# Артефакты: документы — artifacts/<id>.ru.md и .en.md, остальное — файлы в artifacts/
+artifacts:
+  - id: screen-index-light
+    code: UI-01
+    type: ui
+    view: image
+    file: screen-index-light.png
+    updated: '2026.10'
+    title: { ru: "Сводка проектов", en: "Project overview" }
+    summary: { ru: "Упавшие цели наверху, сводка «Не работает: 1 из 7», последняя проверка, время ответа и аптайм за 24 ч. Цели — реальные адреса этого портфолио.", en: "Down targets on top, the summary \"Down: 1 of 7\", last check, response time and 24-hour uptime. The targets are real addresses of this portfolio." }
+  - id: screen-new-error
+    code: UI-02
+    type: ui
+    view: image
+    file: screen-new-error.png
+    updated: '2026.10'
+    title: { ru: "Проверка настроек цели", en: "Target validation" }
+    summary: { ru: "Сервер вернул 422 и сохранил ввод: неподходящая схема URL и таймаут больше интервала.", en: "The server returned 422 and kept the input: an unsupported URL scheme and a timeout longer than the interval." }
+  - id: screen-edit
+    code: UI-03
+    type: ui
+    view: image
+    file: screen-edit.png
+    updated: '2026.10'
+    title: { ru: "Настройки цели", en: "Target settings" }
+    summary: { ru: "Ключевое слово, свои интервал и таймаут, ожидаемый код и заголовки запроса — например, apikey для Supabase.", en: "A keyword, own interval and timeout, an expected code and request headers — for example, an apikey for Supabase." }
+  - id: screen-index-dark
+    code: UI-04
+    type: ui
+    view: image
+    file: screen-index-dark.png
+    updated: '2026.10'
+    title: { ru: "Тёмная тема", en: "Dark theme" }
+    summary: { ru: "Та же сводка в тёмной теме — она включается по настройке системы.", en: "The same overview in the dark theme, which follows the system setting." }
+  - id: screen-index-mobile
+    code: UI-05
+    type: ui
+    view: image
+    file: screen-index-mobile.png
+    updated: '2026.10'
+    title: { ru: "На телефоне", en: "On a phone" }
+    summary: { ru: "На узком экране таблица превращается в карточки.", en: "On a narrow screen the table turns into cards." }
+  - id: plan
+    code: NOTE-01
+    type: note
+    view: doc
+    updated: '2026.10'
+    title: { ru: "План работ и журнал", en: "Work plan and log" }
+    summary: { ru: "Цель, окружение, 7 этапов с состоянием, известные проблемы и что проверено на каждом этапе.", en: "The goal, environment, 7 stages with status, known issues and what was verified at each stage." }
+  - id: api-doc
+    code: DOC-01
+    type: apidoc
+    view: doc
+    updated: '2026.10'
+    title: { ru: "API целей", en: "Targets API" }
+    summary: { ru: "Эндпоинты, формат цели и статуса, правила валидации, коды ответов и пример реального ответа.", en: "Endpoints, the target and status format, validation rules, response codes and a real response example." }
+  - id: sql-migrations
+    code: SQL-01
+    type: db
+    view: code
+    file: migrations.sql
+    updated: '2026.10'
+    title: { ru: "Миграции PostgreSQL", en: "PostgreSQL migrations" }
+    summary: { ru: "Три миграции: исходная схема, история проверок v2 и таблица целей с переносом старых данных.", en: "Three migrations: the original schema, check history v2 and the targets table with old data carried over." }
+  - id: erd-hc
+    code: ERD-01
+    type: erd
+    view: erd
+    diagram: d-hc-erd
+    updated: '2026.10'
+    title: { ru: "Модель данных", en: "Data model" }
+    summary: { ru: "Цели, история проверок и учёт миграций.", en: "Targets, check history and the migration log." }
+  - id: adr-hc
+    code: ADR-01
+    type: other
+    view: doc
+    updated: '2026.10'
+    title: { ru: "Архитектурные решения", en: "Architecture decisions" }
+    summary: { ru: "pgx, свои миграции, вердикт проверки, горутина на цель, интерфейс без фреймворков, Basic Auth и CSRF.", en: "pgx, own migrations, the check verdict, a goroutine per target, a framework-free UI, Basic Auth and CSRF." }
+  - id: c4-hc
+    code: C4-01
+    type: arch
+    view: components
+    diagram: d-hc-components
+    updated: '2026.10'
+    title: { ru: "Схема компонентов", en: "Component diagram" }
+    summary: { ru: "Веб и API, планировщик, проверяемые проекты, обработчик, PostgreSQL и Grafana.", en: "Web and API, the scheduler, the checked projects, the processor, PostgreSQL and Grafana." }

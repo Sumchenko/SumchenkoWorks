@@ -8,7 +8,7 @@ summary:
   ru: Telegram-бот для команды ивентов — превращает текст и голосовые в карточки задач в Notion с дедлайном, приоритетом и исполнителем.
   en: A Telegram bot for an events team — turns text and voice messages into Notion task cards with a deadline, priority and assignee.
 category: dev
-status: wip
+status: done
 year: 2026
 period: '2026.09'
 role:
@@ -80,8 +80,8 @@ results:
     ru: Рабочий MVP примерно на 1 400 строк Python — бот, разбор через LLM, расчёт сроков, Notion с резервом в SQLite; проверен в Telegram на реальной базе Notion. Отдельно — разбор кода с 6 замечаниями и предложениями по доработке.
     en: A working MVP of about 1,400 lines of Python — the bot, LLM parsing, deadline calculation, Notion with an SQLite fallback; tested in Telegram against a real Notion database. Plus a code review with 6 findings and improvement proposals.
   state:
-    ru: Бот не развёрнут на сервере; следующий шаг — исправить замечания, хранить черновики вне памяти процесса и перейти на дату в Notion вместо текста.
-    en: The bot is not deployed; next steps are fixing the findings, keeping drafts outside process memory and switching to a Notion date property instead of text.
+    ru: MVP завершён, бот запускается локально. Если развивать дальше — исправить замечания, хранить черновики вне памяти процесса и перейти на дату в Notion вместо текста.
+    en: The MVP is complete and runs locally. Further development would fix the findings, keep drafts outside process memory and switch to a Notion date property instead of text.
 
 architecture:
   diagram: d-tg-components

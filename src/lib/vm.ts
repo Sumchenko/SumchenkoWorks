@@ -12,6 +12,7 @@ export type LinkVM = { label: string; href: string; icon: string; external: bool
 
 const BADGE: Record<string, Omit<BadgeVM, 'label'>> = {
   live: { variant: 'outline', dot: false, pulse: false },
+  done: { variant: 'outline', dot: false, pulse: false },
   wip: { variant: 'solid', dot: true, pulse: true },
   concept: { variant: 'dashed', dot: false, pulse: false },
   archive: { variant: 'subtle', dot: false, pulse: false },
