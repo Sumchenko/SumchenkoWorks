@@ -1,0 +1,39 @@
+# Sumchenko Works — портфолио. На сервере: /etc/caddy/sites/sumchenko.caddy
+# Главный /etc/caddy/Caddyfile подключает этот файл строкой «import /etc/caddy/sites/*.caddy».
+# HTTPS-сертификаты Caddy получает и продлевает сам, как только домен указывает на сервер.
+
+sumchenko-tech.ru {
+	root * /var/www/sumchenko-works
+	encode zstd gzip
+	file_server
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+
+	# Файлы сборки с хешем в имени — кешируются навсегда
+	@assets path /_astro/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
+	# Страницы 404: у английской версии своя
+	handle_errors {
+		@en404 {
+			expression {err.status_code} == 404
+			path /en/*
+		}
+		handle @en404 {
+			rewrite * /en/404/index.html
+			file_server
+		}
+		@404 expression {err.status_code} == 404
+		handle @404 {
+			rewrite * /404.html
+			file_server
+		}
+	}
+}
+
+www.sumchenko-tech.ru {
+	redir https://sumchenko-tech.ru{uri} permanent
+}

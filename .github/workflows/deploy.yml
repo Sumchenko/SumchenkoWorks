@@ -17,6 +17,8 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      HAS_SSH: ${{ secrets.SSH_KEY != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -31,7 +33,9 @@ jobs:
         env:
           SITE_URL: ${{ vars.SITE_URL }}
 
+      # Пока секреты не добавлены, сборка проверяется, а выкладка пропускается
       - name: Upload to server
+        if: env.HAS_SSH == 'true'
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
           SSH_HOST: ${{ secrets.SSH_HOST }}

@@ -19,4 +19,4 @@ npm run preview  # посмотреть собранную версию
 
 ## Деплой
 
-См. [deploy/README.md](deploy/README.md): домен, nginx, HTTPS и автодеплой.
+См. [deploy/README.md](deploy/README.md): домен, Caddy (HTTPS автоматически) и автодеплой.
