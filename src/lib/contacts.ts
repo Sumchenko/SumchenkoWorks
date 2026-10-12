@@ -8,7 +8,9 @@ export function contactLinks(links: Site['profile']['links']): ContactVM[] {
     const raw = l.href || null;
     const href = raw && l.id === 'email' && !raw.startsWith('mailto:') ? 'mailto:' + raw : raw;
     const external = !!href && /^https?:/.test(href);
-    const display = href ? href.replace(/^mailto:|^https?:\/\//, '').replace(/\/$/, '') : '';
+    let display = href ? href.replace(/^mailto:|^https?:\/\//, '').replace(/\/$/, '') : '';
+    // длинные адреса (резюме, документы) сокращаются до домена и первого раздела
+    if (display.length > 32 && display.includes('/')) display = display.split('/').slice(0, 2).join('/') + '/…';
     return { id: l.id, label: l.label, icon: l.icon, href, external, display };
   });
 }

@@ -9,14 +9,14 @@ description:
   en: Digital project portfolio — software development, systems analysis and solution design.
 
 profile:
-  name: null # ЗАГЛУШКА: { ru: "Никита Сумченко", en: "Nikita Sumchenko" }
-  location: null # ЗАГЛУШКА: { ru: "Москва · UTC+3", en: "Moscow · UTC+3" }
+  name: { ru: "Никита Сумченко", en: "Nikita Sumchenko" }
+  location: { ru: "Москва", en: "Moscow" }
   headline:
-    ru: Разработка · системный анализ · проектирование
-    en: Development · systems analysis · solution design
+    ru: AI-разработка · системный анализ · проектирование
+    en: AI-assisted development · systems analysis · solution design
   summary:
-    ru: Проектирую и разрабатываю цифровые продукты — от постановки задачи и требований до архитектуры, модели данных, API и реализации. Работаю с разными технологиями и использую AI-инструменты там, где они ускоряют работу.
-    en: I design and build digital products — from problem framing and requirements to architecture, data model, API and implementation. I work across different technologies and use AI tools where they genuinely speed things up.
+    ru: Собираю работающие продукты в связке с Claude Code и LLM-ассистентами — от требований до деплоя. Опираюсь на системный анализ и backend на Go, поэтому задаю архитектуру сам, проверяю сгенерированный код и довожу его до рабочего состояния.
+    en: I build working products together with Claude Code and LLM assistants — from requirements to deployment. My foundation is systems analysis and Go backend development, so I set the architecture myself, review the generated code and bring it to a working state.
 
   principles:
     - title: { ru: "Исследование", en: "Research" }
@@ -36,39 +36,44 @@ profile:
         ru: ADR, диаграммы и контракты остаются вместе с продуктом.
         en: ADRs, diagrams and contracts stay with the product.
 
-  # placeholder: true — на сайте рядом с разделом стоит метка «Заглушка». Уберите, когда заполните.
+  # placeholder: true — на сайте рядом с разделом стоит метка «Заглушка».
   skills:
-    placeholder: true
     groups:
       - title: { ru: "Системный анализ", en: "Systems analysis" }
         items:
           - { ru: "Сбор и формализация требований", en: "Requirements elicitation and specification" }
-          - { ru: "Пользовательские сценарии", en: "Use cases and user scenarios" }
-          - BPMN 2.0
-          - 'UML: sequence, activity, state'
+          - { ru: "User Stories с критериями приёмки (Given/When/Then)", en: "User stories with acceptance criteria (Given/When/Then)" }
+          - { ru: "Use Case с альтернативными сценариями", en: "Use cases with alternative flows" }
+          - "BPMN 2.0, UML: use case, sequence"
+          - { ru: "Проверка реализации на соответствие требованиям", en: "Verifying the implementation against requirements" }
       - title: { ru: "Проектирование", en: "Solution design" }
         items:
-          - { ru: "C4-модель", en: "C4 model" }
-          - { ru: "ER-моделирование", en: "ER modelling" }
-          - { ru: "Проектирование REST API", en: "REST API design" }
-          - { ru: "ADR и разбор компромиссов", en: "ADRs and trade-off analysis" }
+          - { ru: "REST API и спецификации OpenAPI", en: "REST APIs and OpenAPI specifications" }
+          - { ru: "Модели данных и ERD на PostgreSQL", en: "Data models and ERDs on PostgreSQL" }
+          - { ru: "Ролевая модель доступа (RBAC), JWT", en: "Role-based access control (RBAC), JWT" }
+          - { ru: "ADR — журнал архитектурных решений", en: "ADRs — architecture decision log" }
       - title: { ru: "Разработка", en: "Development" }
         items:
-          - { ru: "Веб-сервисы и API", en: "Web services and APIs" }
-          - { ru: "Интерфейсы", en: "User interfaces" }
-          - { ru: "Работа с реляционными БД", en: "Relational databases" }
-          - { ru: "Очереди и события", en: "Queues and events" }
+          - "Go: Chi, PostgreSQL"
+          - "Python: FastAPI, aiogram"
+          - "React, TypeScript"
+          - { ru: "Интеграции с LLM API: Groq, Gemini, Whisper", en: "LLM API integrations: Groq, Gemini, Whisper" }
+          - { ru: "Docker, CI/CD на GitHub Actions, деплой на VPS", en: "Docker, CI/CD with GitHub Actions, VPS deployment" }
+      - title: { ru: "AI-разработка", en: "AI-assisted development" }
+        items:
+          - { ru: "Claude Code и LLM-ассистенты", en: "Claude Code and LLM assistants" }
+          - { ru: "Работа по дорожной карте и ADR", en: "Roadmap- and ADR-driven work" }
+          - { ru: "Ревью сгенерированного кода", en: "Reviewing generated code" }
+          - { ru: "Оценка ответов LLM — 1,5 года в Яндексе (YandexGPT)", en: "LLM output evaluation — 1.5 years at Yandex (YandexGPT)" }
   tools:
-    placeholder: true
-    items: [Git, Docker, PostgreSQL, OpenAPI, draw.io, PlantUML, Figma, { ru: "AI-ассистенты для кода", en: "AI coding assistants" }]
+    items: [Claude Code, Git, Docker, PostgreSQL, Supabase, Postman, Swagger, GitHub Actions, Grafana, Linux]
 
   # href: null — ссылка не указана. Email можно писать без mailto:.
   links:
-    - { id: github, label: GitHub, href: null, icon: github }
-    - { id: email, label: Email, href: null, icon: mail }
-    - { id: telegram, label: Telegram, href: null, icon: message }
-    - { id: hh, label: hh.ru, href: null, icon: briefcase }
-    - { id: cv, label: { ru: "Резюме", en: "CV" }, href: null, icon: file }
+    - { id: github, label: GitHub, href: "https://github.com/Sumchenko", icon: github }
+    - { id: email, label: Email, href: "nik.sumchenko.2004@mail.ru", icon: mail }
+    - { id: telegram, label: Telegram, href: "https://t.me/SumchenkoN", icon: message }
+    - { id: hh, label: { ru: "Резюме на hh.ru", en: "CV on hh.ru" }, href: "https://hh.ru/resume/3c01c5c1ff110dd9e20039ed1f684963505843", icon: briefcase }
 
 # Схема «Подход к разработке» на главной: ровно 6 этапов, порядок совпадает с анимацией.
 lifecycle:
