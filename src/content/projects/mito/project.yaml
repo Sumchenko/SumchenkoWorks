@@ -34,7 +34,6 @@ goals:
   - { ru: "Задачи, план и фактическое время — в одном месте", en: "Tasks, the plan and the actual time in one place" }
   - { ru: "Работа без интернета и синхронизация между устройствами", en: "Offline work and sync across devices" }
   - { ru: "План дня одной кнопкой — но в календарь только после подтверждения", en: "A day plan in one click — but into the calendar only after confirmation" }
-  - { ru: "Работа из России, даже если хост Supabase недоступен", en: "Works from Russia even when the Supabase host is unreachable" }
 features:
   - { ru: "Задачи с подзадачами и умными списками", en: "Tasks with subtasks and smart lists" }
   - { ru: "Quick-add: #проект, @тег, приоритет и оценка из строки", en: "Quick-add: #project, @tag, priority and estimate from one line" }
@@ -90,8 +89,6 @@ stages:
     title: { ru: "Этапы 10–11", en: "Stages 10–11" }
     text: { ru: "PWA и производительность, затем Windows и Android на Tauri.", en: "PWA and performance, then Windows and Android with Tauri." }
 challenges:
-  - title: { ru: "Supabase недоступен в части сетей РФ", en: "Supabase is unreachable on some Russian networks" }
-    text: { ru: "Браузер ходит только на свой домен: Caddy проксирует REST, Auth и Realtime под /sb, ссылки из писем ведут на /auth/confirm.", en: "The browser only talks to our domain: Caddy proxies REST, Auth and Realtime under /sb, and email links point to /auth/confirm." }
   - title: { ru: "Модели ошибаются и выдумывают", en: "Models make mistakes and invent things" }
     text: { ru: "Сервер проверяет ответ и убирает блоки с неверным временем и чужими задачами. Модель видит задачи под ссылками t1, t2, а дни занятий сдвигает код, а не модель.", en: "The server validates the answer and drops blocks with wrong times or unknown tasks. The model sees tasks as refs t1, t2, and study days are enforced by code, not by the model." }
   - title: { ru: "Лимиты бесплатных LLM", en: "Free-tier LLM limits" }
