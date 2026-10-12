@@ -1,0 +1,44 @@
+/* Sumchenko Works — typography tokens */
+:root{
+--font-pixel:'Pixelify Sans',ui-monospace,monospace;
+--font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+--font-sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+--font-display:var(--font-pixel);
+--font-ui:var(--font-mono);
+--font-body:var(--font-sans);
+
+/* Display (Pixelify Sans) — fluid */
+--text-display-xl:clamp(56px,10vw,160px);
+--text-display-l:clamp(44px,7vw,104px);
+--text-display-m:clamp(36px,4.6vw,64px);
+/* Headings */
+--text-h1:clamp(32px,3.6vw,48px);
+--text-h2:clamp(26px,2.6vw,34px);
+--text-h3:22px;
+/* Body (IBM Plex Sans) */
+--text-lead:clamp(18px,1.6vw,22px);
+--text-body:16px;
+--text-small:14px;
+/* UI / meta (JetBrains Mono) */
+--text-ui:13px;
+--text-label:12px;
+--text-micro:11px;
+
+--lh-tight:1; /* @kind font */
+--lh-display:.95; /* @kind font */
+--lh-heading:1.15; /* @kind font */
+--lh-body:1.6; /* @kind font */
+--lh-ui:1.4; /* @kind font */
+
+--track-display:-.01em; /* @kind font */
+--track-heading:-.005em; /* @kind font */
+--track-body:0; /* @kind font */
+--track-label:.08em; /* @kind font */
+--track-caps:.16em; /* @kind font */
+
+--weight-light:300; /* @kind font */
+--weight-regular:400; /* @kind font */
+--weight-medium:500; /* @kind font */
+--weight-semibold:600; /* @kind font */
+--weight-bold:700; /* @kind font */
+}

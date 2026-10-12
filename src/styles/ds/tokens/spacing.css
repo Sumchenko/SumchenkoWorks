@@ -1,0 +1,46 @@
+/* Sumchenko Works — space, grid, radius, border, elevation */
+:root{
+--space-0:0;
+--space-1:4px;
+--space-2:8px;
+--space-3:12px;
+--space-4:16px;
+--space-5:24px;
+--space-6:32px;
+--space-7:48px;
+--space-8:64px;
+--space-9:96px;
+--space-10:144px;
+--space-section:clamp(80px,12vw,176px);
+
+/* Grid */
+--grid-cols:12; /* @kind other */
+--grid-gutter:clamp(12px,1.6vw,24px); /* @kind spacing */
+--grid-margin:clamp(20px,4vw,64px); /* @kind spacing */
+--grid-max:1440px; /* @kind spacing */
+--pixel:4px;            /* atomic pixel unit for pixel patterns */
+--dot-grid-size:24px;   /* dotted background pitch */
+
+/* Radius — near-zero by design */
+--radius-0:0;
+--radius-1:2px;
+--radius-round:999px;   /* only for switch thumbs / radio dots */
+
+/* Borders */
+--bw-hair:1px; /* @kind other */
+--bw-strong:2px; /* @kind other */
+--border-hair:1px solid var(--line); /* @kind other */
+--border-strong:1px solid var(--line-strong); /* @kind other */
+--border-dashed:1px dashed var(--line); /* @kind other */
+
+/* Elevation — no soft shadows; offsets are hard, pixel-like */
+--shadow-none:none;
+--shadow-pixel:4px 4px 0 0 var(--line-strong);
+--shadow-pixel-sm:2px 2px 0 0 var(--line-strong);
+
+/* Control sizes */
+--control-sm:32px; /* @kind spacing */
+--control-md:40px; /* @kind spacing */
+--control-lg:48px; /* @kind spacing */
+--nav-h:56px; /* @kind spacing */
+}

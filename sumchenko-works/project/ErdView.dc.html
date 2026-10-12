@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/base.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/components/sw-components.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/styles.css">
+  <script src="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/_ds_bundle.js"></script>
+</helmet>
+<figure style="margin:0; display:flex; flex-direction:column; gap:20px">
+  <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,210px),1fr)); gap:16px">
+    <sc-for list="{{ entities }}" as="e" hint-placeholder-count="4">
+      <div tabindex="0" aria-label="{{ e.aria }}" onPointerEnter="{{ e.enter }}" onPointerLeave="{{ leave }}" onFocus="{{ e.enter }}" onBlur="{{ leave }}" style="background:var(--surface); border:1px solid {{ e.border }}; opacity:{{ e.opacity }}; transition:opacity 140ms cubic-bezier(.2,.7,.2,1), border-color 140ms cubic-bezier(.2,.7,.2,1); cursor:default">
+        <div style="display:flex; justify-content:space-between; gap:8px; padding:10px 12px; border-bottom:1px solid var(--line); background:{{ e.headBg }}; color:{{ e.headFg }}">
+          <span class="sw-mono" style="font-size:12px; letter-spacing:.08em">{{ e.name }}</span>
+          <span class="sw-mono" style="font-size:11px; opacity:.7">{{ e.count }}</span>
+        </div>
+        <sc-for list="{{ e.rows }}" as="f" hint-placeholder-count="4">
+          <div style="display:grid; grid-template-columns:minmax(0,1fr) auto 28px; gap:8px; padding:6px 12px; border-bottom:1px dashed var(--line); font-family:var(--font-mono); font-size:12px; line-height:1.4">
+            <span style="overflow-wrap:anywhere">{{ f.name }}</span>
+            <span style="color:var(--fg-2)">{{ f.type }}</span>
+            <span style="color:var(--fg); text-align:right; font-size:10px; letter-spacing:.06em">{{ f.key }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+  <figcaption style="display:flex; flex-direction:column; border-top:1px solid var(--line)">
+    <span class="sw-label" style="padding:12px 0 8px">Связи · {{ relCount }}</span>
+    <sc-for list="{{ relations }}" as="r" hint-placeholder-count="3">
+      <div onPointerEnter="{{ r.enter }}" onPointerLeave="{{ leave }}" style="display:grid; grid-template-columns:minmax(0,1fr) 88px minmax(0,1fr); gap:12px; padding:8px 0; border-bottom:1px solid var(--line); font-family:var(--font-mono); font-size:12px; letter-spacing:.06em; opacity:{{ r.opacity }}">
+        <span>{{ r.from }}</span>
+        <span style="text-align:center; color:var(--fg-2)">— {{ r.card }} →</span>
+        <span>{{ r.to }}</span>
+      </div>
+    </sc-for>
+  </figcaption>
+</figure>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:900,&quot;height&quot;:560},&quot;diagram&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;ErdDiagram&quot;}}">
+class Component extends DCLogic {
+  state = { hot: null, rel: null };
+  leave = () => this.setState({ hot: null, rel: null });
+  renderVals() {
+    const d = this.props.diagram || { entities: [], relations: [] };
+    const { hot, rel } = this.state;
+    const rels = d.relations || [];
+    const byId = {}; (d.entities || []).forEach((e) => { byId[e.id] = e; });
+    let on = null;
+    if (hot) { on = new Set([hot]); rels.forEach(([a, b]) => { if (a === hot) on.add(b); if (b === hot) on.add(a); }); }
+    if (rel != null && rels[rel]) on = new Set([rels[rel][0], rels[rel][1]]);
+    const keyLabel = { PK: 'первичный ключ', FK: 'внешний ключ', UK: 'уникальный' };
+    const entities = (d.entities || []).map((e) => {
+      const isOn = on && on.has(e.id); const isHot = hot === e.id;
+      return {
+        id: e.id, name: e.name, count: (e.fields || []).length + ' п.',
+        aria: e.name + ': ' + (e.fields || []).map((f) => f[0] + (f[2] ? ' (' + keyLabel[f[2]] + ')' : '')).join(', '),
+        rows: (e.fields || []).map((f) => ({ name: f[0], type: f[1], key: f[2] || '' })),
+        border: isOn ? 'var(--line-strong)' : 'var(--line)',
+        opacity: on && !isOn ? 0.35 : 1,
+        headBg: isHot ? 'var(--inverse-bg)' : 'transparent', headFg: isHot ? 'var(--inverse-fg)' : 'var(--fg)',
+        enter: () => this.setState({ hot: e.id, rel: null }),
+      };
+    });
+    const relations = rels.map(([a, b, card], i) => ({
+      from: (byId[a] || { name: a }).name, to: (byId[b] || { name: b }).name, card: card || '',
+      opacity: (hot && a !== hot && b !== hot) || (rel != null && rel !== i) ? 0.35 : 1,
+      enter: () => this.setState({ rel: i, hot: null }),
+    }));
+    return { entities, relations, relCount: relations.length, leave: this.leave };
+  }
+}
+</script>
+</body>
+</html>

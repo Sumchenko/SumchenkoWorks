@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/base.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/components/sw-components.css">
+  <script src="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/_ds_bundle.js"></script>
+  <script src="data/content.js"></script>
+  <script src="data/store.js"></script>
+</helmet>
+<article ref="{{ rootRef }}" style="max-width:1440px; margin:0 auto; padding:0 var(--grid-margin)">
+  <nav aria-label="Навигация по разделу" style="padding-top:24px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between">
+    <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Button" variant="ghost" size="sm" href="#/works" icon-start="arrow-left" hint-size="140px,32px">Все проекты</x-import>
+    <span class="sw-label"><a href="#/works" style="color:inherit">Проекты</a> / {{ p.code }}</span>
+  </nav>
+
+  <header style="display:flex; flex-wrap:wrap; gap:32px var(--grid-gutter); padding:40px 0 28px; align-items:flex-end">
+    <div style="flex:8 1 480px; display:flex; flex-direction:column; gap:20px">
+      <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
+        <span class="sw-label">{{ p.code }} · {{ p.categoryLabel }}</span>
+        <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Badge" variant="{{ p.badge.variant }}" dot="{{ p.badge.dot }}" pulse="{{ p.badge.pulse }}" hint-size="90px,22px">{{ p.badge.label }}</x-import>
+        <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Badge" variant="dashed" title="Демонстрационный пример: проект, данные и результаты вымышлены" hint-size="56px,22px">Демо</x-import>
+      </div>
+      <h1 style="font-family:var(--font-pixel); font-size:var(--text-display-m); line-height:.95; letter-spacing:-.01em">{{ p.title }}</h1>
+      <p style="font-size:var(--text-lead); line-height:1.45; max-width:48ch">{{ p.summary }}</p>
+      <sc-if value="{{ hasExtLinks }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; flex-wrap:wrap; gap:8px">
+          <sc-for list="{{ extLinks }}" as="l" hint-placeholder-count="1">
+            <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Button" variant="secondary" size="sm" href="{{ l.href }}" target="{{ l.target }}" rel="{{ l.rel }}" icon-start="{{ l.icon }}" hint-size="140px,32px">{{ l.label }}</x-import>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+    <div style="flex:4 1 300px">
+      <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.SpecList" items="{{ spec }}" hint-size="100%,180px"></x-import>
+    </div>
+  </header>
+
+  <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Tabs" numbered="{{ true }}" value="{{ tab }}" onChange="{{ setTab }}" items="{{ tabs }}" aria-label="Разделы проекта" hint-size="100%,48px"></x-import>
+
+  <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
+    <div role="tabpanel" aria-label="Обзор" style="display:flex; flex-direction:column; padding-top:16px">
+      <sc-for list="{{ overviewRows }}" as="r" hint-placeholder-count="4">
+        <section data-reveal="0" style="display:flex; flex-wrap:wrap; gap:12px var(--grid-gutter); padding:28px 0; border-bottom:1px solid var(--line)">
+          <h2 style="flex:0 0 220px; font-size:20px; font-weight:500; line-height:1.25">{{ r.title }}</h2>
+          <div style="flex:1 1 480px; min-width:0; display:flex; flex-direction:column; gap:14px">
+            <sc-if value="{{ r.text }}" hint-placeholder-val="{{ true }}"><p style="font-size:17px; line-height:1.65; max-width:64ch">{{ r.text }}</p></sc-if>
+            <sc-if value="{{ r.sub }}" hint-placeholder-val="{{ false }}"><p style="font-size:15px; line-height:1.6; max-width:64ch; color:var(--fg-2)">{{ r.sub }}</p></sc-if>
+            <sc-if value="{{ r.isList }}" hint-placeholder-val="{{ false }}">
+              <ol style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; max-width:64ch">
+                <sc-for list="{{ r.items }}" as="i" hint-placeholder-count="3">
+                  <li style="display:grid; grid-template-columns:32px 1fr; gap:8px; padding:8px 0; border-top:1px dashed var(--line); font-size:16px"><span class="sw-mono" style="font-size:11px; color:var(--fg-2); padding-top:4px">{{ i.idx }}</span><span>{{ i.text }}</span></li>
+                </sc-for>
+              </ol>
+            </sc-if>
+            <sc-if value="{{ r.isChips }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; flex-wrap:wrap; gap:6px">
+                <sc-for list="{{ r.items }}" as="i" hint-placeholder-count="4">
+                  <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Tag" hint-size="120px,32px">{{ i.text }}</x-import>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ r.isStack }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; flex-wrap:wrap; gap:6px">
+                <sc-for list="{{ r.items }}" as="i" hint-placeholder-count="4">
+                  <a href="{{ i.href }}" title="Другие проекты с этой технологией" style="text-decoration:none"><x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Tag" size="sm" hash="{{ true }}" hint-size="80px,24px">{{ i.text }}</x-import></a>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ r.isReqs }}" hint-placeholder-val="{{ false }}">
+              <div style="overflow-x:auto">
+                <table style="width:100%; border-collapse:collapse; min-width:480px">
+                  <thead><tr>
+                    <th scope="col" class="sw-label" style="text-align:left; padding:6px 12px 6px 0; border-bottom:1px solid var(--line-strong); font-weight:400; width:80px">ID</th>
+                    <th scope="col" class="sw-label" style="text-align:left; padding:6px 12px 6px 0; border-bottom:1px solid var(--line-strong); font-weight:400">Требование</th>
+                    <th scope="col" class="sw-label" style="text-align:left; padding:6px 0; border-bottom:1px solid var(--line-strong); font-weight:400; width:72px">Приоритет</th>
+                  </tr></thead>
+                  <tbody>
+                    <sc-for list="{{ r.items }}" as="q" hint-placeholder-count="4">
+                      <tr>
+                        <td class="sw-mono" style="padding:9px 12px 9px 0; border-bottom:1px solid var(--line); font-size:12px">{{ q.id }}</td>
+                        <td style="padding:9px 12px 9px 0; border-bottom:1px solid var(--line); font-size:15px; line-height:1.45">{{ q.text }}</td>
+                        <td class="sw-mono" style="padding:9px 0; border-bottom:1px solid var(--line); font-size:12px">{{ q.priority }}</td>
+                      </tr>
+                    </sc-for>
+                  </tbody>
+                </table>
+              </div>
+            </sc-if>
+            <sc-if value="{{ r.isScenarios }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr)); gap:var(--grid-gutter)">
+                <sc-for list="{{ r.items }}" as="s" hint-placeholder-count="2">
+                  <div style="display:flex; flex-direction:column; gap:10px; padding:20px; background:var(--surface); border:1px solid var(--line)">
+                    <span class="sw-label">{{ s.actor }}</span>
+                    <span style="font-size:17px; font-weight:500">{{ s.title }}</span>
+                    <ol style="margin:0; padding:0; list-style:none; display:flex; flex-direction:column">
+                      <sc-for list="{{ s.steps }}" as="st" hint-placeholder-count="3">
+                        <li style="display:grid; grid-template-columns:24px 1fr; gap:6px; padding:6px 0; border-top:1px dashed var(--line); font-size:14px; line-height:1.45"><span class="sw-mono" style="font-size:11px; color:var(--fg-2); padding-top:2px">{{ st.idx }}</span><span>{{ st.text }}</span></li>
+                      </sc-for>
+                    </ol>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ r.isStages }}" hint-placeholder-val="{{ false }}">
+              <ol style="list-style:none; margin:0; padding:0 0 0 20px; display:flex; flex-direction:column; border-left:1px dashed var(--fg-3)">
+                <sc-for list="{{ r.items }}" as="s" hint-placeholder-count="3">
+                  <li style="position:relative; display:flex; flex-wrap:wrap; gap:2px 20px; padding:0 0 18px">
+                    <span aria-hidden="true" style="position:absolute; left:-25px; top:6px; width:9px; height:9px; background:var(--fg)"></span>
+                    <span class="sw-label" style="flex:0 0 80px; padding-top:3px">{{ s.period }}</span>
+                    <span style="flex:1 1 240px; display:flex; flex-direction:column; gap:2px"><span style="font-size:16px; font-weight:500">{{ s.title }}</span><span style="font-size:14px; color:var(--fg-2)">{{ s.text }}</span></span>
+                  </li>
+                </sc-for>
+              </ol>
+            </sc-if>
+            <sc-if value="{{ r.isChallenges }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr)); gap:var(--grid-gutter)">
+                <sc-for list="{{ r.items }}" as="c" hint-placeholder-count="2">
+                  <div style="display:flex; flex-direction:column; gap:6px; padding:18px; border:1px dashed var(--line-strong)"><span style="font-size:16px; font-weight:500">{{ c.title }}</span><span style="font-size:14px; color:var(--fg-2); line-height:1.5">{{ c.text }}</span></div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </section>
+      </sc-for>
+      <sc-if value="{{ hasDeeper }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; flex-wrap:wrap; gap:8px; padding-top:28px">
+          <sc-if value="{{ hasArch }}" hint-placeholder-val="{{ true }}">
+            <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Button" variant="secondary" icon-end="arrow-right" onClick="{{ goArch }}" hint-size="200px,40px">Архитектура</x-import>
+          </sc-if>
+          <sc-if value="{{ hasArtifacts }}" hint-placeholder-val="{{ true }}">
+            <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Button" variant="ghost" icon-end="arrow-right" onClick="{{ goArtifacts }}" hint-size="200px,40px">{{ artifactsLabel }}</x-import>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isArch }}" hint-placeholder-val="{{ false }}">
+    <div role="tabpanel" aria-label="Архитектура" style="display:flex; flex-direction:column; gap:64px; padding-top:40px">
+      <sc-if value="{{ archDiagram }}" hint-placeholder-val="{{ true }}">
+        <section aria-labelledby="h-comp" style="display:flex; flex-direction:column; gap:20px">
+          <div style="display:flex; gap:16px; align-items:baseline; flex-wrap:wrap"><span class="sw-label">§ 2.1</span><h2 id="h-comp" style="font-size:var(--text-h2); font-weight:500">Компоненты</h2></div>
+          <sc-if value="{{ archText }}" hint-placeholder-val="{{ false }}"><p style="font-size:17px; line-height:1.6; max-width:64ch">{{ archText }}</p></sc-if>
+          <div style="display:flex; flex-wrap:wrap; gap:var(--grid-gutter); align-items:flex-start">
+            <figure style="flex:2 1 460px; margin:0; min-width:0; border:1px solid var(--line); background:var(--surface); padding:48px 24px 40px; position:relative">
+              <figcaption class="sw-label" style="position:absolute; top:14px; left:16px">FIG. {{ figNo }} — компоненты</figcaption>
+              <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Coord" x="{{ 0 }}" y="{{ 0 }}" style="position:absolute; bottom:14px; right:16px" hint-size="110px,16px"></x-import>
+              <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.IsoDiagram" nodes="{{ archNodes }}" links="{{ archLinks }}" unit="{{ 28 }}" highlight="{{ hot }}" onNodeHover="{{ setHot }}" style="max-height:440px" hint-size="100%,320px"></x-import>
+            </figure>
+            <ol aria-label="Компоненты" style="flex:1 1 240px; list-style:none; margin:0; padding:0; display:flex; flex-direction:column; border-top:1px solid var(--line)">
+              <sc-for list="{{ archItems }}" as="n" hint-placeholder-count="5">
+                <li tabindex="0" onPointerEnter="{{ n.enter }}" onPointerLeave="{{ clearHot }}" onFocus="{{ n.enter }}" onBlur="{{ clearHot }}" style="display:grid; grid-template-columns:28px 1fr; gap:8px; padding:12px 0; border-bottom:1px solid var(--line); opacity:{{ n.opacity }}; transition:opacity 140ms cubic-bezier(.2,.7,.2,1)">
+                  <span class="sw-label">{{ n.idx }}</span>
+                  <div style="display:flex; flex-direction:column; gap:4px"><span class="sw-mono" style="font-size:12px; letter-spacing:.06em">{{ n.label }}</span><span style="font-size:14px; color:var(--fg-2); line-height:1.45">{{ n.note }}</span></div>
+                </li>
+              </sc-for>
+            </ol>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-for list="{{ flows }}" as="f" hint-placeholder-count="1">
+        <section style="display:flex; flex-direction:column; gap:20px">
+          <div style="display:flex; gap:16px; align-items:baseline; flex-wrap:wrap"><span class="sw-label">§ {{ f.idx }}</span><h2 style="font-size:var(--text-h2); font-weight:500">{{ f.title }}</h2></div>
+          <div style="padding:clamp(20px,3vw,32px); border:1px solid var(--line); background:var(--surface)"><dc-import name="FlowView" diagram="{{ f.diagram }}" hint-size="100%,220px"></dc-import></div>
+        </section>
+      </sc-for>
+
+      <sc-if value="{{ erd }}" hint-placeholder-val="{{ false }}">
+        <section aria-labelledby="h-data" style="display:flex; flex-direction:column; gap:20px">
+          <div style="display:flex; gap:16px; align-items:baseline"><span class="sw-label">§ {{ idx.data }}</span><h2 id="h-data" style="font-size:var(--text-h2); font-weight:500">Модель данных</h2></div>
+          <sc-if value="{{ dataText }}" hint-placeholder-val="{{ false }}"><p style="font-size:17px; line-height:1.6; max-width:64ch">{{ dataText }}</p></sc-if>
+          <dc-import name="ErdView" diagram="{{ erd }}" hint-size="100%,420px"></dc-import>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ hasApi }}" hint-placeholder-val="{{ false }}">
+        <section aria-labelledby="h-api" style="display:flex; flex-direction:column; gap:20px">
+          <div style="display:flex; gap:16px; align-items:baseline"><span class="sw-label">§ {{ idx.api }}</span><h2 id="h-api" style="font-size:var(--text-h2); font-weight:500">API и интеграции</h2></div>
+          <sc-if value="{{ hasEndpoints }}" hint-placeholder-val="{{ true }}">
+            <ul aria-label="Эндпоинты" style="list-style:none; margin:0; padding:0; border-top:1px solid var(--line)">
+              <sc-for list="{{ endpoints }}" as="e" hint-placeholder-count="3">
+                <li style="display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; padding:12px 0; border-bottom:1px solid var(--line)">
+                  <span class="sw-mono" style="min-width:56px; text-align:center; font-size:11px; letter-spacing:.08em; padding:3px 6px; border:1px solid var(--line-strong); background:{{ e.bg }}; color:{{ e.fg }}">{{ e.method }}</span>
+                  <code style="font-size:13px; flex:1 1 220px; overflow-wrap:anywhere">{{ e.path }}</code>
+                  <span style="font-size:14px; color:var(--fg-2); flex:1 1 240px">{{ e.text }}</span>
+                </li>
+              </sc-for>
+            </ul>
+          </sc-if>
+          <sc-if value="{{ hasIntegrations }}" hint-placeholder-val="{{ false }}">
+            <ul aria-label="Интеграции" style="list-style:none; margin:0; padding:0; border-top:1px solid var(--line)">
+              <sc-for list="{{ integrations }}" as="i" hint-placeholder-count="2">
+                <li style="display:flex; flex-wrap:wrap; gap:6px 24px; padding:12px 0; border-bottom:1px solid var(--line); align-items:baseline">
+                  <span class="sw-mono" style="flex:1 1 200px; font-size:13px">{{ i.name }}</span>
+                  <span class="sw-label" style="flex:0 0 140px">{{ i.protocol }}</span>
+                  <span style="flex:2 1 260px; font-size:14px; color:var(--fg-2)">{{ i.text }}</span>
+                </li>
+              </sc-for>
+            </ul>
+          </sc-if>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ hasDecisions }}" hint-placeholder-val="{{ false }}">
+        <section aria-labelledby="h-dec" style="display:flex; flex-direction:column; gap:20px">
+          <div style="display:flex; gap:16px; align-items:baseline"><span class="sw-label">§ {{ idx.decisions }}</span><h2 id="h-dec" style="font-size:var(--text-h2); font-weight:500">Ключевые решения</h2></div>
+          <sc-for list="{{ decisions }}" as="d" hint-placeholder-count="2">
+            <div style="display:flex; flex-wrap:wrap; gap:16px 24px; padding:24px; background:var(--surface); border:1px solid var(--line)">
+              <div style="flex:1 1 220px; display:flex; flex-direction:column; gap:8px"><span class="sw-label">Решение {{ d.idx }}</span><h3 style="font-size:var(--text-h3); font-weight:500; line-height:1.2">{{ d.title }}</h3></div>
+              <dl style="flex:2 1 320px; margin:0; display:flex; flex-direction:column; gap:12px">
+                <sc-if value="{{ d.choice }}" hint-placeholder-val="{{ true }}"><div style="display:flex; flex-direction:column; gap:2px"><dt class="sw-label">Выбор</dt><dd style="margin:0; font-size:15px">{{ d.choice }}</dd></div></sc-if>
+                <sc-if value="{{ d.why }}" hint-placeholder-val="{{ true }}"><div style="display:flex; flex-direction:column; gap:2px"><dt class="sw-label">Обоснование</dt><dd style="margin:0; font-size:15px; color:var(--fg-2)">{{ d.why }}</dd></div></sc-if>
+                <sc-if value="{{ d.pros }}" hint-placeholder-val="{{ false }}"><div style="display:flex; flex-direction:column; gap:2px"><dt class="sw-label">+ Плюсы</dt><dd style="margin:0; font-size:15px">{{ d.pros }}</dd></div></sc-if>
+                <sc-if value="{{ d.cons }}" hint-placeholder-val="{{ false }}"><div style="display:flex; flex-direction:column; gap:2px"><dt class="sw-label">− Компромиссы</dt><dd style="margin:0; font-size:15px; color:var(--fg-2)">{{ d.cons }}</dd></div></sc-if>
+                <sc-if value="{{ d.alternatives }}" hint-placeholder-val="{{ false }}"><div style="display:flex; flex-direction:column; gap:2px"><dt class="sw-label">Альтернативы</dt><dd style="margin:0; font-size:15px; color:var(--fg-2)">{{ d.alternatives }}</dd></div></sc-if>
+              </dl>
+            </div>
+          </sc-for>
+        </section>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isArtifacts }}" hint-placeholder-val="{{ false }}">
+    <div role="tabpanel" aria-label="Артефакты" style="display:flex; flex-direction:column; gap:16px; padding-top:32px">
+      <p style="font-size:15px; color:var(--fg-2); max-width:64ch">Материалы проекта: требования, диаграммы, спецификации и заметки. Каждый открывается здесь, без перехода на другую страницу.</p>
+      <div style="display:flex; flex-direction:column; border-top:1px solid var(--line)">
+        <sc-for list="{{ artifacts }}" as="a" hint-placeholder-count="4">
+          <dc-import name="ArtifactRow" artifact="{{ a }}" hint-size="100%,74px"></dc-import>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasRelated }}" hint-placeholder-val="{{ false }}">
+    <section aria-labelledby="h-rel" style="padding-top:var(--space-section); display:flex; flex-direction:column">
+      <h2 id="h-rel" class="sw-label" style="padding-bottom:12px">Связанные проекты</h2>
+      <sc-for list="{{ related }}" as="r" hint-placeholder-count="2">
+        <a href="{{ r.href }}" style="display:grid; grid-template-columns:64px minmax(0,1fr) 32px; gap:var(--grid-gutter); align-items:center; padding:16px 12px; border-top:1px solid var(--line); color:var(--fg); text-decoration:none" style-hover="background:var(--surface)">
+          <span class="sw-label">{{ r.code }}</span>
+          <span style="display:flex; flex-wrap:wrap; gap:4px 24px; align-items:baseline"><span style="font-size:18px; font-weight:500; margin-right:auto">{{ r.title }}</span><span class="sw-label">{{ r.categoryLabel }} · {{ r.year }}</span></span>
+          <span aria-hidden="true" style="width:32px; height:32px; display:grid; place-items:center; border:1px solid var(--line-strong)"><x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Icon" name="arrow-right" size="{{ 16 }}" hint-size="16px,16px"></x-import></span>
+        </a>
+      </sc-for>
+    </section>
+  </sc-if>
+
+  <div style="margin:var(--space-section) 0; border-top:1px solid var(--line); padding-top:24px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap">
+    <span class="sw-label">Следующий · {{ next.code }}</span>
+    <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Button" variant="secondary" href="{{ next.href }}" icon-end="arrow-right" hint-size="240px,40px">{{ next.title }}</x-import>
+  </div>
+
+  <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Dialog" open="{{ docOpen }}" onClose="{{ closeDoc }}" label="{{ docLabel }}" title="{{ docTitle }}" width="{{ 1040 }}" hint-size="0px,0px">
+    <div style="max-height:72vh; overflow:auto; padding-right:4px">
+      <dc-import name="ArtifactViewer" artifact-id="{{ doc }}" hint-size="100%,400px"></dc-import>
+    </div>
+  </x-import>
+</article>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  rootRef = React.createRef();
+  state = Object.assign({ hot: null }, Component.fromQs(this.props.qs));
+  static fromQs(qs) { const p = new URLSearchParams(qs || ''); return { tab: p.get('tab') || 'overview', doc: p.get('doc') || null }; }
+  setHot = (id) => this.setState({ hot: id });
+  clearHot = () => this.setState({ hot: null });
+
+  componentDidMount() {
+    const S = window.SWStore;
+    if (S && S.status !== 'ready') S.load().then(() => this.forceUpdate(), () => {});
+    if (S) this._unrev = S.reveal(this.rootRef.current);
+  }
+  componentWillUnmount() { if (this._unrev) this._unrev(); }
+  componentDidUpdate(prev) {
+    if (prev.slug !== this.props.slug || (prev.nav !== this.props.nav && this.props.qs !== this._lastQs)) {
+      this._lastQs = this.props.qs;
+      this.setState(Object.assign({ hot: null }, Component.fromQs(this.props.qs)));
+    }
+  }
+  sync() {
+    const p = new URLSearchParams();
+    if (this.state.tab !== 'overview') p.set('tab', this.state.tab);
+    if (this.state.doc) p.set('doc', this.state.doc);
+    const qs = p.toString(); this._lastQs = qs;
+    try { history.replaceState(null, '', '#/works/' + this.props.slug + (qs ? '?' + qs : '')); } catch (e) {}
+  }
+  setTab = (tab) => this.setState({ tab, doc: null }, () => this.sync());
+  goArch = () => { this.setTab('arch'); this.scrollToTabs(); };
+  goArtifacts = () => { this.setTab('artifacts'); this.scrollToTabs(); };
+  scrollToTabs() { const t = this.rootRef.current && this.rootRef.current.querySelector('[role=tablist]'); if (t) window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 72 }); }
+  closeDoc = () => this.setState({ doc: null }, () => this.sync());
+
+  renderVals() {
+    const S = window.SWStore;
+    if (!S || S.status !== 'ready') return { rootRef: this.rootRef };
+    const raw = S.project(this.props.slug) || S.data.projects[0];
+    const p = S.projectVM(raw);
+    const pad = (n) => String(n).padStart(2, '0');
+    const entries = S.archOf(raw.id);
+    const archD = raw.architecture && S.diagram(raw.architecture.diagram);
+    const erd = raw.dataModel && S.diagram(raw.dataModel.diagram);
+    const api = raw.api || {};
+    const flowIds = [...new Set(entries.map((e) => e.flow).concat((raw.gallery || []).map((g) => g.diagram)).filter((id) => { const d = S.diagram(id); return d && d.kind === 'flow'; }))];
+    const integrations = (api.integrations || []).concat(...entries.map((e) => e.integrations || []));
+    const decisions = (raw.decisions || []).map((d) => ({ ...d }))
+      .concat(...entries.map((e) => (e.decisions || []).map((d) => ({ title: d.title, pros: (d.pros || []).join('; '), cons: (d.cons || []).join('; ') }))));
+    const arts = S.artifactsOf(raw.id).map(S.artifactVM);
+    const hasArch = !!(archD || erd || flowIds.length || (api.endpoints && api.endpoints.length) || integrations.length || decisions.length);
+    const hasArtifacts = arts.length > 0;
+    const tabs = [{ id: 'overview', label: 'Обзор' }];
+    if (hasArch) tabs.push({ id: 'arch', label: 'Архитектура' });
+    if (hasArtifacts) tabs.push({ id: 'artifacts', label: 'Артефакты', count: arts.length });
+    const tab = tabs.some((t) => t.id === this.state.tab) ? this.state.tab : 'overview';
+
+    const rows = [];
+    if (raw.problem) rows.push({ title: 'Задача', text: raw.problem });
+    if (raw.overview) rows.push({ title: 'Решение', text: raw.overview, sub: raw.purpose || '' });
+    if (raw.goals && raw.goals.length) rows.push({ title: 'Цели', isList: true, items: raw.goals.map((g, i) => ({ idx: pad(i + 1), text: g })) });
+    if (raw.features && raw.features.length) rows.push({ title: 'Функции', isChips: true, items: raw.features.map((f) => ({ text: f })) });
+    if (raw.requirements && raw.requirements.length) rows.push({ title: 'Ключевые требования', isReqs: true, items: raw.requirements });
+    if (raw.scenarios && raw.scenarios.length) rows.push({ title: 'Сценарии', isScenarios: true, items: raw.scenarios.map((s) => ({ ...s, steps: s.steps.map((t, j) => ({ idx: pad(j + 1), text: t })) })) });
+    if (raw.stages && raw.stages.length) rows.push({ title: 'Ход работы', isStages: true, items: raw.stages });
+    if (raw.challenges && raw.challenges.length) rows.push({ title: 'Сложности', isChallenges: true, items: raw.challenges });
+    const res = raw.results || {};
+    if (res.text || res.state) rows.push({ title: 'Результат', text: res.text || res.state, sub: res.text ? (res.state || '') : '' });
+    rows.push({ title: 'Технологии', isStack: true, items: p.techList.map((t) => ({ text: t.label, href: '#/works?tech=' + t.id })) });
+
+    let k = archD ? 1 : 0; const idx = {};
+    const flows = flowIds.map((id) => { k++; const d = S.diagram(id); return { idx: '2.' + k, title: d.title, diagram: d }; });
+    if (erd) idx.data = '2.' + (++k);
+    const hasApi = !!((api.endpoints && api.endpoints.length) || integrations.length);
+    if (hasApi) idx.api = '2.' + (++k);
+    if (decisions.length) idx.decisions = '2.' + (++k);
+
+    const hot = this.state.hot;
+    const list = S.data.projects; const next = S.projectVM(list[(list.indexOf(raw) + 1) % list.length]);
+    const extLinks = p.linkList.filter((l) => l.external);
+    const docA = this.state.doc ? S.artifact(this.state.doc) : null;
+    const docOk = !!(docA && docA.project === raw.id);
+    return {
+      rootRef: this.rootRef, p,
+      extLinks, hasExtLinks: extLinks.length > 0,
+      spec: [
+        { label: 'Роль', value: p.role || p.categoryLabel },
+        { label: 'Период', value: p.period || String(p.year) },
+        { label: 'Статус', value: p.badge.label + ' · демо-пример' },
+        { label: 'Стек', value: p.techLine },
+      ],
+      tabs, tab, setTab: this.setTab,
+      isOverview: tab === 'overview', isArch: tab === 'arch', isArtifacts: tab === 'artifacts',
+      overviewRows: rows,
+      hasArch, hasArtifacts, hasDeeper: hasArch || hasArtifacts, goArch: this.goArch, goArtifacts: this.goArtifacts,
+      artifactsLabel: 'Артефакты · ' + arts.length,
+      archDiagram: !!archD, archText: raw.architecture && raw.architecture.text, figNo: p.code.slice(-2),
+      archNodes: archD ? archD.nodes : [], archLinks: archD ? archD.links : [], hot, setHot: this.setHot, clearHot: this.clearHot,
+      archItems: archD ? archD.nodes.map((n, i) => ({ idx: pad(i + 1), label: n.label, note: (archD.notes || {})[n.id] || n.sub || '—', opacity: hot && hot !== n.id ? 0.35 : 1, enter: () => this.setState({ hot: n.id }) })) : [],
+      flows, erd, dataText: raw.dataModel && raw.dataModel.text, idx,
+      hasApi, endpoints: (api.endpoints || []).map((e) => ({ ...e, bg: e.method === 'GET' ? 'transparent' : 'var(--inverse-bg)', fg: e.method === 'GET' ? 'var(--fg)' : 'var(--inverse-fg)' })),
+      hasEndpoints: !!(api.endpoints && api.endpoints.length), integrations, hasIntegrations: integrations.length > 0,
+      decisions: decisions.map((d, i) => ({ ...d, idx: pad(i + 1) })), hasDecisions: decisions.length > 0,
+      artifacts: arts,
+      related: S.relatedOf(raw).map(S.projectVM), hasRelated: S.relatedOf(raw).length > 0,
+      next,
+      doc: docOk ? docA.id : '', docOpen: docOk, closeDoc: this.closeDoc,
+      docLabel: docOk ? 'Артефакт / ' + docA.code : '', docTitle: docOk ? docA.title : '',
+    };
+  }
+}
+</script>
+</body>
+</html>

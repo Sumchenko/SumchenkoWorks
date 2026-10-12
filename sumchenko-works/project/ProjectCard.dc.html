@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/base.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/components/sw-components.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/styles.css">
+  <script src="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/_ds_bundle.js"></script>
+</helmet>
+<x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Card" as="article" interactive="{{ true }}" dc-props="{{ cardProps }}" style="height:100%; width:100%; display:flex" hint-size="100%,440px">
+  <div aria-hidden="true" style="height:180px; margin:-24px -24px 0; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:center; padding:16px 24px; background:var(--bg)">
+    <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.IsoDiagram" nodes="{{ project.coverNodes }}" links="{{ project.coverLinks }}" unit="{{ 16 }}" animate="{{ false }}" labels="{{ false }}" style="max-height:148px" hint-size="100%,148px"></x-import>
+  </div>
+  <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap">
+    <span class="sw-label">{{ project.code }} · {{ project.year }} · {{ project.categoryLabel }}</span>
+    <div style="display:flex; gap:6px; flex-wrap:wrap">
+      <sc-if value="{{ project.demo }}" hint-placeholder-val="{{ true }}">
+        <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Badge" variant="dashed" title="Демонстрационный пример, не реальный проект" hint-size="56px,22px">Демо</x-import>
+      </sc-if>
+      <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Badge" variant="{{ project.badge.variant }}" dot="{{ project.badge.dot }}" pulse="{{ project.badge.pulse }}" hint-size="80px,22px">{{ project.badge.label }}</x-import>
+    </div>
+  </div>
+  <h3 style="font-family:var(--font-sans); font-size:20px; font-weight:500; line-height:1.2">
+    <a href="{{ project.href }}" style="color:inherit; text-decoration:none" style-after="content:''; position:absolute; inset:0; z-index:1">{{ project.title }}</a>
+  </h3>
+  <p style="font-size:14px; color:var(--fg-2); line-height:1.5">{{ project.summary }}</p>
+  <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:auto">
+    <sc-for list="{{ project.techList }}" as="t" hint-placeholder-count="3">
+      <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Tag" size="sm" hint-size="60px,24px">{{ t.label }}</x-import>
+    </sc-for>
+  </div>
+  <sc-if value="{{ project.hasLinks }}" hint-placeholder-val="{{ false }}">
+    <div style="position:relative; z-index:2; display:flex; flex-wrap:wrap; gap:4px; border-top:1px dashed var(--line); padding-top:12px; margin-top:-4px">
+      <sc-for list="{{ project.linkList }}" as="l" hint-placeholder-count="1">
+        <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Button" variant="ghost" size="sm" href="{{ l.href }}" target="{{ l.target }}" rel="{{ l.rel }}" icon-start="{{ l.icon }}" hint-size="120px,32px">{{ l.label }}</x-import>
+      </sc-for>
+    </div>
+  </sc-if>
+</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:380,&quot;height&quot;:480},&quot;project&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;ProjectVM&quot;}}">class Component extends DCLogic {
+  static CARD = { style: { flex: 1, width: '100%', gap: 18 } };
+  renderVals() { return { project: this.props.project || {}, cardProps: Component.CARD }; }
+}</script>
+</body>
+</html>

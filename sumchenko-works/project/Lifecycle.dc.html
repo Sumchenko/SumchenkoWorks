@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/base.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/components/sw-components.css">
+  <script src="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/_ds_bundle.js"></script>
+  <style>@keyframes sw-lc-blink{50%{opacity:0}}</style>
+</helmet>
+<div style="display:flex; flex-direction:column; gap:16px">
+  <div style="display:flex; justify-content:space-between; align-items:center; gap:8px 16px; flex-wrap:wrap">
+    <span class="sw-label">FIG. 01 — от идеи до работающей системы</span>
+    <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap">
+      <span class="sw-label" style="color:var(--fg); display:inline-flex; align-items:center; gap:8px">
+        <span aria-hidden="true" style="width:8px; height:8px; background:var(--fg); animation:sw-lc-blink 1s steps(1) infinite"></span>{{ runText }}
+      </span>
+      <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.IconButton" icon="{{ pauseIcon }}" label="{{ pauseLabel }}" pressed="{{ paused }}" size="sm" variant="bare" onClick="{{ togglePause }}" hint-size="32px,32px"></x-import>
+    </div>
+  </div>
+
+  <div style="display:flex; flex-wrap:wrap; gap:var(--grid-gutter); align-items:stretch">
+    <div class="sw-dotgrid" style="flex:1.9 1 520px; min-width:0; border:1px solid var(--line); background-color:var(--bg); position:relative">
+      <x-import component-from-global-scope="sw-lifecycle" from="./assets/sw-lifecycle.js" focus="{{ focusAttr }}" paused="{{ pausedAttr }}" hint-size="100%,560px"></x-import>
+    </div>
+    <aside aria-live="polite" style="flex:1 1 280px; min-width:0; display:flex; flex-direction:column; gap:18px; border-top:1px solid var(--line-strong); padding-top:20px">
+      <span class="sw-label">{{ info.eyebrow }}</span>
+      <h3 style="margin:0; font-size:var(--text-h3); font-weight:500; line-height:1.15">{{ info.title }}</h3>
+      <p style="margin:0; color:var(--fg-2); font-size:15px; line-height:1.6; text-wrap:pretty; max-width:46ch">{{ info.text }}</p>
+      <sc-if value="{{ info.isStage }}" hint-placeholder-val="{{ false }}">
+        <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.SpecList" items="{{ info.spec }}" hint-size="100%,140px"></x-import>
+      </sc-if>
+      <sc-if value="{{ info.isOverview }}" hint-placeholder-val="{{ true }}">
+        <span class="sw-mono" style="font-size:12px; color:var(--fg-2)">Наведите на этап на схеме или выберите его ниже.</span>
+      </sc-if>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:auto">
+        <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.IconButton" icon="arrow-left" label="Предыдущий этап" size="sm" onClick="{{ prev }}" hint-size="32px,32px"></x-import>
+        <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.IconButton" icon="arrow-right" label="Следующий этап" size="sm" onClick="{{ next }}" hint-size="32px,32px"></x-import>
+        <sc-if value="{{ info.isStage }}" hint-placeholder-val="{{ false }}">
+          <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Button" variant="ghost" size="sm" onClick="{{ overview }}" hint-size="140px,32px">Обзор системы</x-import>
+        </sc-if>
+      </div>
+    </aside>
+  </div>
+
+  <div role="group" aria-label="Этапы цикла" style="display:grid; grid-template-columns:repeat({{ stripCols }},minmax(0,1fr)); gap:6px">
+    <sc-for list="{{ stages }}" as="s" hint-placeholder-count="6">
+      <button type="button" aria-pressed="{{ s.pressed }}" onClick="{{ s.select }}" onMouseEnter="{{ s.enter }}" onMouseLeave="{{ clearHover }}" onFocus="{{ s.enter }}" onBlur="{{ clearHover }}" style="display:flex; flex-direction:column; align-items:flex-start; gap:6px; padding:12px 12px 14px; text-align:left; cursor:pointer; border:1px solid {{ s.border }}; background:{{ s.bg }}; color:{{ s.fg }}; font:inherit; min-height:44px" style-active="transform:translate(1px,1px)">
+        <span style="display:flex; width:100%; justify-content:space-between; align-items:center; gap:8px">
+          <span class="sw-label" style="color:inherit; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0">{{ s.idx }} {{ s.code }}</span>
+          <sc-if value="{{ s.running }}" hint-placeholder-val="{{ false }}">
+            <span aria-hidden="true" style="width:6px; height:6px; background:currentColor; animation:sw-lc-blink 1s steps(1) infinite"></span>
+          </sc-if>
+        </span>
+        <span style="font-size:14px; line-height:1.3">{{ s.name }}</span>
+      </button>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  static STAGES = [
+    { code: 'IDEA', name: 'Идея', text: 'Исходная идея фиксируется как цель продукта, требования и основные пользовательские сценарии.', input: 'Запрос, проблема, гипотеза', output: 'Цель, требования, сценарии' },
+    { code: 'ANALYSIS', name: 'Системный анализ', text: 'Требования связываются с сущностями и процессами. Появляется модель предметной области и границы системы.', input: 'Цель, требования, сценарии', output: 'Модель данных, процессы, границы' },
+    { code: 'ARCHITECTURE', name: 'Архитектура', text: 'Из модели строится архитектура: интерфейс, API, бизнес-логика, база данных и внешние интеграции. Определяются контракты и потоки данных.', input: 'Модель данных и процессов', output: 'C4-схема, контракты API, ADR' },
+    { code: 'AI-ASSISTED DEV', name: 'Разработка с AI', text: 'Задачи из архитектуры реализуются с AI-инструментами. Черновик кода появляется быстрее, но каждое решение проходит инженерное ревью и встраивается в архитектуру.', input: 'Задачи, контракты, ADR', output: 'Модули после ревью' },
+    { code: 'TESTING & AUTOMATION', name: 'Тесты и автоматизация', text: 'Автотесты, проверка контрактов и контроль качества в CI. Модуль, не прошедший проверку, возвращается на доработку и проверяется снова.', input: 'Модули приложения', output: 'Проверенная сборка, отчёт' },
+    { code: 'WORKING PRODUCT', name: 'Работающий продукт', text: 'Модули собираются в продукт, связанный с API, базой данных и интеграциями. Данные эксплуатации становятся входом следующего цикла.', input: 'Проверенная сборка', output: 'Релиз, метрики, обратная связь' },
+  ];
+  state = {
+    sel: -1, hover: -1, run: 4, cycle: 0,
+    paused: !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches),
+  };
+  componentDidMount() {
+    this._on = (e) => {
+      const d = e.detail || {};
+      if (d.type === 'run') this.setState({ run: d.i, cycle: d.cycle });
+      else if (d.type === 'hover') this.setState({ hover: d.i });
+      else if (d.type === 'select') this.select(d.i);
+    };
+    window.addEventListener('sw:lc', this._on);
+    this._rs = () => this.setState({ vw: window.innerWidth });
+    window.addEventListener('resize', this._rs);
+  }
+  componentWillUnmount() { window.removeEventListener('sw:lc', this._on); window.removeEventListener('resize', this._rs); }
+  select(i) { this.setState((s) => ({ sel: s.sel === i ? -1 : i })); }
+  step(d) { this.setState((s) => ({ sel: s.sel < 0 ? (d > 0 ? 0 : 5) : (s.sel + d + 6) % 6, hover: -1 })); }
+  pad(i) { return String(i + 1).padStart(2, '0'); }
+
+  renderVals() {
+    const ST = Component.STAGES, { sel, hover, run, cycle, paused } = this.state;
+    const shown = hover >= 0 ? hover : sel;
+    let info;
+    if (shown >= 0) {
+      const s = ST[shown], pv = ST[(shown + 5) % 6], nx = ST[(shown + 1) % 6];
+      info = {
+        isStage: true, isOverview: false,
+        eyebrow: this.pad(shown) + ' / 06 · ' + s.code,
+        title: s.name, text: s.text,
+        spec: [
+          { label: 'Вход', value: s.input },
+          { label: 'Результат', value: s.output },
+          { label: 'Связь', value: '← ' + this.pad((shown + 5) % 6) + ' ' + pv.name + ' · ' + this.pad((shown + 1) % 6) + ' ' + nx.name + ' →' },
+        ],
+      };
+    } else {
+      info = {
+        isStage: false, isOverview: true,
+        eyebrow: 'Обзор · 6 этапов · цикл ' + String(cycle + 1).padStart(2, '0'),
+        title: 'Один цикл создания продукта',
+        text: 'Идея проходит системный анализ и проектирование, реализуется с AI-инструментами под инженерным контролем, проверяется автотестами и становится работающим продуктом. Данные эксплуатации запускают следующий цикл.',
+      };
+    }
+    const stages = ST.map((s, i) => {
+      const on = sel === i, hv = hover === i && !on;
+      return {
+        idx: this.pad(i), code: ['IDEA', 'ANALYSIS', 'ARCHITECTURE', 'AI-DEV', 'TESTING', 'PRODUCT'][i], name: s.name, running: run === i, pressed: on ? 'true' : 'false',
+        bg: on ? 'var(--inverse-bg)' : 'var(--surface)', fg: on ? 'var(--inverse-fg)' : 'var(--fg)',
+        border: on || hv ? 'var(--fg)' : 'var(--line)',
+        select: () => this.select(i), enter: () => this.setState({ hover: i }),
+      };
+    });
+    const vw = this.state.vw || window.innerWidth;
+    return {
+      info, stages, stripCols: vw >= 1000 ? 6 : vw >= 560 ? 3 : 2,
+      focusAttr: String(shown),
+      pausedAttr: paused ? 'true' : 'false', paused,
+      pauseIcon: paused ? 'play' : 'pause', pauseLabel: paused ? 'Запустить анимацию' : 'Пауза',
+      togglePause: () => this.setState((s) => ({ paused: !s.paused })),
+      runText: run < 6 ? 'Этап ' + this.pad(run) + ' / 06 · ' + ST[run].code : 'Цикл замыкается → 01',
+      clearHover: () => this.setState({ hover: -1 }),
+      prev: () => this.step(-1), next: () => this.step(1),
+      overview: () => this.setState({ sel: -1, hover: -1 }),
+    };
+  }
+}
+</script>
+</body>
+</html>

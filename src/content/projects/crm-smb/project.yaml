@@ -1,0 +1,109 @@
+code: P—05
+order: 5
+demo: true
+featured: true
+title: { ru: "CRM для малого бизнеса", en: "CRM for a small business" }
+summary:
+  ru: Описание процессов продаж, модель данных и требования к интеграциям.
+  en: Sales process description, data model and integration requirements.
+category: sa
+status: archive
+year: 2024
+period: 2024.04 → 2024.08
+role: { ru: "Системный анализ", en: "Systems analysis" }
+tech: [bpmn, erd, openapi, uml]
+cover: d-crm-c4
+links: { demo: null, repo: null, docs: artifacts }
+
+problem:
+  ru: Продажи велись в мессенджерах и таблицах; не было единого статуса сделки.
+  en: Sales lived in messengers and spreadsheets; there was no single deal status.
+overview:
+  ru: 'Аналитический проект: процессы, модель данных и требования для последующей разработки CRM.'
+  en: 'An analysis project: processes, data model and requirements for building the CRM later.'
+goals:
+  - { ru: "Описать текущий и целевой процесс", en: "Describe the current and target process" }
+  - { ru: "Подготовить модель данных", en: "Prepare the data model" }
+  - { ru: "Сформулировать требования к интеграции с учётом", en: "Specify requirements for the accounting integration" }
+requirements:
+  - { id: FR-01, type: FR, priority: Must, text: { ru: "Сделка создаётся из заявки в один шаг.", en: "A deal is created from a lead in one step." } }
+  - { id: FR-02, type: FR, priority: Must, text: { ru: "Счёт формируется из сделки.", en: "An invoice is generated from a deal." } }
+  - { id: NFR-01, type: NFR, priority: Should, text: { ru: "Выгрузка в учётную систему раз в час.", en: "Export to the accounting system every hour." } }
+results:
+  state: { ru: 'Пример: архив, материалы переданы в разработку.', en: 'Example: archived, materials handed over to development.' }
+
+architecture:
+  diagram: d-crm-c4
+  text: { ru: "Три контура и внешняя учётная система.", en: "Three domains and an external accounting system." }
+  flows: [d-crm-bpmn]
+dataModel:
+  diagram: d-crm-erd
+api:
+  integrations:
+    - name: BILLING → ACCOUNTING
+      protocol: { ru: "Файловый обмен", en: "File exchange" }
+      text: { ru: "Счета раз в час, подтверждение оплаты — обратным файлом.", en: "Invoices hourly; payment confirmation comes back as a file." }
+    - name: { ru: "LEADS ← Сайт", en: "LEADS ← Website" }
+      protocol: Webhook
+      text: { ru: "Заявки из форм в реальном времени.", en: "Form leads in real time." }
+decisions:
+  - title: { ru: "Пакетный обмен раз в час", en: "Hourly batch exchange" }
+    pros:
+      - { ru: "Не требует доработок учётной системы", en: "No changes needed in the accounting system" }
+    cons:
+      - { ru: "Статус оплаты обновляется с задержкой", en: "Payment status updates with a delay" }
+related: [payment-gateway]
+
+diagrams:
+  - id: d-crm-c4
+    kind: components
+    title: { ru: "Контуры CRM", en: "CRM domains" }
+    nodes:
+      - { id: leads, label: LEADS, sub: { ru: "формы · звонки", en: "forms · calls" }, x: 0, y: 0, w: 2, d: 2, h: 1 }
+      - { id: deals, label: DEALS, sub: { ru: "воронка", en: "pipeline" }, x: 4, y: 0, w: 2, d: 2, h: 1 }
+      - { id: billing, label: BILLING, sub: { ru: "счета", en: "invoices" }, x: 8, y: 0, w: 2, d: 2, h: 1 }
+      - { id: acc, label: ACCOUNTING, sub: { ru: "внешняя", en: "external" }, x: 8, y: 4, w: 2, d: 1, h: 0.5 }
+    links: [[leads, deals], [deals, billing], [billing, acc]]
+    notes:
+      leads: { ru: "Заявки из форм сайта и телефонии.", en: "Leads from website forms and telephony." }
+      deals: { ru: "Этапы сделки и задачи менеджера.", en: "Deal stages and manager tasks." }
+      billing: { ru: "Счета и статусы оплаты.", en: "Invoices and payment statuses." }
+      acc: { ru: "Выгрузка документов в учётную систему.", en: "Document export to the accounting system." }
+  - id: d-crm-bpmn
+    kind: flow
+    title: { ru: "Процесс продажи", en: "Sales process" }
+    steps:
+      - { lane: { ru: "КЛИЕНТ", en: "CLIENT" }, title: { ru: "Заявка", en: "Lead" }, text: { ru: "Форма на сайте или звонок.", en: "A website form or a call." } }
+      - { lane: { ru: "МЕНЕДЖЕР", en: "MANAGER" }, title: { ru: "Квалификация", en: "Qualification" }, text: { ru: "Не позже 2 часов в рабочее время.", en: "Within 2 business hours." } }
+      - { lane: { ru: "МЕНЕДЖЕР", en: "MANAGER" }, title: { ru: "Предложение", en: "Proposal" }, text: { ru: "КП из шаблона по услуге.", en: "A proposal from the service template." } }
+      - { lane: { ru: "БУХГАЛТЕРИЯ", en: "ACCOUNTING" }, title: { ru: "Счёт", en: "Invoice" }, text: { ru: "Создаётся из сделки автоматически.", en: "Created from the deal automatically." } }
+      - { lane: { ru: "СИСТЕМА", en: "SYSTEM" }, title: { ru: "Закрытие", en: "Closing" }, text: { ru: "Оплата переводит сделку в «Выиграна».", en: "Payment moves the deal to “Won”." } }
+  - id: d-crm-erd
+    kind: erd
+    title: { ru: "Модель данных CRM", en: "CRM data model" }
+    entities:
+      - { id: company, name: COMPANY, fields: [[id, uuid, PK], [name, text], [inn, text, UK]] }
+      - { id: contact, name: CONTACT, fields: [[id, uuid, PK], [company_id, uuid, FK], [name, text], [phone, text]] }
+      - { id: deal, name: DEAL, fields: [[id, uuid, PK], [company_id, uuid, FK], [stage, enum], [amount, numeric]] }
+      - { id: invoice, name: INVOICE, fields: [[id, uuid, PK], [deal_id, uuid, FK], [number, text, UK], [paid_at, timestamptz]] }
+    relations: [[company, contact, '1 : N'], [company, deal, '1 : N'], [deal, invoice, '1 : N']]
+
+artifacts:
+  - id: bpmn-02
+    code: BPMN-02
+    type: bpmn
+    view: flow
+    diagram: d-crm-bpmn
+    version: '2.0'
+    updated: '2024.06'
+    title: { ru: "Целевой процесс продажи", en: "Target sales process" }
+    summary: { ru: "От заявки до оплаты счёта.", en: "From lead to paid invoice." }
+  - id: erd-03
+    code: ERD-03
+    type: erd
+    view: erd
+    diagram: d-crm-erd
+    version: '1.0'
+    updated: '2024.06'
+    title: { ru: "Модель данных CRM", en: "CRM data model" }
+    summary: { ru: "Компании, контакты, сделки, счета.", en: "Companies, contacts, deals, invoices." }

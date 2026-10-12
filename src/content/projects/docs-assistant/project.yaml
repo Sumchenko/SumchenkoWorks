@@ -1,0 +1,104 @@
+code: P—04
+order: 2
+demo: true
+featured: true
+title: { ru: "AI-ассистент для документации", en: "AI assistant for documentation" }
+summary:
+  ru: Поиск и ответы по внутренней технической документации с указанием источников.
+  en: Search and answers over internal technical documentation, with sources.
+category: dev
+status: wip
+year: 2026
+period: 2026.02 → …
+role: { ru: "Разработка, проектирование", en: "Development, solution design" }
+tech: [python, fastapi, pgvector, rag, llm, docker]
+cover: d-rag-c4
+
+problem:
+  ru: Документация разбросана по нескольким системам; полнотекстовый поиск не находит ответы, сформулированные другими словами.
+  en: Documentation is spread across several systems; full-text search misses answers phrased differently.
+overview:
+  ru: Сервис отвечает на вопросы по внутренней wiki и README репозиториев и всегда показывает фрагменты, на которые опирается ответ.
+  en: The service answers questions over the internal wiki and repository READMEs and always shows the passages the answer relies on.
+goals:
+  - { ru: "Ответ со ссылкой на источник", en: "Every answer links to its source" }
+  - { ru: "Обновление индекса без ручных действий", en: "Index updates without manual steps" }
+  - { ru: "Отказ от ответа при отсутствии данных", en: "Decline to answer when there is no data" }
+features:
+  - { ru: "Гибридный поиск", en: "Hybrid search" }
+  - { ru: "Ответы со ссылками", en: "Answers with citations" }
+  - { ru: "Оценка полезности ответа", en: "Answer usefulness rating" }
+stages:
+  - period: '2026.02'
+    title: { ru: "Прототип", en: "Prototype" }
+    text: { ru: "Индекс по одной wiki, ручная оценка ответов.", en: "Index over a single wiki, manual answer review." }
+  - period: '2026.04'
+    title: { ru: "Гибридный поиск", en: "Hybrid search" }
+    text: { ru: "Добавлен полнотекст, выросла точность на коротких запросах.", en: "Added full-text search; accuracy improved on short queries." }
+  - period: { ru: "Сейчас", en: "Now" }
+    title: { ru: "Оценка качества", en: "Quality evaluation" }
+    text: { ru: "Набор контрольных вопросов и метрики.", en: "A benchmark question set and metrics." }
+results:
+  state:
+    ru: 'Пример: в работе, идёт сбор контрольного набора вопросов.'
+    en: 'Example: in progress, the benchmark question set is being collected.'
+
+architecture:
+  diagram: d-rag-c4
+  text:
+    ru: Индексация и ответы разделены — конвейер загрузки работает по расписанию, API — по запросу.
+    en: Indexing and answering are separate — the ingestion pipeline runs on a schedule, the API on demand.
+  flows: [d-rag-flow]
+api:
+  integrations:
+    - name: API → LLM
+      protocol: HTTPS
+      text: { ru: "Внешний API, контекст ограничен найденными фрагментами.", en: "External API; context is limited to the retrieved passages." }
+decisions:
+  - title: { ru: "pgvector вместо отдельной векторной БД", en: "pgvector instead of a separate vector DB" }
+    choice: { ru: "Векторы рядом с метаданными в PostgreSQL.", en: "Vectors next to metadata in PostgreSQL." }
+    why: { ru: "Объём — десятки тысяч фрагментов; один компонент проще сопровождать.", en: "Tens of thousands of passages; one component is easier to maintain." }
+    alternatives: { ru: "Отдельная векторная БД — оправдана при росте на порядки.", en: "A dedicated vector DB — justified at orders of magnitude more data." }
+  - title: { ru: "Гибридный поиск", en: "Hybrid search" }
+    pros:
+      - { ru: "Находит точные термины и перефразировки", en: "Finds both exact terms and paraphrases" }
+    cons:
+      - { ru: "Две системы ранжирования нужно согласовывать", en: "Two ranking systems have to be reconciled" }
+related: [analytics-dwh]
+
+diagrams:
+  - id: d-rag-c4
+    kind: components
+    title: { ru: "Компоненты ассистента", en: "Assistant components" }
+    nodes:
+      - { id: docs, label: DOCS, sub: wiki · repo, x: 0, y: 0, w: 2, d: 2, h: 1 }
+      - { id: ing, label: INGEST, sub: python, x: 4, y: 0, w: 2, d: 1, h: 0.5 }
+      - { id: idx, label: INDEX, sub: pgvector, x: 8, y: 0, w: 2, d: 2, h: 0.5 }
+      - { id: api, label: API, sub: fastapi, x: 4, y: 4, w: 2, d: 2, h: 1 }
+      - { id: llm, label: LLM, sub: { ru: "внешний API", en: "external API" }, x: 8, y: 4, w: 2, d: 2, h: 1.5 }
+    links: [[docs, ing], [ing, idx], [api, idx], [api, llm]]
+    notes:
+      docs: { ru: "Внутренняя wiki и README репозиториев.", en: "Internal wiki and repository READMEs." }
+      ing: { ru: "Разбиение на фрагменты и эмбеддинги.", en: "Chunking and embeddings." }
+      idx: { ru: "Векторный поиск рядом с метаданными.", en: "Vector search next to metadata." }
+      api: { ru: "Поиск, сборка контекста, ответ со ссылками.", en: "Retrieval, context assembly, answer with citations." }
+      llm: { ru: "Генерация ответа только по найденным фрагментам.", en: "Generates answers only from retrieved passages." }
+  - id: d-rag-flow
+    kind: flow
+    title: { ru: "Конвейер ответа", en: "Answer pipeline" }
+    steps:
+      - { lane: USER, title: { ru: "Вопрос", en: "Question" }, text: { ru: "Свободная формулировка.", en: "Free-form wording." } }
+      - { lane: API, title: { ru: "Поиск", en: "Retrieval" }, text: { ru: 'Гибридный: вектор + полнотекст.', en: 'Hybrid: vector + full text.' } }
+      - { lane: API, title: { ru: "Контекст", en: "Context" }, text: { ru: "Топ-8 фрагментов с источниками.", en: "Top 8 passages with sources." } }
+      - { lane: LLM, title: { ru: "Ответ", en: "Answer" }, text: { ru: "Только по контексту, со ссылками.", en: "Context only, with citations." } }
+      - { lane: USER, title: { ru: "Оценка", en: "Rating" }, text: { ru: "Отметка «полезно / нет» для разбора.", en: "A helpful / not helpful mark for review." } }
+
+artifacts:
+  - id: note-02
+    code: NOTE-02
+    type: note
+    view: doc
+    version: '0.3'
+    updated: '2026.03'
+    title: { ru: 'Исследование: разбиение документов для RAG', en: 'Research: document chunking for RAG' }
+    summary: { ru: "Сравнение стратегий разбиения на фрагменты.", en: "A comparison of chunking strategies." }

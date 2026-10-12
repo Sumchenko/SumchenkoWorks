@@ -1,0 +1,26 @@
+---
+import Base from '@/layouts/Base.astro';
+import { localePath, t, type Lang } from '@/i18n';
+import { Button } from '@/components/ds/Button';
+import { PixelField } from '@/components/ds/PixelField';
+
+const { lang } = Astro.props as { lang: Lang };
+const T = t(lang).notFound;
+---
+<Base lang={lang} path="/404/" title={T.meta} noindex>
+  <div style="max-width:1440px; margin:0 auto; padding:clamp(48px,10vw,140px) clamp(20px,4vw,64px) var(--space-section); display:flex; flex-wrap:wrap; gap:48px; align-items:flex-end; justify-content:space-between">
+    <div style="flex:1 1 420px; display:flex; flex-direction:column; gap:28px; align-items:flex-start">
+      <span class="sw-label">{T.label}</span>
+      <h1 style="font-family:var(--font-pixel); font-size:var(--text-display-l); line-height:.95; letter-spacing:-.01em" set:html={T.title} />
+      <p style="font-size:var(--text-lead); line-height:1.45; max-width:36ch">{T.text}</p>
+      <div style="display:flex; flex-wrap:wrap; gap:8px">
+        <Button href={localePath(lang, '/')} iconStart="home">{T.home}</Button>
+        <Button variant="ghost" href={localePath(lang, '/works/')} iconEnd="arrow-right">{T.works}</Button>
+      </div>
+    </div>
+    <div aria-hidden="true" style="flex:0 1 360px; aspect-ratio:1/1; border:1px solid var(--line); position:relative; overflow:hidden">
+      <PixelField client:visible height="100%" cell={16} radius={120} style={{ position: 'absolute', inset: 0 }} />
+      <span class="sw-label" style="position:absolute; top:14px; left:14px">{T.fig}</span>
+    </div>
+  </div>
+</Base>

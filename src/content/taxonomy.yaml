@@ -1,0 +1,62 @@
+# Справочники: категории, статусы, технологии и типы артефактов.
+# Проекты ссылаются на них по id. Новую технологию сначала добавьте сюда.
+
+categories:
+  - id: dev
+    label: { ru: "Разработка", en: "Development" }
+    text:
+      ru: Веб-сервисы, API и внутренние инструменты — от прототипа до продакшена.
+      en: Web services, APIs and internal tools — from prototype to production.
+  - id: sa
+    label: { ru: "Системный анализ", en: "Systems analysis" }
+    text:
+      ru: Требования, процессы, модели данных и контракты интеграций.
+      en: Requirements, processes, data models and integration contracts.
+  - id: arch
+    label: { ru: "Проектирование", en: "Solution design" }
+    text:
+      ru: Архитектура программных решений и документация, по которой можно строить.
+      en: Software architecture and documentation you can actually build from.
+
+# Вид бейджа задаётся в коде: live — контур, wip — мигающая точка, concept — пунктир, archive — серый.
+statuses:
+  - { id: live, label: Production }
+  - { id: wip, label: { ru: "В работе", en: "In progress" } }
+  - { id: concept, label: { ru: "Концепт", en: "Concept" } }
+  - { id: archive, label: { ru: "Архив", en: "Archive" } }
+
+technologies:
+  - { id: go, label: Go, group: { ru: "Языки", en: "Languages" } }
+  - { id: python, label: Python, group: { ru: "Языки", en: "Languages" } }
+  - { id: typescript, label: TypeScript, group: { ru: "Языки", en: "Languages" } }
+  - { id: react, label: React, group: { ru: "Интерфейс", en: "Frontend" } }
+  - { id: nodejs, label: Node.js, group: { ru: "Сервер", en: "Backend" } }
+  - { id: fastapi, label: FastAPI, group: { ru: "Сервер", en: "Backend" } }
+  - { id: postgres, label: PostgreSQL, group: { ru: "Данные", en: "Data" } }
+  - { id: redis, label: Redis, group: { ru: "Данные", en: "Data" } }
+  - { id: clickhouse, label: ClickHouse, group: { ru: "Данные", en: "Data" } }
+  - { id: timescaledb, label: TimescaleDB, group: { ru: "Данные", en: "Data" } }
+  - { id: pgvector, label: pgvector, group: { ru: "Данные", en: "Data" } }
+  - { id: kafka, label: Kafka, group: { ru: "Инфраструктура", en: "Infrastructure" } }
+  - { id: mqtt, label: MQTT, group: { ru: "Инфраструктура", en: "Infrastructure" } }
+  - { id: airflow, label: Airflow, group: { ru: "Инфраструктура", en: "Infrastructure" } }
+  - { id: dbt, label: dbt, group: { ru: "Инфраструктура", en: "Infrastructure" } }
+  - { id: docker, label: Docker, group: { ru: "Инфраструктура", en: "Infrastructure" } }
+  - { id: llm, label: LLM API, group: AI }
+  - { id: rag, label: RAG, group: AI }
+  - { id: bpmn, label: BPMN, group: { ru: "Нотации", en: "Notations" } }
+  - { id: uml, label: UML, group: { ru: "Нотации", en: "Notations" } }
+  - { id: erd, label: ERD, group: { ru: "Нотации", en: "Notations" } }
+  - { id: openapi, label: OpenAPI, group: { ru: "Нотации", en: "Notations" } }
+  - { id: c4, label: C4, group: { ru: "Нотации", en: "Notations" } }
+
+artifactTypes:
+  - { id: srs, code: SRS, label: { ru: "ТЗ и требования", en: "Specs and requirements" } }
+  - { id: uml, code: UML, label: { ru: "UML-диаграммы", en: "UML diagrams" } }
+  - { id: erd, code: ERD, label: { ru: "ER-диаграммы и модели данных", en: "ER diagrams and data models" } }
+  - { id: openapi, code: API, label: { ru: "OpenAPI-спецификации", en: "OpenAPI specifications" } }
+  - { id: bpmn, code: BPMN, label: { ru: "Бизнес-процессы", en: "Business processes" } }
+  - { id: apidoc, code: DOC, label: { ru: "Документация API", en: "API documentation" } }
+  - { id: arch, code: C4, label: { ru: "Архитектурные схемы", en: "Architecture diagrams" } }
+  - { id: note, code: NOTE, label: { ru: "Заметки и исследования", en: "Notes and research" } }
+  - { id: other, code: ADR, label: { ru: "Другие материалы СА", en: "Other analysis materials" } }

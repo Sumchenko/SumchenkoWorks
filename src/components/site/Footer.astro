@@ -1,0 +1,38 @@
+---
+import { localePath, t, type Lang } from '@/i18n';
+import { getContent } from '@/lib/content';
+import { PixelLogo } from '@/components/ds/PixelLogo';
+import { Coord } from '@/components/ds/Display';
+import { contactLinks } from '@/lib/contacts';
+
+const { lang } = Astro.props as { lang: Lang };
+const T = t(lang);
+const c = getContent(lang);
+const home = localePath(lang, '/');
+const nav = (['top', 'approach', 'featured', 'skills', 'contacts'] as const).map((id, i) => ({
+  idx: String(i + 1).padStart(2, '0'), label: T.nav[id], href: id === 'top' ? home : home + '#' + id,
+}));
+const contacts = contactLinks(c.site.profile.links).filter((l) => l.id !== 'cv');
+---
+<footer style="border-top:1px solid var(--line); margin-top:auto">
+  <div style="max-width:1440px; margin:0 auto; padding:40px clamp(20px,4vw,64px) 36px; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:32px 24px">
+    <div style="display:flex; flex-direction:column; gap:14px">
+      <PixelLogo size={56} />
+      <span class="sw-label" style="letter-spacing:.16em; color:var(--fg)">{c.site.tagline}</span>
+      {c.hasDemo && <p style="font-size:13px; line-height:1.5; color:var(--fg-2); max-width:34ch">{T.footer.demoNote}</p>}
+    </div>
+    <nav aria-label={T.footer.sections} style="display:flex; flex-direction:column; gap:10px">
+      <span class="sw-label" style="color:var(--fg-3)">{T.footer.sections}</span>
+      {nav.map((l) => <a href={l.href} class="sw-label plain-link" style="width:fit-content">{l.idx} / {l.label}</a>)}
+    </nav>
+    <div style="display:flex; flex-direction:column; gap:10px">
+      <span class="sw-label" style="color:var(--fg-3)">{T.footer.contacts}</span>
+      {contacts.map((l) => l.href
+        ? <a href={l.href} target={l.external ? '_blank' : undefined} rel={l.external ? 'noopener noreferrer' : undefined} class="sw-label plain-link" style="width:fit-content">{l.label} ↗</a>
+        : <span class="sw-label" style="color:var(--fg-3)">{l.label} · {T.footer.notSet}</span>)}
+    </div>
+    <div style="display:flex; flex-direction:column; gap:10px; justify-content:flex-end">
+      <Coord>© {new Date().getFullYear()} · {c.site.name}</Coord>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/base.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/components/sw-components.css">
+  <script src="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/_ds_bundle.js"></script>
+  <script src="data/content.js"></script>
+  <script src="data/store.js"></script>
+</helmet>
+<div ref="{{ rootRef }}" style="max-width:1440px; margin:0 auto; padding:56px var(--grid-margin) var(--space-section)">
+  <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.SectionHead" index="01 / Проекты" title="Проекты" meta="{{ meta }}" hint-size="100%,96px"></x-import>
+  <p style="margin-top:20px; max-width:64ch; color:var(--fg-2); font-size:15px">Разработка, системный анализ и проектирование. Откройте проект, чтобы увидеть задачу, результат, архитектуру и артефакты. Все проекты здесь — демонстрационные примеры.</p>
+
+  <div role="search" aria-label="Фильтры проектов" style="display:flex; flex-direction:column; gap:16px; margin:32px 0 24px; padding:20px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line)">
+    <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end">
+      <div style="flex:2 1 260px">
+        <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Input" label="Поиск" icon="search" type="search" placeholder="Название или описание" value="{{ q }}" onChange="{{ onQ }}" hint-size="100%,64px"></x-import>
+      </div>
+      <div style="flex:1 1 170px">
+        <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Select" label="Технология" options="{{ techOptions }}" value="{{ tech }}" onChange="{{ onTech }}" hint-size="100%,64px"></x-import>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between">
+      <div role="group" aria-label="Категория" style="display:flex; flex-wrap:wrap; gap:8px">
+        <sc-for list="{{ cats }}" as="c" hint-placeholder-count="4">
+          <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Tag" selected="{{ c.selected }}" onClick="{{ c.pick }}" hint-size="110px,32px">{{ c.label }} · {{ c.n }}</x-import>
+        </sc-for>
+      </div>
+      <sc-if value="{{ hasFilters }}" hint-placeholder-val="{{ false }}">
+        <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Button" variant="ghost" size="sm" icon-start="close" onClick="{{ reset }}" hint-size="160px,32px">Сбросить фильтры</x-import>
+      </sc-if>
+    </div>
+  </div>
+
+  <p class="sw-label" aria-live="polite" style="margin-bottom:16px">{{ resultLabel }}</p>
+
+  <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:64px 24px; border:1px dashed var(--line); display:flex; flex-direction:column; align-items:center; gap:20px; text-align:center">
+      <span class="sw-label">0 результатов — попробуйте другой запрос</span>
+      <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Button" variant="secondary" size="sm" icon-start="reload" onClick="{{ reset }}" hint-size="180px,32px">Сбросить фильтры</x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showGrid }}" hint-placeholder-val="{{ true }}">
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr)); gap:var(--grid-gutter)">
+      <sc-for list="{{ list }}" as="p" hint-placeholder-count="6">
+        <div data-reveal="{{ p.delay }}" style="display:flex">
+          <dc-import name="ProjectCard" project="{{ p }}" style="flex:1; display:flex" hint-size="100%,460px"></dc-import>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showList }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex; flex-direction:column; border-top:1px solid var(--line)">
+      <sc-for list="{{ list }}" as="p" hint-placeholder-count="6">
+        <a href="{{ p.href }}" style="display:grid; grid-template-columns:64px minmax(0,1fr) 32px; gap:var(--grid-gutter); align-items:center; padding:18px 12px; border-bottom:1px solid var(--line); color:var(--fg); text-decoration:none; transition:background-color 140ms cubic-bezier(.2,.7,.2,1)" style-hover="background:var(--surface)">
+          <span class="sw-label">{{ p.code }}</span>
+          <span style="display:flex; flex-wrap:wrap; align-items:center; gap:6px 24px">
+            <span style="display:flex; flex-direction:column; gap:4px; margin-right:auto; min-width:0">
+              <span style="font-size:clamp(18px,1.8vw,22px); font-weight:500; line-height:1.2">{{ p.title }}</span>
+              <span class="sw-label">{{ p.techLine }}</span>
+            </span>
+            <span style="display:flex; gap:6px; align-items:center">
+              <span class="sw-label">{{ p.categoryLabel }} · {{ p.year }}</span>
+              <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Badge" variant="{{ p.badge.variant }}" dot="{{ p.badge.dot }}" pulse="{{ p.badge.pulse }}" hint-size="90px,22px">{{ p.badge.label }}</x-import>
+            </span>
+          </span>
+          <span aria-hidden="true" style="width:32px; height:32px; display:grid; place-items:center; border:1px solid var(--line-strong)">
+            <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Icon" name="arrow-right" size="{{ 16 }}" hint-size="16px,16px"></x-import>
+          </span>
+        </a>
+      </sc-for>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  rootRef = React.createRef();
+  state = Object.assign({ view: 'grid' }, Component.fromQs(this.props.qs));
+
+  static fromQs(qs) {
+    const p = new URLSearchParams(qs || '');
+    let view = 'grid'; try { view = localStorage.getItem('sw-works-view') || 'grid'; } catch (e) {}
+    return { q: p.get('q') || '', cat: p.get('cat') || 'all', status: p.get('status') || 'all', tech: p.get('tech') || 'all', view };
+  }
+  componentDidMount() {
+    const S = window.SWStore;
+    if (S && S.status !== 'ready') S.load().then(() => this.forceUpdate(), () => {});
+    if (S) this._unrev = S.reveal(this.rootRef.current);
+  }
+  componentWillUnmount() { if (this._unrev) this._unrev(); }
+  componentDidUpdate(prev) {
+    if (prev.nav !== this.props.nav && this.props.qs !== this._lastQs) { this._lastQs = this.props.qs; this.setState(Component.fromQs(this.props.qs)); }
+  }
+  patch(ch) {
+    this.setState(ch, () => {
+      const { q, cat, status, tech } = this.state;
+      const p = new URLSearchParams();
+      if (q) p.set('q', q); if (cat !== 'all') p.set('cat', cat); if (status !== 'all') p.set('status', status); if (tech !== 'all') p.set('tech', tech);
+      const qs = p.toString(); this._lastQs = qs;
+      try { history.replaceState(null, '', '#/works' + (qs ? '?' + qs : '')); } catch (e) {}
+    });
+  }
+  onQ = (e) => this.patch({ q: e.target.value });
+  onStatus = (e) => this.patch({ status: e.target.value });
+  onTech = (e) => this.patch({ tech: e.target.value });
+  onView = (v) => { this.setState({ view: v }); try { localStorage.setItem('sw-works-view', v); } catch (e) {} };
+  reset = () => this.patch({ q: '', cat: 'all', status: 'all', tech: 'all' });
+
+  renderVals() {
+    const S = window.SWStore;
+    if (!S || S.status !== 'ready') return { rootRef: this.rootRef };
+    const D = S.data; const st = this.state;
+    const list = S.filterProjects(st).map((p, i) => ({ ...S.projectVM(p), delay: Math.min(i, 8) * 50 }));
+    const total = D.projects.length;
+    const withoutCat = S.filterProjects({ ...st, cat: 'all' });
+    const cats = [{ id: 'all', label: 'Все' }].concat(D.categories).map((c) => ({
+      label: c.label, selected: st.cat === c.id,
+      n: c.id === 'all' ? withoutCat.length : withoutCat.filter((p) => p.category === c.id).length,
+      pick: () => this.patch({ cat: c.id }),
+    }));
+    const hasFilters = !!st.q || st.cat !== 'all' || st.status !== 'all' || st.tech !== 'all';
+    const n = list.length;
+    const word = (n % 10 === 1 && n % 100 !== 11) ? 'проект' : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) ? 'проекта' : 'проектов';
+    return {
+      rootRef: this.rootRef,
+      meta: n + ' из ' + total,
+      q: st.q, status: st.status, tech: st.tech, view: st.view,
+      onQ: this.onQ, onStatus: this.onStatus, onTech: this.onTech, onView: this.onView, reset: this.reset,
+      statusOptions: [{ value: 'all', label: 'Все статусы' }].concat(D.statuses.map((s) => ({ value: s.id, label: s.label }))),
+      techOptions: [{ value: 'all', label: 'Все технологии' }].concat(S.techOptions().map((t) => ({ value: t.id, label: t.label }))),
+      viewItems: [{ id: 'grid', label: 'Сетка' }, { id: 'list', label: 'Список' }],
+      cats, hasFilters,
+      resultLabel: hasFilters ? 'Найдено: ' + n + ' ' + word : 'Показаны все ' + n + ' ' + word,
+      list, isEmpty: n === 0, showGrid: n > 0, showList: false,
+    };
+  }
+}
+</script>
+</body>
+</html>

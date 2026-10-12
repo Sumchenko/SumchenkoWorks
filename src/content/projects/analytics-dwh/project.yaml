@@ -1,0 +1,85 @@
+code: P—02
+order: 3
+demo: true
+featured: true
+title: { ru: "Аналитическое хранилище", en: "Analytics data warehouse" }
+summary:
+  ru: 'Слой данных для отчётности: источники, ETL, витрины и правила качества.'
+  en: 'A reporting data layer: sources, ETL, data marts and quality rules.'
+category: arch
+status: live
+year: 2025
+period: 2025.01 → 2025.06
+role: { ru: "Проектирование", en: "Solution design" }
+tech: [clickhouse, airflow, dbt, python, docker]
+cover: d-dwh-c4
+
+problem:
+  ru: Отчёты строились напрямую по операционным базам, нагружали их и расходились между отделами.
+  en: Reports ran directly against operational databases, loaded them and disagreed between departments.
+overview:
+  ru: Хранилище собирает данные из CRM, биллинга и веб-аналитики и публикует витрины для отчётов.
+  en: The warehouse collects data from the CRM, billing and web analytics and publishes data marts for reporting.
+goals:
+  - { ru: "Единые определения метрик", en: "Shared metric definitions" }
+  - { ru: "Отчёты без нагрузки на операционные БД", en: "Reports without load on operational DBs" }
+  - { ru: "Проверки качества до публикации", en: "Quality checks before publishing" }
+results:
+  text: { ru: 'Пример: отчёты отделов считаются по одним витринам.', en: 'Example: all departments report from the same marts.' }
+  state: { ru: 'Пример: в эксплуатации.', en: 'Example: in production.' }
+
+architecture:
+  diagram: d-dwh-c4
+  text:
+    ru: 'Классическая слоистая схема: raw → staging → marts, проверки качества между staging и marts.'
+    en: 'A classic layered design: raw → staging → marts, with quality checks between staging and marts.'
+  flows: [d-dwh-flow]
+decisions:
+  - title: { ru: "ClickHouse для витрин", en: "ClickHouse for data marts" }
+    choice: { ru: "Колоночное хранилище.", en: "A columnar store." }
+    why: { ru: "Агрегации по сотням миллионов строк за секунды.", en: "Aggregations over hundreds of millions of rows in seconds." }
+    alternatives: { ru: "PostgreSQL — проще, но медленнее на аналитических запросах.", en: "PostgreSQL — simpler, but slower on analytical queries." }
+  - title: { ru: "Проверки до публикации витрин", en: "Checks before publishing marts" }
+    pros:
+      - { ru: "Ошибки не попадают в отчёты", en: "Errors never reach the reports" }
+    cons:
+      - { ru: "Отчёт может задержаться до исправления", en: "A report may be delayed until the fix" }
+related: [docs-assistant]
+
+diagrams:
+  - id: d-dwh-c4
+    kind: components
+    title: { ru: "Компоненты хранилища", en: "Warehouse components" }
+    nodes:
+      - { id: src, label: SOURCES, sub: crm · billing · web, x: 0, y: 0, w: 2, d: 3, h: 1 }
+      - { id: etl, label: ETL, sub: airflow, x: 4, y: 1, w: 2, d: 1, h: 0.5 }
+      - { id: dq, label: QUALITY, sub: dbt tests, x: 4, y: 4, w: 2, d: 1, h: 0.5 }
+      - { id: dwh, label: DWH, sub: clickhouse, x: 8, y: 0, w: 3, d: 3, h: 2 }
+      - { id: bi, label: BI, sub: { ru: "витрины", en: "marts" }, x: 8, y: 5, w: 2, d: 1, h: 0.5 }
+    links: [[src, etl], [etl, dwh], [dwh, dq], [dwh, bi]]
+    notes:
+      src: { ru: "Три операционные системы, выгрузка инкрементами.", en: "Three operational systems, incremental extracts." }
+      etl: { ru: "DAG на источник, ретраи и SLA.", en: "One DAG per source, retries and SLAs." }
+      dq: { ru: "Тесты уникальности, полноты и свежести.", en: "Uniqueness, completeness and freshness tests." }
+      dwh: { ru: "Слои raw → staging → marts.", en: "Layers raw → staging → marts." }
+      bi: { ru: "Витрины под конкретные отчёты.", en: "Marts tailored to specific reports." }
+  - id: d-dwh-flow
+    kind: flow
+    title: { ru: "Поток данных", en: "Data flow" }
+    steps:
+      - { lane: SOURCES, title: { ru: "Извлечение", en: "Extract" }, text: { ru: "Инкремент по updated_at.", en: "Incremental by updated_at." } }
+      - { lane: RAW, title: { ru: "Загрузка как есть", en: "Load as is" }, text: { ru: "Без преобразований, с метаданными загрузки.", en: "No transformations, with load metadata." } }
+      - { lane: STAGING, title: { ru: "Очистка", en: "Cleanup" }, text: { ru: "Типы, дедупликация, справочники.", en: "Types, deduplication, reference data." } }
+      - { lane: QUALITY, title: { ru: "Проверки", en: "Checks" }, text: { ru: "Падение теста останавливает публикацию.", en: "A failed test stops publishing." } }
+      - { lane: MARTS, title: { ru: "Витрины", en: "Marts" }, text: { ru: "Агрегаты для отчётов.", en: "Aggregates for reports." } }
+
+artifacts:
+  - id: c4-dwh
+    code: C4-02
+    type: arch
+    view: components
+    diagram: d-dwh-c4
+    version: '1.0'
+    updated: '2025.02'
+    title: { ru: "Схема хранилища", en: "Warehouse diagram" }
+    summary: { ru: "Источники, ETL, проверки, хранилище и витрины.", en: "Sources, ETL, checks, the warehouse and marts." }

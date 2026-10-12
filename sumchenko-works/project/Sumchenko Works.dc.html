@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta property="og:site_name" content="Sumchenko Works">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#F7F7F5">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/tokens/base.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/components/sw-components.css">
+  <link rel="stylesheet" href="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/styles.css">
+  <script src="_ds/sumchenko-works-design-system-bf1cba9a-6b4a-4fa3-b750-c4ddc505709d/_ds_bundle.js"></script>
+  <script src="data/content.js"></script>
+  <script src="data/store.js"></script>
+  <style>
+    html{scroll-padding-top:72px}
+    body{margin:0;min-height:100vh;background:var(--bg);color:var(--fg)}
+    a{color:var(--fg)}
+    a:hover{color:var(--fg)}
+    @keyframes sw-blink{50%{opacity:0}}
+    @media (prefers-reduced-motion:reduce){*{animation-duration:0ms!important}}
+  </style>
+</helmet>
+<div ref="{{ rootRef }}" style="min-height:100vh; display:flex; flex-direction:column; background:var(--bg); color:var(--fg)">
+  <button type="button" onClick="{{ skipToMain }}" style="position:fixed; left:12px; top:-60px; z-index:100; height:40px; padding:0 16px; background:var(--inverse-bg); color:var(--inverse-fg); border:0; font-family:var(--font-mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase; cursor:pointer" style-focus="top:8px">Перейти к содержанию</button>
+  {{ header }}
+  <main id="sw-main" tabindex="-1" style="flex:1; outline:none">
+    <sc-if value="{{ isLoading }}" hint-placeholder-val="{{ true }}">
+      <div role="status" aria-live="polite" style="max-width:1440px; margin:0 auto; padding:clamp(48px,10vw,140px) clamp(20px,4vw,64px); display:flex; flex-direction:column; gap:20px">
+        <span class="sw-label">SW—00 / Загрузка</span>
+        <div style="display:flex; gap:6px" aria-hidden="true">
+          <span style="width:12px; height:12px; background:var(--fg); animation:sw-blink 1s steps(1) infinite"></span>
+          <span style="width:12px; height:12px; background:var(--fg); animation:sw-blink 1s steps(1) .33s infinite"></span>
+          <span style="width:12px; height:12px; background:var(--fg); animation:sw-blink 1s steps(1) .66s infinite"></span>
+        </div>
+        <p class="sw-mono" style="font-size:13px; color:var(--fg-2)">Загружаю проекты…</p>
+      </div>
+    </sc-if>
+    <sc-if value="{{ isError }}" hint-placeholder-val="{{ false }}">
+      <div role="alert" style="max-width:1440px; margin:0 auto; padding:clamp(48px,10vw,140px) clamp(20px,4vw,64px); display:flex; flex-direction:column; gap:24px; align-items:flex-start">
+        <span class="sw-label">!! Ошибка загрузки</span>
+        <h1 style="font-family:var(--font-pixel); font-size:var(--text-display-m); line-height:.95">Данные не загрузились</h1>
+        <p style="color:var(--fg-2); max-width:56ch">{{ errorText }}</p>
+        <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Button" icon-start="reload" onClick="{{ retry }}" hint-size="140px,40px">Повторить</x-import>
+      </div>
+    </sc-if>
+    <sc-if value="{{ page.home }}" hint-placeholder-val="{{ false }}">
+      <dc-import name="Home" hint-size="100%,100vh"></dc-import>
+    </sc-if>
+    <sc-if value="{{ page.works }}" hint-placeholder-val="{{ false }}">
+      <dc-import name="Works" qs="{{ route.qs }}" nav="{{ route.n }}" hint-size="100%,100vh"></dc-import>
+    </sc-if>
+    <sc-if value="{{ page.project }}" hint-placeholder-val="{{ false }}">
+      <dc-import name="Project" slug="{{ route.slug }}" qs="{{ route.qs }}" nav="{{ route.n }}" hint-size="100%,100vh"></dc-import>
+    </sc-if>
+    <sc-if value="{{ page.notfound }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1440px; margin:0 auto; padding:clamp(48px,10vw,140px) clamp(20px,4vw,64px) var(--space-section); display:flex; flex-wrap:wrap; gap:48px; align-items:flex-end; justify-content:space-between">
+        <div style="flex:1 1 420px; display:flex; flex-direction:column; gap:28px; align-items:flex-start">
+          <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center">
+            <span class="sw-label">!! 404</span>
+            <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Coord" hint-size="120px,16px">{{ missingPath }}</x-import>
+          </div>
+          <h1 style="font-family:var(--font-pixel); font-size:var(--text-display-l); line-height:.95; letter-spacing:-.01em">Страница<br>не найдена</h1>
+          <p style="font-size:var(--text-lead); line-height:1.45; max-width:36ch">Проверьте адрес. Возможно, материал переименован или ещё не опубликован.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:8px">
+            <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Button" href="#/" icon-start="home" hint-size="140px,40px">На главную</x-import>
+            <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Button" variant="ghost" href="#/works" icon-end="arrow-right" hint-size="160px,40px">Все проекты</x-import>
+          </div>
+        </div>
+        <div aria-hidden="true" style="flex:0 1 360px; aspect-ratio:1/1; border:1px solid var(--line); position:relative; overflow:hidden">
+          <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.PixelField" height="100%" cell="{{ 16 }}" radius="{{ 120 }}" style="position:absolute; inset:0" hint-size="100%,100%"></x-import>
+          <span class="sw-label" style="position:absolute; top:14px; left:14px">FIG. 404 — пусто</span>
+        </div>
+      </div>
+    </sc-if>
+  </main>
+  <footer style="border-top:1px solid var(--line); margin-top:auto">
+    <div style="max-width:1440px; margin:0 auto; padding:40px clamp(20px,4vw,64px) 36px; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:32px 24px">
+      <div style="display:flex; flex-direction:column; gap:14px">
+        <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.PixelLogo" size="{{ 56 }}" animate="{{ false }}" hint-size="56px,40px"></x-import>
+        <span class="sw-label" style="letter-spacing:.16em; color:var(--fg)">Ideas / Systems / Products</span>
+        <p style="font-size:13px; line-height:1.5; color:var(--fg-2); max-width:34ch">Проекты, схемы и артефакты на сайте — демонстрационные примеры.</p>
+      </div>
+      <nav aria-label="Разделы сайта" style="display:flex; flex-direction:column; gap:10px">
+        <span class="sw-label" style="color:var(--fg-3)">Разделы</span>
+        <sc-for list="{{ nav }}" as="l" hint-placeholder-count="5">
+          <a href="{{ l.href }}" class="sw-label" style="color:var(--fg); text-decoration:none; width:fit-content" style-hover="text-decoration:underline">{{ l.idx }} / {{ l.label }}</a>
+        </sc-for>
+      </nav>
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <span class="sw-label" style="color:var(--fg-3)">Контакты</span>
+        <sc-for list="{{ contacts }}" as="c" hint-placeholder-count="4">
+          <sc-if value="{{ c.href }}" hint-placeholder-val="{{ false }}">
+            <a href="{{ c.href }}" target="{{ c.target }}" rel="{{ c.rel }}" class="sw-label" style="color:var(--fg); text-decoration:none; width:fit-content" style-hover="text-decoration:underline">{{ c.label }} ↗</a>
+          </sc-if>
+          <sc-if value="{{ c.empty }}" hint-placeholder-val="{{ true }}">
+            <span class="sw-label" title="Ссылка ещё не указана" style="color:var(--fg-3)">{{ c.label }} · не указан</span>
+          </sc-if>
+        </sc-for>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:10px; justify-content:flex-end">
+        <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Coord" hint-size="180px,16px">© {{ year }} · Sumchenko Works</x-import>
+      </div>
+    </div>
+  </footer>
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; right:clamp(16px,2vw,24px); bottom:clamp(16px,2vw,24px); left:auto; z-index:200; max-width:calc(100vw - 32px)">
+      <x-import component-from-global-scope="SumchenkoWorksDesignSystem_bf1cba.Toast" title="{{ toast.title }}" icon="{{ toast.icon }}" duration="{{ 3200 }}" onClose="{{ toast.close }}" hint-size="320px,64px">{{ toast.msg }}</x-import>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { route: Component.parse(), store: 'idle', toast: null, tick: 0 };
+  rootRef = React.createRef();
+
+  static NAV = [
+    { id: 'top', label: 'Главная', href: '#/' },
+    { id: 'approach', label: 'Подход', href: '#/?to=approach' },
+    { id: 'featured', label: 'Избранное', href: '#/?to=featured' },
+    { id: 'skills', label: 'Навыки', href: '#/?to=skills' },
+    { id: 'contacts', label: 'Контакты', href: '#/?to=contacts' },
+  ];
+
+  static parse() {
+    const raw = (location.hash || '').replace(/^#\/?/, '');
+    const [path, qs = ''] = raw.split('?');
+    const parts = path.split('/').filter(Boolean).map((s) => { try { return decodeURIComponent(s); } catch (e) { return s; } });
+    Component._n = (Component._n || 0) + 1;
+    return { parts, section: parts[0] || 'home', slug: parts[1] || '', qs, path: '/' + path, n: Component._n };
+  }
+
+  static initTheme() {
+    try {
+      const saved = localStorage.getItem('sw-theme');
+      const t = saved || (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  }
+
+  componentDidMount() {
+    Component.initTheme();
+    document.documentElement.lang = 'ru';
+    if (!document.title) document.title = 'Sumchenko Works — портфолио цифровых проектов';
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    this._onHash = () => {
+      const prev = this.state.route; const next = Component.parse();
+      this.setState({ route: next });
+      const to = new URLSearchParams(next.qs).get('to');
+      if (to && next.section === 'home') {
+        setTimeout(() => { this.scrollToSection(to); try { history.replaceState(null, '', '#/'); } catch (e) {} }, 180);
+      } else if (prev.section !== next.section || prev.slug !== next.slug) {
+        window.scrollTo({ top: 0 });
+        const m = document.getElementById('sw-main'); if (m) m.focus({ preventScroll: true });
+      }
+    };
+    window.addEventListener('hashchange', this._onHash);
+    this._rs = () => { const w = window.innerWidth >= 1100 || window.innerWidth < 760; if (w !== this.state.wide) this.setState({ wide: w }); };
+    this._rs(); window.addEventListener('resize', this._rs);
+    this._spy = () => {
+      if (this.state.route.section !== 'home') return;
+      let cur = 'top';
+      Component.NAV.forEach((l) => { const el = document.getElementById('sec-' + l.id); if (el && el.getBoundingClientRect().top < 140) cur = l.id; });
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) cur = Component.NAV[Component.NAV.length - 1].id;
+      if (cur !== this.state.active) this.setState({ active: cur });
+    };
+    window.addEventListener('scroll', this._spy, { passive: true });
+    this._onToast = (e) => this.showToast(e.detail.title, e.detail.msg);
+    window.addEventListener('sw:toast', this._onToast);
+    this._wait = setInterval(() => {
+      if (window.SumchenkoWorksDesignSystem_bf1cba && window.SWStore) { clearInterval(this._wait); this.boot(); }
+    }, 25);
+    this._failsafe = setTimeout(() => { if (!window.SWStore || !window.SumchenkoWorksDesignSystem_bf1cba) { clearInterval(this._wait); this.setState({ store: 'error', errText: 'Не загрузились скрипты сайта. Проверьте, что сайт открыт через веб-сервер.' }); } }, 8000);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('hashchange', this._onHash);
+    window.removeEventListener('scroll', this._spy);
+    window.removeEventListener('resize', this._rs);
+    window.removeEventListener('sw:toast', this._onToast);
+    clearInterval(this._wait); clearTimeout(this._failsafe);
+    if (this._unsub) this._unsub();
+  }
+  componentDidUpdate() {
+    if (this.state.store === 'ready' && this.legacyTarget()) { location.replace('#' + this.legacyTarget()); return; }
+    clearTimeout(this._meta); this._meta = setTimeout(() => this.syncMeta(), 0); }
+
+  boot() {
+    clearTimeout(this._failsafe);
+    const S = window.SWStore;
+    this._unsub = S.subscribe((st) => this.setState({ store: st }));
+    this.setState({ store: S.status });
+    S.load().catch(() => {});
+  }
+  scrollToSection(id) {
+    if (id === 'top') { window.scrollTo({ top: 0, behavior: window.SWStore && window.SWStore.reducedMotion() ? 'auto' : 'smooth' }); return; }
+    if (window.SWStore) window.SWStore.scrollTo('sec-' + id);
+  }
+  onNavigate = (id) => {
+    if (this.state.route.section === 'home' && !this.state.route.slug) { this.scrollToSection(id); this.setState({ active: id }); }
+    else location.hash = id === 'top' ? '#/' : '#/?to=' + id;
+  };
+  retry = () => { if (window.SWStore) window.SWStore.load(true).catch(() => {}); else location.reload(); };
+  skipToMain = () => { const m = document.getElementById('sw-main'); if (m) m.focus(); };
+
+  showToast(title, msg) {
+    const k = Date.now();
+    const close = () => this.setState((s) => (s.toast && s.toast.k === k ? { toast: null } : null));
+    const err = String(title || '').startsWith('!!');
+    this.setState({ toast: { k, title, msg, close, icon: err ? 'alert' : 'check' } });
+  }
+
+  resolve() {
+    const r = this.state.route; const S = window.SWStore;
+    if (this.legacyTarget()) return 'redirect';
+    const known = ['home', 'works'];
+    if (!known.includes(r.section) || r.parts.length > 2) return 'notfound';
+    if (r.section === 'home') return r.parts.length > 1 ? 'notfound' : 'home';
+    if (!r.slug) return r.section;
+    if (r.section === 'works') return S.project(r.slug) ? 'project' : 'notfound';
+    return 'notfound';
+  }
+
+  /* Старые адреса разделов «Архитектура» и «Артефакты» ведут в соответствующий проект. */
+  legacyTarget() {
+    const r = this.state.route; const S = window.SWStore;
+    if (r.section === 'about') return '/';
+    if (r.section === 'architecture') { const e = r.slug && S.arch(r.slug); return e ? '/works/' + e.project + '?tab=arch' : '/works'; }
+    if (r.section === 'artifacts') { const a = r.slug && S.artifact(r.slug); return a && a.project ? '/works/' + a.project + '?tab=artifacts&doc=' + a.id : '/works'; }
+    return null;
+  }
+
+  syncMeta() {
+    if (this.state.store !== 'ready') return;
+    const S = window.SWStore; const r = this.state.route; const page = this.resolve();
+    const base = 'Sumchenko Works';
+    let t = base + ' — портфолио цифровых проектов'; let d = S.data.site.description;
+    const ent = page === 'project' ? S.project(r.slug) : null;
+    if (ent) { t = ent.title + ' · ' + ent.code + ' — ' + base; d = ent.summary || d; }
+    else if (page === 'works') t = 'Проекты — ' + base;
+    else if (page === 'notfound') t = '404 — страница не найдена · ' + base;
+    if (document.title !== t) document.title = t;
+    const set = (key, val) => {
+      let m = document.head.querySelector('meta[data-sw-meta="' + key + '"]');
+      if (!m) { m = document.createElement('meta'); m.setAttribute('data-sw-meta', key); if (key.startsWith('og:')) m.setAttribute('property', key); else m.setAttribute('name', key); document.head.appendChild(m); }
+      if (m.getAttribute('content') !== val) m.setAttribute('content', val);
+    };
+    set('description', d); set('og:title', t); set('og:description', d);
+    const robots = document.head.querySelector('meta[name="robots"]');
+    if (page === 'notfound' && !robots) { const m = document.createElement('meta'); m.name = 'robots'; m.content = 'noindex'; document.head.appendChild(m); }
+    if (page !== 'notfound' && robots) robots.remove();
+  }
+
+  renderVals() {
+    const DS = window.SumchenkoWorksDesignSystem_bf1cba;
+    const S = window.SWStore;
+    const h = React.createElement;
+    const st = this.state.store;
+    const ready = st === 'ready' && !!S;
+    const page = ready ? this.resolve() : '';
+    const navCur = page === 'home' ? (this.state.active || 'top') : null;
+    const nav = Component.NAV.map((l, i) => ({ ...l, idx: String(i + 1).padStart(2, '0') }));
+    const header = DS ? h(DS.NavBar, {
+      brand: h('a', { className: 'sw-nav__brand', href: '#/', 'aria-label': 'Sumchenko Works — на главную' },
+        h(DS.PixelLogo, { size: 30, animate: false, title: 'Sumchenko Works' }), this.state.wide ? h('span', null, 'Sumchenko Works') : null),
+      links: Component.NAV, current: navCur, onNavigate: this.onNavigate,
+      actions: h(DS.Tooltip, { content: 'Сменить тему', side: 'bottom' }, h(DS.ThemeToggle, { size: 'sm' })),
+    }) : null;
+    const contacts = ready ? S.data.profile.links.filter((l) => l.id !== 'cv').map((l) => {
+      const href = l.href ? (l.id === 'email' && !l.href.startsWith('mailto:') ? 'mailto:' + l.href : l.href) : null;
+      const ext = href && /^https?:/.test(href);
+      return { label: l.label, href, empty: !href, target: ext ? '_blank' : undefined, rel: ext ? 'noopener noreferrer' : undefined };
+    }) : [];
+    const flags = {}; ['home', 'works', 'project', 'notfound'].forEach((k) => { flags[k] = page === k; });
+    return {
+      rootRef: this.rootRef,
+      header, nav, contacts,
+      route: this.state.route,
+      page: flags,
+      isLoading: !ready && st !== 'error',
+      isError: st === 'error',
+      errorText: (this.state.errText || (S && S.error && S.error.message) || 'Неизвестная ошибка') + '.',
+      retry: this.retry,
+      skipToMain: this.skipToMain,
+      missingPath: '#' + this.state.route.path,
+      toast: this.state.toast,
+      year: new Date().getFullYear(),
+    };
+  }
+}
+</script>
+</body>
+</html>

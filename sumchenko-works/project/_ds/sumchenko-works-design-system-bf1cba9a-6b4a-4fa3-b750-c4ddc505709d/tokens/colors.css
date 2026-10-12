@@ -1,0 +1,61 @@
+/* Sumchenko Works — color tokens. Monochrome only: no hue anywhere. */
+:root{
+/* Base palette — light */
+--sw-paper:#F7F7F5;      /* page background */
+--sw-white:#FFFFFF;      /* raised surfaces */
+--sw-ink:#111111;        /* primary text, fills */
+--sw-ash:#E8E8E5;        /* secondary surfaces */
+--sw-stone:#A3A3A0;      /* secondary text (large / decorative) */
+--sw-rule:#D1D1CD;       /* dividers, grids */
+--sw-slate:#62625F;      /* addition: AA-safe small meta text on paper */
+/* Base palette — dark */
+--sw-void:#080808;       /* page background */
+--sw-carbon:#171717;     /* cards, panels */
+--sw-bone:#F2F2F0;       /* primary text */
+--sw-graphite:#777774;   /* secondary text, strong lines */
+--sw-soot:#232322;       /* addition: secondary surface / subtle grid on dark */
+--sw-smoke:#2E2E2D;      /* addition: hairline dividers on dark */
+
+/* Semantic — light theme (default) */
+--bg:var(--sw-paper);
+--surface:var(--sw-white);
+--surface-2:var(--sw-ash);
+--fg:var(--sw-ink);
+--fg-2:var(--sw-slate);
+--fg-3:var(--sw-stone);
+--line:var(--sw-rule);
+--line-strong:var(--sw-ink);
+--grid-dot:var(--sw-rule);
+--inverse-bg:var(--sw-ink);
+--inverse-fg:var(--sw-paper);
+--focus:var(--sw-ink);
+--overlay:rgba(17,17,17,.32);
+--selection-bg:var(--sw-ink);
+--selection-fg:var(--sw-paper);
+
+/* Aliases */
+--text-body:var(--fg);
+--text-meta:var(--fg-2);
+--text-faint:var(--fg-3);
+--surface-page:var(--bg);
+--surface-card:var(--surface);
+--surface-sunken:var(--surface-2);
+--border-default:var(--line);
+}
+[data-theme="dark"]{
+--bg:var(--sw-void);
+--surface:var(--sw-carbon);
+--surface-2:var(--sw-soot);
+--fg:var(--sw-bone);
+--fg-2:var(--sw-graphite);
+--fg-3:var(--sw-graphite);
+--line:var(--sw-smoke);
+--line-strong:var(--sw-bone);
+--grid-dot:var(--sw-soot);
+--inverse-bg:var(--sw-bone);
+--inverse-fg:var(--sw-void);
+--focus:var(--sw-bone);
+--overlay:rgba(0,0,0,.6);
+--selection-bg:var(--sw-bone);
+--selection-fg:var(--sw-void);
+}

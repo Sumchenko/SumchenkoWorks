@@ -1,0 +1,77 @@
+---
+/*
+ * Общий каркас страницы: метаданные и превью ссылок, тема без мигания, шапка, футер.
+ * path — адрес страницы без языкового префикса ('/works/'), из него строятся canonical и hreflang.
+ */
+import '@/styles/global.css';
+import SiteHeader from '@/components/site/SiteHeader';
+import Footer from '@/components/site/Footer.astro';
+import { altLang, localePath, t, type Lang } from '@/i18n';
+import { getContent } from '@/lib/content';
+
+type Props = { lang: Lang; path: string; title?: string; description?: string; isHome?: boolean; noindex?: boolean };
+const { lang, path, title, description, isHome = false, noindex = false } = Astro.props;
+
+const T = t(lang);
+const c = getContent(lang);
+const fullTitle = title ? `${title} — ${c.site.name}` : `${c.site.name} — ${T.siteSuffix}`;
+const desc = description || c.site.description;
+const site = Astro.site!;
+const canonical = new URL(localePath(lang, path), site).href;
+const alt = altLang(lang);
+const ogImage = new URL('/og-image.png', site).href;
+// Тексты для скриптов страницы (копирование email, уведомления)
+const clientTexts = { copyFail: T.toast.copyFail, copyFailMsg: T.toast.copyFailMsg, close: T.close };
+---
+<!doctype html>
+<html lang={T.htmlLang}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{fullTitle}</title>
+  <meta name="description" content={desc} />
+  {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+  {!noindex && <link rel="alternate" hreflang="ru" href={new URL(localePath('ru', path), site).href} />}
+  {!noindex && <link rel="alternate" hreflang="en" href={new URL(localePath('en', path), site).href} />}
+  {!noindex && <link rel="alternate" hreflang="x-default" href={new URL(localePath('ru', path), site).href} />}
+  <meta property="og:site_name" content={c.site.name} />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={desc} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:locale" content={T.ogLocale} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="theme-color" content="#F7F7F5" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#080808" media="(prefers-color-scheme: dark)" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="sitemap" href="/sitemap-index.xml" />
+  <script is:inline>
+    // Тема ставится до отрисовки, чтобы не было вспышки светлой страницы в тёмной теме
+    try {
+      var s = localStorage.getItem('sw-theme');
+      document.documentElement.setAttribute('data-theme', s || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+    } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">{T.skip}</a>
+  <SiteHeader client:load lang={lang} isHome={isHome} homeHref={localePath(lang, '/')} altHref={localePath(alt, path)} altLang={alt} />
+  <main id="main" tabindex="-1">
+    <slot />
+  </main>
+  <Footer lang={lang} />
+  <script type="application/json" id="sw-texts" set:html={JSON.stringify(clientTexts)} />
+  <script>
+    import { copyText, initReveal } from '@/lib/client';
+    initReveal();
+    const texts = JSON.parse(document.getElementById('sw-texts')?.textContent || '{}');
+    // Кнопки вида <button data-copy="текст" data-copy-done="Скопировано">
+    document.addEventListener('click', (e) => {
+      const b = (e.target as Element).closest<HTMLElement>('[data-copy]');
+      if (!b) return;
+      copyText(b.dataset.copy || '', { done: b.dataset.copyDone || '', fail: texts.copyFail, failMsg: texts.copyFailMsg, close: texts.close });
+    });
+  </script>
+</body>
+</html>

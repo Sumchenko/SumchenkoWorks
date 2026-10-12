@@ -1,0 +1,44 @@
+# Сборка и выкладка на VPS при каждом push в main.
+# Секреты репозитория (Settings → Secrets and variables → Actions):
+#   SSH_HOST — IP или домен сервера, SSH_USER — пользователь, SSH_KEY — приватный ключ для деплоя,
+#   SSH_PORT — порт SSH (необязательно, по умолчанию 22).
+# Переменная репозитория SITE_URL — адрес сайта, например https://sumchenko-tech.ru
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+
+      - name: Upload to server
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+        run: |
+          install -m 600 /dev/null ~/.ssh_deploy_key
+          echo "$SSH_KEY" > ~/.ssh_deploy_key
+          mkdir -p ~/.ssh && ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
+          rsync -az --delete -e "ssh -i ~/.ssh_deploy_key -p $SSH_PORT" dist/ "$SSH_USER@$SSH_HOST:/var/www/sumchenko-works/"

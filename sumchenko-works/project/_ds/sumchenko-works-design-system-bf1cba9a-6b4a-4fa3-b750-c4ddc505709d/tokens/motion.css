@@ -1,0 +1,25 @@
+/* Sumchenko Works — motion tokens. Short, precise, never theatrical. */
+:root{
+--ease-out:cubic-bezier(.2,.7,.2,1); /* @kind other */
+--ease-in-out:cubic-bezier(.65,0,.35,1); /* @kind other */
+--ease-linear:linear; /* @kind other */
+--ease-pixel:steps(6,end); /* @kind other */     /* stepped motion for pixel reveals */
+--dur-instant:80ms; /* @kind other */
+--dur-fast:140ms; /* @kind other */
+--dur-base:220ms; /* @kind other */
+--dur-slow:420ms; /* @kind other */
+--dur-draw:900ms; /* @kind other */              /* line / diagram stroke draw */
+--dur-theme:360ms; /* @kind other */
+--stagger:24ms; /* @kind other */                /* per-element delay in sequences */
+}
+@media (prefers-reduced-motion:reduce){
+:root{
+--dur-instant:0ms; /* @kind other */
+--dur-fast:0ms; /* @kind other */
+--dur-base:0ms; /* @kind other */
+--dur-slow:0ms; /* @kind other */
+--dur-draw:0ms; /* @kind other */
+--dur-theme:0ms; /* @kind other */
+--stagger:0ms; /* @kind other */
+}
+}

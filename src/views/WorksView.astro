@@ -1,0 +1,20 @@
+---
+import Base from '@/layouts/Base.astro';
+import { t, type Lang } from '@/i18n';
+import { getContent } from '@/lib/content';
+import { cardVM } from '@/lib/vm';
+import WorksCatalog from '@/components/works/WorksCatalog';
+
+const { lang } = Astro.props as { lang: Lang };
+const T = t(lang).works;
+const c = getContent(lang);
+const projects = c.projects.map((p) => cardVM(p, lang));
+// в фильтре только технологии, которые встречаются в проектах
+const technologies = c.taxonomy.technologies.filter((x) => c.projects.some((p) => p.tech.includes(x.id))).map((x) => ({ id: x.id, label: x.label }));
+const categories = c.taxonomy.categories.map((x) => ({ id: x.id, label: x.label }));
+---
+<Base lang={lang} path="/works/" title={T.metaTitle}>
+  <div style="max-width:1440px; margin:0 auto; padding:56px var(--grid-margin) var(--space-section)">
+    <WorksCatalog client:load lang={lang} projects={projects} categories={categories} technologies={technologies} intro={T.intro + (c.hasDemo ? T.introDemo : '')} />
+  </div>
+</Base>

@@ -1,0 +1,9 @@
+---
+import ProjectView from '@/views/ProjectView.astro';
+import { getContent } from '@/lib/content';
+
+export function getStaticPaths() {
+  return getContent('en').projects.map((p) => ({ params: { id: p.id } }));
+}
+---
+<ProjectView lang="en" id={Astro.params.id} />

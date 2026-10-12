@@ -1,0 +1,137 @@
+---
+import Base from '@/layouts/Base.astro';
+import { localePath, pad2, t, type Lang } from '@/i18n';
+import { getContent } from '@/lib/content';
+import { cardVM } from '@/lib/vm';
+import { contactLinks } from '@/lib/contacts';
+import { ProjectCard } from '@/components/ProjectCard';
+import { Badge, Coord, SectionHead, Tag } from '@/components/ds/Display';
+import { Button } from '@/components/ds/Button';
+import { Icon } from '@/components/ds/Icon';
+import HeroVisual from '@/components/home/HeroVisual';
+import Lifecycle from '@/components/home/Lifecycle';
+
+const { lang } = Astro.props as { lang: Lang };
+const T = t(lang);
+const H = T.home;
+const c = getContent(lang);
+const P = c.site.profile;
+const years = c.projects.map((p) => p.year);
+const featured = c.projects.filter((p) => p.featured).slice(0, 3).map((p) => cardVM(p, lang));
+const links = contactLinks(P.links);
+const email = links.find((l) => l.id === 'email')?.href?.replace(/^mailto:/, '') || '';
+const eyebrow = P.name ? P.name + (P.location ? ' · ' + P.location : '') : H.eyebrowFallback;
+const skillsPlaceholder = !!(P.skills.placeholder || P.tools.placeholder);
+---
+<Base lang={lang} path="/" isHome>
+  <div class="sw-container">
+    <section id="top" aria-labelledby="hero-title" style="padding-top:clamp(40px,7vw,96px)">
+      <div style="display:flex; flex-wrap:wrap; gap:clamp(32px,4vw,56px) var(--grid-gutter); align-items:center">
+        <div style="flex:7 1 440px; display:flex; flex-direction:column; gap:24px">
+          <span class="sw-label">{eyebrow}</span>
+          <h1 id="hero-title" style="font-family:var(--font-pixel); font-size:var(--text-display-l); line-height:.95; letter-spacing:-.01em" set:html={H.heroTitle} />
+          <span class="sw-label" style="color:var(--fg)">{P.headline}</span>
+          <p style="font-size:var(--text-lead); line-height:1.45; max-width:42ch">{P.summary}</p>
+          <div style="display:flex; flex-wrap:wrap; gap:8px">
+            <Button iconEnd="arrow-down" href="#featured">{H.toFeatured}</Button>
+            <Button variant="ghost" href="#contacts">{H.toContacts}</Button>
+          </div>
+        </div>
+        <div style="flex:5 1 300px; position:relative; aspect-ratio:1/1; max-height:480px; border:1px solid var(--line); display:grid; place-items:center; overflow:hidden">
+          <HeroVisual client:load />
+          <Coord x={0} y={0} style={{ position: 'absolute', top: 12, left: 12 }} />
+          <span class="sw-label" style="position:absolute; top:14px; right:14px">FIG. 00</span>
+        </div>
+      </div>
+      <dl style="margin:clamp(48px,6vw,80px) 0 0; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); border-top:1px solid var(--line)">
+        {c.taxonomy.categories.map((cat, i) => (
+          <div data-reveal={i * 80} style="padding:20px 24px 0 0; display:flex; flex-direction:column; gap:8px">
+            <dt style="display:flex; flex-direction:column; gap:8px"><span class="sw-label">{pad2(i + 1)}</span><span style="font-size:var(--text-h3); font-weight:500; line-height:1.15">{cat.label}</span></dt>
+            <dd style="margin:0; color:var(--fg-2); font-size:15px; max-width:36ch">{cat.text}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    <section id="approach" aria-labelledby="h-approach" style="padding-top:var(--space-section)">
+      <SectionHead index={H.approachIdx} title={H.approachTitle} titleId="h-approach" meta={H.approachMeta} />
+      <div style="margin-top:40px">
+        <Lifecycle client:visible lang={lang} data={c.site.lifecycle} />
+      </div>
+      <ol class="dash-rail" style="list-style:none; margin:56px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:32px var(--grid-gutter)">
+        {P.principles.map((s, i) => (
+          <li data-reveal={i * 90} style="display:flex; flex-direction:column; gap:12px; padding-top:28px; position:relative">
+            <span aria-hidden="true" style="position:absolute; top:0; left:0; width:9px; height:9px; background:var(--fg)"></span>
+            <span class="sw-label">{pad2(i + 1)}</span>
+            <h3 style="font-size:var(--text-h3); font-weight:500">{s.title}</h3>
+            <p style="color:var(--fg-2); font-size:15px">{s.text}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section id="featured" aria-label={H.featuredAria} style="padding-top:var(--space-section)">
+      <SectionHead index={H.featuredIdx} title={H.featuredTitle} meta={H.worksMeta(c.projects.length, Math.min(...years), Math.max(...years))} />
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr)); gap:var(--grid-gutter); margin-top:32px">
+        {featured.map((p, i) => (
+          <div data-reveal={i * 60} style="display:flex"><ProjectCard p={p} lang={lang} /></div>
+        ))}
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-top:24px">
+        <span class="sw-label">{c.hasDemo ? H.demoNote : ''}</span>
+        <Button variant="secondary" href={localePath(lang, '/works/')} iconEnd="arrow-right">{H.allWorks(c.projects.length)}</Button>
+      </div>
+    </section>
+
+    <section id="skills" aria-labelledby="h-skills" style="padding-top:var(--space-section)">
+      <SectionHead index={H.skillsIdx} title={H.skillsTitle} titleId="h-skills" />
+      {skillsPlaceholder && <div style="margin-top:16px"><Badge variant="dashed" title={H.placeholderTitle}>{H.placeholder}</Badge></div>}
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); gap:32px var(--grid-gutter); margin-top:32px">
+        {P.skills.groups.map((g, i) => (
+          <div data-reveal={i * 60} style="display:flex; flex-direction:column; border-top:1px solid var(--line-strong)">
+            <span class="sw-label" style="padding:12px 0; color:var(--fg)">{g.title}</span>
+            {g.items.map((it) => <span style="padding:9px 0; border-top:1px solid var(--line); font-size:15px">{it}</span>)}
+          </div>
+        ))}
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:28px">
+        <span class="sw-label" style="margin-right:8px">{H.tools}</span>
+        {P.tools.items.map((x) => <Tag size="sm">{x}</Tag>)}
+      </div>
+    </section>
+
+    <section id="contacts" aria-labelledby="h-contacts" style="padding:var(--space-section) 0">
+      <div style="display:flex; flex-wrap:wrap; gap:40px var(--grid-gutter); border-top:1px solid var(--line); padding-top:28px">
+        <div style="flex:5 1 360px; display:flex; flex-direction:column; gap:24px; align-items:flex-start">
+          <span class="sw-label">{H.contactsIdx}</span>
+          <h2 id="h-contacts" style="font-family:var(--font-pixel); font-size:var(--text-display-m); line-height:.95" set:html={H.contactsTitle} />
+          {email && (
+            <button type="button" class="hover-dim" data-copy={email} data-copy-done={T.toast.emailCopied}
+              style="display:inline-flex; align-items:center; gap:14px; font-family:var(--font-mono); font-size:clamp(16px,2vw,22px); color:var(--fg); background:none; border:0; border-bottom:1px solid var(--line-strong); padding:0 0 8px; cursor:pointer; max-width:100%; overflow-wrap:anywhere; text-align:left">
+              {email}<Icon name="copy" size={16} />
+            </button>
+          )}
+        </div>
+        <ul style="flex:7 1 360px; list-style:none; margin:0; padding:0; border-top:1px solid var(--line); align-self:flex-end">
+          {links.map((l) => (
+            <li style="border-bottom:1px solid var(--line)">
+              {l.href ? (
+                <a href={l.href} target={l.external ? '_blank' : undefined} rel={l.external ? 'noopener noreferrer' : undefined} class="row-link" style="display:flex; align-items:center; gap:14px; padding:16px 8px">
+                  <Icon name={l.icon} size={16} />
+                  <span class="sw-label" style="color:var(--fg); flex:1">{l.label}</span>
+                  <span class="sw-mono" style="font-size:12px; color:var(--fg-2); overflow-wrap:anywhere; text-align:right">{l.display} ↗</span>
+                </a>
+              ) : (
+                <div style="display:flex; align-items:center; gap:14px; padding:16px 8px; color:var(--fg-3)">
+                  <Icon name={l.icon} size={16} />
+                  <span class="sw-label" style="color:var(--fg-2); flex:1">{l.label}</span>
+                  <span class="sw-mono" style="font-size:12px; border:1px dashed var(--line); padding:2px 8px; white-space:nowrap">{H.notSet}</span>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  </div>
+</Base>

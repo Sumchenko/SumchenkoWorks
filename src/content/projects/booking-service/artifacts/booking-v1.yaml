@@ -1,0 +1,19 @@
+openapi: 3.1.0
+info:
+  title: Booking API (demo)
+  version: 0.9.0
+paths:
+  /v1/slots:
+    get:
+      summary: Free slots
+      parameters:
+        - { in: query, name: service_id, required: true, schema: { type: string } }
+        - { in: query, name: date, required: true, schema: { type: string, format: date } }
+      responses:
+        '200': { description: List of slots }
+  /v1/bookings:
+    post:
+      summary: Create a booking
+      responses:
+        '201': { description: Booking created, slot held for 10 minutes }
+        '409': { description: Slot already taken }

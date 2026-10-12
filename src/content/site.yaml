@@ -1,0 +1,127 @@
+# Профиль и тексты главной страницы.
+# Любое текстовое поле: строка (одинаково для RU и EN) или пара { ru: "...", en: "..." }.
+# null — поле не заполнено: на сайте оно показывается как «не указан».
+
+name: Sumchenko Works
+tagline: Ideas / Systems / Products
+description:
+  ru: Портфолио цифровых проектов — разработка, системный анализ и проектирование программных решений.
+  en: Digital project portfolio — software development, systems analysis and solution design.
+
+profile:
+  name: null # ЗАГЛУШКА: { ru: "Никита Сумченко", en: "Nikita Sumchenko" }
+  location: null # ЗАГЛУШКА: { ru: "Москва · UTC+3", en: "Moscow · UTC+3" }
+  headline:
+    ru: Разработка · системный анализ · проектирование
+    en: Development · systems analysis · solution design
+  summary:
+    ru: Проектирую и разрабатываю цифровые продукты — от постановки задачи и требований до архитектуры, модели данных, API и реализации. Работаю с разными технологиями и использую AI-инструменты там, где они ускоряют работу.
+    en: I design and build digital products — from problem framing and requirements to architecture, data model, API and implementation. I work across different technologies and use AI tools where they genuinely speed things up.
+
+  principles:
+    - title: { ru: "Исследование", en: "Research" }
+      text:
+        ru: Контекст, пользователи, ограничения. Что именно должно работать.
+        en: Context, users, constraints. What exactly has to work.
+    - title: { ru: "Модель", en: "Model" }
+      text:
+        ru: Границы системы, сущности, сценарии. Схема раньше кода.
+        en: System boundaries, entities, scenarios. Diagram before code.
+    - title: { ru: "Реализация", en: "Build" }
+      text:
+        ru: Итерации с проверкой гипотез. AI-инструменты там, где они ускоряют.
+        en: Iterations that test hypotheses. AI tools where they help.
+    - title: { ru: "Документация", en: "Documentation" }
+      text:
+        ru: ADR, диаграммы и контракты остаются вместе с продуктом.
+        en: ADRs, diagrams and contracts stay with the product.
+
+  # placeholder: true — на сайте рядом с разделом стоит метка «Заглушка». Уберите, когда заполните.
+  skills:
+    placeholder: true
+    groups:
+      - title: { ru: "Системный анализ", en: "Systems analysis" }
+        items:
+          - { ru: "Сбор и формализация требований", en: "Requirements elicitation and specification" }
+          - { ru: "Пользовательские сценарии", en: "Use cases and user scenarios" }
+          - BPMN 2.0
+          - 'UML: sequence, activity, state'
+      - title: { ru: "Проектирование", en: "Solution design" }
+        items:
+          - { ru: "C4-модель", en: "C4 model" }
+          - { ru: "ER-моделирование", en: "ER modelling" }
+          - { ru: "Проектирование REST API", en: "REST API design" }
+          - { ru: "ADR и разбор компромиссов", en: "ADRs and trade-off analysis" }
+      - title: { ru: "Разработка", en: "Development" }
+        items:
+          - { ru: "Веб-сервисы и API", en: "Web services and APIs" }
+          - { ru: "Интерфейсы", en: "User interfaces" }
+          - { ru: "Работа с реляционными БД", en: "Relational databases" }
+          - { ru: "Очереди и события", en: "Queues and events" }
+  tools:
+    placeholder: true
+    items: [Git, Docker, PostgreSQL, OpenAPI, draw.io, PlantUML, Figma, { ru: "AI-ассистенты для кода", en: "AI coding assistants" }]
+
+  # href: null — ссылка не указана. Email можно писать без mailto:.
+  links:
+    - { id: github, label: GitHub, href: null, icon: github }
+    - { id: email, label: Email, href: null, icon: mail }
+    - { id: telegram, label: Telegram, href: null, icon: message }
+    - { id: hh, label: hh.ru, href: null, icon: briefcase }
+    - { id: cv, label: { ru: "Резюме", en: "CV" }, href: null, icon: file }
+
+# Схема «Подход к разработке» на главной: ровно 6 этапов, порядок совпадает с анимацией.
+lifecycle:
+  title: { ru: "Один цикл создания продукта", en: "One product cycle" }
+  text:
+    ru: Идея проходит системный анализ и проектирование, реализуется с AI-инструментами под инженерным контролем, проверяется автотестами и становится работающим продуктом. Данные эксплуатации запускают следующий цикл.
+    en: An idea goes through systems analysis and design, is implemented with AI tools under engineering control, is verified by automated tests and becomes a working product. Production data starts the next cycle.
+  stages:
+    - code: IDEA
+      short: IDEA
+      name: { ru: "Идея", en: "Idea" }
+      text:
+        ru: Исходная идея фиксируется как цель продукта, требования и основные пользовательские сценарии.
+        en: The initial idea is captured as a product goal, requirements and the main user scenarios.
+      input: { ru: "Запрос, проблема, гипотеза", en: "Request, problem, hypothesis" }
+      output: { ru: "Цель, требования, сценарии", en: "Goal, requirements, scenarios" }
+    - code: ANALYSIS
+      short: ANALYSIS
+      name: { ru: "Системный анализ", en: "Systems analysis" }
+      text:
+        ru: Требования связываются с сущностями и процессами. Появляется модель предметной области и границы системы.
+        en: Requirements are linked to entities and processes. A domain model and system boundaries emerge.
+      input: { ru: "Цель, требования, сценарии", en: "Goal, requirements, scenarios" }
+      output: { ru: "Модель данных, процессы, границы", en: "Data model, processes, boundaries" }
+    - code: ARCHITECTURE
+      short: ARCHITECTURE
+      name: { ru: "Архитектура", en: "Architecture" }
+      text:
+        ru: Из модели строится архитектура — интерфейс, API, бизнес-логика, база данных и внешние интеграции. Определяются контракты и потоки данных.
+        en: The model turns into an architecture — UI, API, business logic, database and external integrations. Contracts and data flows are defined.
+      input: { ru: "Модель данных и процессов", en: "Data and process model" }
+      output: { ru: "C4-схема, контракты API, ADR", en: "C4 diagram, API contracts, ADRs" }
+    - code: AI-ASSISTED DEV
+      short: AI-DEV
+      name: { ru: "Разработка с AI", en: "AI-assisted development" }
+      text:
+        ru: Задачи из архитектуры реализуются с AI-инструментами. Черновик кода появляется быстрее, но каждое решение проходит инженерное ревью и встраивается в архитектуру.
+        en: Tasks from the architecture are implemented with AI tools. Draft code appears faster, but every decision goes through engineering review and fits into the architecture.
+      input: { ru: "Задачи, контракты, ADR", en: "Tasks, contracts, ADRs" }
+      output: { ru: "Модули после ревью", en: "Reviewed modules" }
+    - code: TESTING & AUTOMATION
+      short: TESTING
+      name: { ru: "Тесты и автоматизация", en: "Testing and automation" }
+      text:
+        ru: Автотесты, проверка контрактов и контроль качества в CI. Модуль, не прошедший проверку, возвращается на доработку и проверяется снова.
+        en: Automated tests, contract checks and quality gates in CI. A module that fails goes back for rework and is checked again.
+      input: { ru: "Модули приложения", en: "Application modules" }
+      output: { ru: "Проверенная сборка, отчёт", en: "Verified build, report" }
+    - code: WORKING PRODUCT
+      short: PRODUCT
+      name: { ru: "Работающий продукт", en: "Working product" }
+      text:
+        ru: Модули собираются в продукт, связанный с API, базой данных и интеграциями. Данные эксплуатации становятся входом следующего цикла.
+        en: Modules come together into a product connected to the API, database and integrations. Production data becomes the input of the next cycle.
+      input: { ru: "Проверенная сборка", en: "Verified build" }
+      output: { ru: "Релиз, метрики, обратная связь", en: "Release, metrics, feedback" }

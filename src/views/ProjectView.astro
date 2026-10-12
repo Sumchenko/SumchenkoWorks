@@ -1,0 +1,76 @@
+---
+import Base from '@/layouts/Base.astro';
+import { localePath, t, type Lang } from '@/i18n';
+import { getContent } from '@/lib/content';
+import { badgeOf, projectBodyVM, projectLinks } from '@/lib/vm';
+import { Badge, SpecList } from '@/components/ds/Display';
+import { Button } from '@/components/ds/Button';
+import { Icon } from '@/components/ds/Icon';
+import ProjectBody from '@/components/project/ProjectBody';
+
+const { lang, id } = Astro.props as { lang: Lang; id: string };
+const T = t(lang).project;
+const c = getContent(lang);
+const p = c.project(id)!;
+const badge = badgeOf(p);
+const extLinks = projectLinks(p, lang).filter((l) => l.external);
+const techLine = p.techList.map((x) => x.label).join(' · ');
+const spec = [
+  { label: T.role, value: p.role || p.categoryLabel },
+  { label: T.period, value: p.period || String(p.year) },
+  { label: T.status, value: badge.label + (p.demo ? T.demoSuffix : '') },
+  { label: T.stack, value: techLine },
+];
+const related = (p.related ?? []).map((r) => c.project(r)!).filter(Boolean);
+const idx = c.projects.indexOf(p);
+const next = c.projects[(idx + 1) % c.projects.length];
+const works = localePath(lang, '/works/');
+---
+<Base lang={lang} path={`/works/${p.id}/`} title={`${p.title} · ${p.code}`} description={p.summary}>
+  <article style="max-width:1440px; margin:0 auto; padding:0 var(--grid-margin)">
+    <nav aria-label={T.crumbsAria} style="padding-top:24px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between">
+      <Button variant="ghost" size="sm" href={works} iconStart="arrow-left">{T.back}</Button>
+      <span class="sw-label"><a href={works} style="color:inherit">{T.crumbs}</a> / {p.code}</span>
+    </nav>
+
+    <header style="display:flex; flex-wrap:wrap; gap:32px var(--grid-gutter); padding:40px 0 28px; align-items:flex-end">
+      <div style="flex:8 1 480px; min-width:0; display:flex; flex-direction:column; gap:20px">
+        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
+          <span class="sw-label">{p.code} · {p.categoryLabel}</span>
+          <Badge variant={badge.variant} dot={badge.dot} pulse={badge.pulse}>{badge.label}</Badge>
+          {p.demo && <Badge variant="dashed" title={T.demoTitle}>{t(lang).card.demo}</Badge>}
+        </div>
+        <h1 style="font-family:var(--font-pixel); font-size:var(--text-display-m); line-height:.95; letter-spacing:-.01em; overflow-wrap:anywhere">{p.title}</h1>
+        <p style="font-size:var(--text-lead); line-height:1.45; max-width:48ch">{p.summary}</p>
+        {extLinks.length > 0 && (
+          <div style="display:flex; flex-wrap:wrap; gap:8px">
+            {extLinks.map((l) => <Button variant="secondary" size="sm" href={l.href} target="_blank" rel="noopener noreferrer" iconStart={l.icon}>{l.label}</Button>)}
+          </div>
+        )}
+      </div>
+      <div style="flex:4 1 300px; min-width:0">
+        <SpecList items={spec} />
+      </div>
+    </header>
+
+    <ProjectBody client:load vm={projectBodyVM(p, c)} />
+
+    {related.length > 0 && (
+      <section aria-labelledby="h-rel" style="padding-top:var(--space-section); display:flex; flex-direction:column">
+        <h2 id="h-rel" class="sw-label" style="padding-bottom:12px">{T.related}</h2>
+        {related.map((r) => (
+          <a href={r.href} class="row-link" style="display:grid; grid-template-columns:64px minmax(0,1fr) 32px; gap:var(--grid-gutter); align-items:center; padding:16px 12px; border-top:1px solid var(--line)">
+            <span class="sw-label">{r.code}</span>
+            <span style="display:flex; flex-wrap:wrap; gap:4px 24px; align-items:baseline"><span style="font-size:18px; font-weight:500; margin-right:auto">{r.title}</span><span class="sw-label">{r.categoryLabel} · {r.year}</span></span>
+            <span aria-hidden="true" class="arrow-box"><Icon name="arrow-right" size={16} /></span>
+          </a>
+        ))}
+      </section>
+    )}
+
+    <div style="margin:var(--space-section) 0; border-top:1px solid var(--line); padding-top:24px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap">
+      <span class="sw-label">{T.next(next.code)}</span>
+      <Button variant="secondary" href={next.href} iconEnd="arrow-right" style={{ maxWidth: '100%' }}>{next.title}</Button>
+    </div>
+  </article>
+</Base>
