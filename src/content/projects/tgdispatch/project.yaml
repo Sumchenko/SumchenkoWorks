@@ -77,8 +77,8 @@ challenges:
     text: { ru: "Задача не должна пропасть из-за внешнего сервиса: SQLite как outbox, досылка при старте и перед каждой новой задачей, остановка на первой сетевой ошибке.", en: "A task must not vanish because of an external service: SQLite as an outbox, resent on start and before each new task, stopping at the first network error." }
 results:
   text:
-    ru: Рабочий MVP примерно на 1 400 строк Python — бот, разбор через LLM, расчёт сроков, Notion с резервом в SQLite. Отдельно — разбор кода с 6 замечаниями и предложениями по доработке.
-    en: A working MVP of about 1,400 lines of Python — the bot, LLM parsing, deadline calculation, Notion with an SQLite fallback. Plus a code review with 6 findings and improvement proposals.
+    ru: Рабочий MVP примерно на 1 400 строк Python — бот, разбор через LLM, расчёт сроков, Notion с резервом в SQLite; проверен в Telegram на реальной базе Notion. Отдельно — разбор кода с 6 замечаниями и предложениями по доработке.
+    en: A working MVP of about 1,400 lines of Python — the bot, LLM parsing, deadline calculation, Notion with an SQLite fallback; tested in Telegram against a real Notion database. Plus a code review with 6 findings and improvement proposals.
   state:
     ru: Бот не развёрнут на сервере; следующий шаг — исправить замечания, хранить черновики вне памяти процесса и перейти на дату в Notion вместо текста.
     en: The bot is not deployed; next steps are fixing the findings, keeping drafts outside process memory and switching to a Notion date property instead of text.
@@ -176,6 +176,54 @@ diagrams:
 
 # Артефакты: документы — artifacts/<id>.ru.md и .en.md, остальное — файлы в artifacts/
 artifacts:
+  - id: screen-multi
+    code: UI-01
+    type: ui
+    view: image
+    file: screen-multi.png
+    updated: '2026.09'
+    title: { ru: "Одно сообщение — три задачи", en: "One message — three tasks" }
+    summary: { ru: "«Закажи капкейки до завтра до 15:00, передай Кате анонс к пятнице и напомни мне созвониться послезавтра»: первая задача уже в Notion, вторая ждёт подтверждения.", en: "“Order cupcakes by 15:00 tomorrow, tell Katya to finish the announcement by Friday and remind me to call the day after tomorrow”: the first task is already in Notion, the second awaits confirmation." }
+  - id: screen-notion
+    code: UI-02
+    type: ui
+    view: image
+    file: screen-notion.png
+    updated: '2026.09'
+    title: { ru: "Задачи в Notion", en: "Tasks in Notion" }
+    summary: { ru: "База, которую наполнил бот: срок, категория, исполнитель, приоритет и статус «Не начато» для канбан-доски.", en: "The database filled by the bot: deadline, category, assignee, priority and status Not started for the kanban board." }
+  - id: screen-voice
+    code: UI-03
+    type: ui
+    view: image
+    file: screen-voice.png
+    updated: '2026.09'
+    title: { ru: "Голосовое и правка черновика", en: "Voice message and draft editing" }
+    summary: { ru: "Whisper распознал голосовое, срок «до понедельника» стал датой, открыто меню правки полей.", en: "Whisper transcribed the voice message, “by Monday” became a date, and the field editing menu is open." }
+  - id: screen-soft
+    code: UI-04
+    type: ui
+    view: image
+    file: screen-soft.png
+    updated: '2026.09'
+    title: { ru: "Мягкий срок и низкий приоритет", en: "Soft deadline and low priority" }
+    summary: { ru: "«Если останется окно на неделе» — срок до пятницы и приоритет «низкий»; исполнителю ушло уведомление.", en: "“If there’s a window this week” — a deadline of Friday and low priority; the assignee was notified." }
+  - id: screen-notify
+    code: UI-05
+    type: ui
+    view: image
+    file: screen-notify.png
+    updated: '2026.09'
+    title: { ru: "Уведомление исполнителю", en: "Assignee notification" }
+    summary: { ru: "Что получает Виктория, когда задачу на неё подтвердили.", en: "What Viktoria receives when a task for her is confirmed." }
+  - id: screen-start
+    code: UI-06
+    type: ui
+    view: image
+    file: screen-start.png
+    updated: '2026.09'
+    title: { ru: "Приветствие", en: "Welcome message" }
+    summary: { ru: "Ответ на /start: что умеет бот и почему коллегам нужно один раз написать ему.", en: "The reply to /start: what the bot can do and why colleagues need to message it once." }
   - id: spec-dispatch
     code: SRS-01
     type: srs
