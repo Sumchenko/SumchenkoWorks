@@ -73,7 +73,7 @@ export default function ProjectBody({ vm }: { vm: ProjectBodyVM }) {
 
       {/* ---------- Обзор ---------- */}
       <div {...panel('overview')} style={{ display: tab === 'overview' ? 'flex' : 'none', flexDirection: 'column', paddingTop: 16 }}>
-        {vm.screens.length ? <ScreensGallery items={vm.screens} lang={lang} onOpen={openDoc} /> : null}
+        {vm.screens.length ? <ScreensGallery items={vm.screens} lang={lang} /> : null}
         {vm.rows.map((r, i) => <Row key={i} r={r} lang={lang} />)}
         {A || vm.artifacts.length ? (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, paddingTop: 28 }}>
@@ -239,7 +239,7 @@ function Row({ r, lang }: { r: OverviewRow; lang: ProjectBodyVM['lang'] }) {
             ))}
           </ol>
         ) : null}
-        {r.kind === 'chips' ? <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>{r.items.map((x) => <Tag key={x}>{x}</Tag>)}</div> : null}
+        {r.kind === 'chips' ? <div className="chips-wrap" style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>{r.items.map((x) => <Tag key={x}>{x}</Tag>)}</div> : null}
         {r.kind === 'stack' ? (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {r.items.map((x) => <a key={x.href} href={x.href} title={T.techTitle} style={{ textDecoration: 'none' }}><Tag size="sm" hash>{x.text}</Tag></a>)}

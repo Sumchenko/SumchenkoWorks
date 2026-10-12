@@ -86,6 +86,9 @@ main { flex: 1; outline: none; }
 .sw-doc img { max-width: 100%; height: auto; border: 1px solid var(--line); }
 .sw-doc hr { border-top: 1px dashed var(--line); }
 
+/* ---------- Длинные чипы (функции проекта) переносятся, а не расширяют страницу ---------- */
+.chips-wrap .sw-tag { white-space: normal; height: auto; min-height: 28px; padding-block: 6px; line-height: 1.35; max-width: 100%; }
+
 /* ---------- Окно: шапка на месте, прокручивается только тело ---------- */
 .sw-dialog { display: flex; flex-direction: column; overflow: hidden; }
 .sw-dialog__head, .sw-dialog__foot { flex: none; }

@@ -158,7 +158,9 @@ const ru = {
     artifactLabel: (code: string) => `Артефакт / ${code}`,
     screens: 'Интерфейс',
     screensAria: 'Экраны проекта',
-    screensOpen: 'Открыть экран',
+    screensOpen: 'Открыть на весь экран',
+    screensPrev: 'Предыдущий экран',
+    screensNext: 'Следующий экран',
   },
   artifact: {
     download: (ext: string) => `Скачать .${ext}`,
@@ -337,7 +339,9 @@ const en: UI = {
     artifactLabel: (code: string) => `Artifact / ${code}`,
     screens: 'Interface',
     screensAria: 'Project screens',
-    screensOpen: 'Open screen',
+    screensOpen: 'Open full screen',
+    screensPrev: 'Previous screen',
+    screensNext: 'Next screen',
   },
   artifact: {
     download: (ext: string) => `Download .${ext}`,

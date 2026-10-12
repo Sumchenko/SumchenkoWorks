@@ -1,10 +1,10 @@
-Mismatches between the requirements of case SRS-01 and the implementation, found during the code review and in the pilot customer's feedback. Each finding has the issue, a scenario, a proposal and a status. Finding codes keep the original Russian numbering (З = finding).
+Mismatches between the requirements of case SRS-01 and the implementation, found during the code review and in the feedback from a company that reviewed the system. Each finding has the issue, a scenario, a proposal and a status. Finding codes keep the original Russian numbering (З = finding).
 
 | # | Finding | Severity | Status |
 | --- | --- | --- | --- |
 | З-1 | Double booking under concurrent requests | High | Fixed |
 | З-2 | Availability checks bypassed with another date format | High | Fixed |
-| З-11 | The order form shows only part of the fleet (pilot feedback) | High | Fixed |
+| З-11 | The order form shows only part of the fleet (company feedback) | High | Fixed |
 | З-3 | Order numbers can repeat | Medium | Fixed |
 | З-4 | Edit and cancel permissions are not checked by the server | Medium | Open |
 | З-5 | The order total is not validated by the server | Medium | Open |
@@ -34,7 +34,7 @@ Mismatches between the requirements of case SRS-01 and the implementation, found
 
 ## З-11. The order form shows only part of the fleet
 
-**Source.** Feedback from the pilot customer with 24 machines, confirmed in the code.
+**Source.** Feedback from a company with 24 machines that reviewed the system; confirmed in the code.
 
 **Issue.** The form asked for 200 records, and the server silently replaced anything above 100 with 20. The list showed the 20 newest machines — older equipment could not be booked via "New order". It did not show up in development: the test data had 18 machines. Side effect: booking from the calendar for a machine outside the first 20 left the rates empty and the total at 0.
 
@@ -96,9 +96,9 @@ Mismatches between the requirements of case SRS-01 and the implementation, found
 
 **Proposal.** A dialog "Cancel order ТР-…? The equipment will be released"; on the server — 422 for a completed order.
 
-## Pilot customer feedback
+## Company feedback
 
-| # | What the customer said | Analysis | Where it is reflected |
+| # | What the company head said | Analysis | Where it is reflected |
 | --- | --- | --- | --- |
 | F-1 | "We have 24 machines, the whole list does not fit when creating an order. We need search" | Not just UX but a defect: equipment beyond 20 is not available in the form at all | З-11, US-2 criterion 8, ticket requirement 9 |
 | F-2 | "I couldn't find how to extend the list of equipment types" | Categories are hard-coded in the UI (10 values), although the database accepts any string | Options below — for the catalogue backlog |

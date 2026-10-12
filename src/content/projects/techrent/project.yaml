@@ -27,8 +27,8 @@ overview:
   ru: ТехРент заменяет таблицы простым веб-сервисом для менеджеров. Система сама проверяет, свободна ли техника на нужные даты, считает стоимость аренды по ставкам, следит за оплатой и показывает должников. Администратор приглашает менеджеров по ссылке и выдаёт им права по разделам, а каждое изменение попадает в журнал.
   en: TechRent replaces spreadsheets with a simple web service for managers. The system checks whether equipment is free on the requested dates, calculates the rental price from the rates, tracks payments and shows who owes money. The administrator invites managers by link and grants them per-module permissions, and every change goes into an audit log.
 purpose:
-  ru: Дипломный проект, который сейчас проходит пилот в компании с собственным парком техники. Я вёл его как аналитик и архитектор — требования, модель данных, API, ролевая модель, — а код писал в Claude Code пошагово, с проверкой каждого шага. Отдельно разобрал главную фичу, бронирование, сквозным кейсом и принял реализацию по коду — так нашлись 11 расхождений с требованиями.
-  en: A graduation project now in a pilot at a company with its own equipment fleet. I ran it as the analyst and architect — requirements, data model, API, role model — and wrote the code with Claude Code step by step, reviewing every step. I documented the key feature, booking, as an end-to-end case and accepted the implementation against the code, which surfaced 11 mismatches with the requirements.
+  ru: Дипломный проект. Готовую систему я передал на обзор компании с собственным парком техники и получил обратную связь от её руководителя. Я вёл его как аналитик и архитектор — требования, модель данных, API, ролевая модель, — а код писал в Claude Code пошагово, с проверкой каждого шага. Отдельно разобрал главную фичу, бронирование, сквозным кейсом и принял реализацию по коду — так нашлись 11 расхождений с требованиями.
+  en: A graduation project. I handed the finished system to a company with its own equipment fleet for review and got feedback from its head. I ran it as the analyst and architect — requirements, data model, API, role model — and wrote the code with Claude Code step by step, reviewing every step. I documented the key feature, booking, as an end-to-end case and accepted the implementation against the code, which surfaced 11 mismatches with the requirements.
 goals:
   - { ru: "Не допустить двойного бронирования и аренды неисправной техники", en: "Prevent double booking and renting out broken equipment" }
   - { ru: "Видеть занятость всего парка на месяц за одну минуту", en: "See the whole fleet's availability for a month in a minute" }
@@ -82,8 +82,8 @@ stages:
     title: { ru: "Персонал и финансы", en: "Staff and finance" }
     text: { ru: "Панели деталей, приглашения и права менеджеров, финансовая сводка и должники.", en: "Detail panels, manager invitations and permissions, financial summary and debtors." }
   - period: { ru: "Приёмка", en: "Acceptance" }
-    title: { ru: "Кейс и пилот", en: "Case and pilot" }
-    text: { ru: "Сквозной кейс «Бронирование», 11 замечаний по коду и отзывам пилота; исправлены все три высоких и повтор номеров.", en: "The end-to-end booking case, 11 findings from the code and pilot feedback; all three high-severity ones and repeated numbers fixed." }
+    title: { ru: "Кейс и обратная связь", en: "Case and feedback" }
+    text: { ru: "Сквозной кейс «Бронирование», 11 замечаний по коду и отзыву компании; исправлены все три высоких и повтор номеров.", en: "The end-to-end booking case, 11 findings from the code and the company's feedback; all three high-severity ones and repeated numbers fixed." }
   - period: { ru: "Далее", en: "Next" }
     title: { ru: "Уведомления и документы", en: "Notifications and documents" }
     text: { ru: "Уведомления в Telegram, договор, счёт и акт в PDF, аналитика загрузки парка.", en: "Telegram notifications, contract, invoice and certificate in PDF, fleet utilisation analytics." }
@@ -91,15 +91,15 @@ challenges:
   - title: { ru: "Двойное бронирование при одновременных запросах", en: "Double booking under concurrent requests" }
     text: { ru: "Проверка и запись шли отдельными запросами. Теперь — одна транзакция с блокировкой строки техники, а в БД ограничение EXCLUDE: из 10 одновременных запросов проходит один, остальные получают 409.", en: "The check and the write were separate queries. Now it is one transaction that locks the equipment row, plus an EXCLUDE constraint in the database: of 10 concurrent requests one succeeds and the rest get 409." }
   - title: { ru: "В форме была видна только часть техники", en: "The form showed only part of the fleet" }
-    text: { ru: "Пилотный заказчик с 24 машинами не нашёл нужную: сервер молча обрезал список до 20. Явная ошибка 400 вместо подмены и поле выбора с серверным поиском.", en: "The pilot customer with 24 machines could not find one: the server silently cut the list to 20. An explicit 400 instead of the silent clamp and a picker with server-side search." }
+    text: { ru: "Компания с 24 машинами при обзоре не нашла нужную: сервер молча обрезал список до 20. Явная ошибка 400 вместо подмены и поле выбора с серверным поиском.", en: "A reviewing company with 24 machines could not find one: the server silently cut the list to 20. An explicit 400 instead of the silent clamp and a picker with server-side search." }
   - title: { ru: "Номер заказа мог повториться", en: "Order numbers could repeat" }
     text: { ru: "COUNT + 1 выдавал занятый номер после удаления заказа. Таблица-счётчик по годам: номер выдаётся в транзакции заказа, не повторяется и не оставляет пропусков.", en: "COUNT + 1 handed out a taken number after a deletion. A per-year counter table: the number is issued inside the order transaction, never repeats and leaves no gaps." }
   - title: { ru: "Статус заказа зависит от сегодняшней даты", en: "Order status depends on today's date" }
     text: { ru: "В БД хранятся только «запланирован» и «отменён», а «активен» и «завершён» вычисляются в SQL при чтении — без ночных задач и рассинхронизации.", en: "The database stores only planned and cancelled; active and completed are computed in SQL on read — no nightly jobs and no drift." }
 results:
   text:
-    ru: Работающая CRM из 14 шагов — около 5,5 тысячи строк Go и 6,5 тысячи строк TypeScript, — которая проходит пилот в реальной компании. Сквозной кейс бронирования, OpenAPI, BPMN и словарь данных; из 11 замечаний аналитика исправлены все три высоких и повтор номеров, гонки проверены одновременными запросами.
-    en: A working CRM built in 14 steps — about 5,500 lines of Go and 6,500 lines of TypeScript — now in a pilot at a real company. An end-to-end booking case, OpenAPI, BPMN and a data dictionary; of 11 analyst findings all three high-severity ones and repeated numbers are fixed, and the races are verified with concurrent requests.
+    ru: Работающая CRM из 14 шагов — около 5,5 тысячи строк Go и 6,5 тысячи строк TypeScript, — с обратной связью от реальной компании. Сквозной кейс бронирования, OpenAPI, BPMN и словарь данных; из 11 замечаний аналитика исправлены все три высоких и повтор номеров, гонки проверены одновременными запросами.
+    en: A working CRM built in 14 steps — about 5,500 lines of Go and 6,500 lines of TypeScript — reviewed by a real company. An end-to-end booking case, OpenAPI, BPMN and a data dictionary; of 11 analyst findings all three high-severity ones and repeated numbers are fixed, and the races are verified with concurrent requests.
   state:
     ru: Дальше — права на изменение и отмену заказа на сервере, уведомления в Telegram и документы в PDF.
     en: Next — server-side checks for order edit and cancel permissions, Telegram notifications and PDF documents.
@@ -234,7 +234,7 @@ artifacts:
     view: doc
     updated: '2026.10'
     title: { ru: "Замечания аналитика: 11 расхождений", en: "Analyst findings: 11 mismatches" }
-    summary: { ru: "Что нашлось при приёмке по коду и в отзывах пилотного заказчика: сценарий, риск, предложение и что исправлено.", en: "What the code review and pilot feedback surfaced: scenario, risk, proposal and what was fixed." }
+    summary: { ru: "Что нашлось при приёмке по коду и в обратной связи компании: сценарий, риск, предложение и что исправлено.", en: "What the code review and the company's feedback surfaced: scenario, risk, proposal and what was fixed." }
   - id: screen-calendar
     code: UI-01
     type: ui
