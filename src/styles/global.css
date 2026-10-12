@@ -65,7 +65,7 @@ main { flex: 1; outline: none; }
 .diagram-scroll > svg { min-width: 460px; }
 
 /* ---------- Текст артефактов (Markdown) ---------- */
-.sw-doc { display: flex; flex-direction: column; gap: 14px; font-size: 16px; line-height: 1.65; padding: clamp(20px, 3vw, 36px); background: var(--surface); border: 1px solid var(--line); overflow-wrap: anywhere; }
+.sw-doc { display: flex; flex-direction: column; gap: 14px; font-size: 16px; line-height: 1.65; padding: clamp(20px, 3vw, 36px); background: var(--surface); border: 1px solid var(--line); overflow-wrap: break-word; }
 .sw-doc > * { margin: 0; }
 .sw-doc h1, .sw-doc h2, .sw-doc h3, .sw-doc h4 { font-size: 18px; font-weight: 500; line-height: 1.3; margin-top: 10px; }
 .sw-doc > :first-child { margin-top: 0; }
@@ -79,7 +79,8 @@ main { flex: 1; outline: none; }
 .sw-doc pre code { font-size: inherit; }
 .sw-doc :not(pre) > code { padding: 1px 5px; background: var(--surface-2); font-size: .88em; }
 .sw-doc table { width: 100%; border-collapse: collapse; font-size: 14px; display: block; overflow-x: auto; }
-.sw-doc th, .sw-doc td { text-align: left; padding: 8px 12px 8px 0; border-bottom: 1px solid var(--line); }
+.sw-doc th, .sw-doc td { text-align: left; padding: 8px 12px 8px 0; border-bottom: 1px solid var(--line); min-width: 7.5em; vertical-align: top; }
+.sw-doc td code { white-space: nowrap; }
 .sw-doc th { font-family: var(--font-mono); font-size: var(--text-label); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--fg-2); font-weight: 400; border-bottom-color: var(--line-strong); }
 .sw-doc blockquote { margin: 0; padding-left: 16px; border-left: 2px solid var(--line-strong); color: var(--fg-2); }
 .sw-doc img { max-width: 100%; height: auto; border: 1px solid var(--line); }

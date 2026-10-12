@@ -68,9 +68,11 @@ const works = localePath(lang, '/works/');
       </section>
     )}
 
-    <div style="margin:var(--space-section) 0; border-top:1px solid var(--line); padding-top:24px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap">
-      <span class="sw-label">{T.next(next.code)}</span>
-      <Button variant="secondary" href={next.href} iconEnd="arrow-right" style={{ maxWidth: '100%' }}>{next.title}</Button>
-    </div>
+    {next !== p ? (
+      <div style="margin:var(--space-section) 0; border-top:1px solid var(--line); padding-top:24px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap">
+        <span class="sw-label">{T.next(next.code)}</span>
+        <Button variant="secondary" href={next.href} iconEnd="arrow-right" style={{ maxWidth: '100%' }}>{next.title}</Button>
+      </div>
+    ) : <div style="height:var(--space-section)" />}
   </article>
 </Base>

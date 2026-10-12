@@ -1,0 +1,301 @@
+# Mito — источник: репозиторий github.com/Sumchenko/Mito (README, docs/ROADMAP.md, docs/DEPLOY.md, sa-docs/, код).
+code: P—01
+order: 1
+demo: false
+featured: true
+title: Mito
+summary:
+  ru: Задачи, таймер, календарь с семантическим зумом и AI-ментор в одном local-first приложении.
+  en: Tasks, a timer, a semantic-zoom calendar and an AI mentor in one local-first app.
+category: dev
+status: live
+year: 2026
+period: 2026.09 → …
+role:
+  ru: Аналитика, архитектура, разработка в Claude Code
+  en: Analysis, architecture, development with Claude Code
+tech: [react, typescript, zustand, dexie, supabase, nodejs, llm, github-actions]
+cover: d-mito-c4
+links:
+  demo: https://mito.13-143-64-158.sslip.io
+  repo: https://github.com/Sumchenko/Mito
+  docs: artifacts
+
+problem:
+  ru: Люди, которые хотят научиться новому, начинают на волне мотивации — составляют расписание, ведут заметки — и через несколько дней бросают. Планирование отнимает силы, а план и реально потраченное время хранятся в разных местах.
+  en: People who want to learn something new start on a wave of motivation — they draw up a schedule and keep notes — and drop it a few days later. Planning takes effort, and the plan and the time actually spent live in different places.
+overview:
+  ru: Mito собирает в одном приложении задачи, календарь (план) и таймер (факт) и показывает, насколько план совпал с реальностью. Планирование можно поручить AI-ментору — он предлагает расписание, а пользователь решает, что добавить.
+  en: Mito brings tasks, a calendar (the plan) and a timer (the fact) into one app and shows how well the plan matched reality. Planning can be handed to an AI mentor — it proposes a schedule, and the user decides what to add.
+purpose:
+  ru: Личный проект — в нём я и заказчик, и аналитик, и архитектор. Код написан в Claude Code по дорожной карте из 11 этапов с журналом архитектурных решений; каждый этап закрывался моей проверкой.
+  en: A personal project where I am the customer, the analyst and the architect. The code was written with Claude Code following an 11-stage roadmap and an architecture decision log; every stage closed only after my review.
+goals:
+  - { ru: "Задачи, план и фактическое время — в одном месте", en: "Tasks, the plan and the actual time in one place" }
+  - { ru: "Работа без интернета и синхронизация между устройствами", en: "Offline work and sync across devices" }
+  - { ru: "План дня одной кнопкой — но в календарь только после подтверждения", en: "A day plan in one click — but into the calendar only after confirmation" }
+  - { ru: "Работа из России, даже если хост Supabase недоступен", en: "Works from Russia even when the Supabase host is unreachable" }
+features:
+  - { ru: "Задачи с подзадачами и умными списками", en: "Tasks with subtasks and smart lists" }
+  - { ru: "Quick-add: #проект, @тег, приоритет и оценка из строки", en: "Quick-add: #project, @tag, priority and estimate from one line" }
+  - { ru: "Таймер и Pomodoro", en: "Timer and Pomodoro" }
+  - { ru: "Календарь с семантическим зумом: от часов до года", en: "Semantic-zoom calendar: from hours to a year" }
+  - { ru: "Сравнение плана и факта", en: "Plan vs actual" }
+  - { ru: "Статистика на собственных SVG-графиках", en: "Statistics on custom SVG charts" }
+  - { ru: "Гостевой режим и синхронизация аккаунта", en: "Guest mode and account sync" }
+  - { ru: "AI-ментор: план дня, чат, цели обучения", en: "AI mentor: day plan, chat, learning goals" }
+  - { ru: "RU / EN, светлая и тёмная темы", en: "RU / EN, light and dark themes" }
+requirements:
+  - { id: FR-01, type: FR, priority: Must, text: { ru: "Изменения сохраняются на устройстве и не теряются без интернета.", en: "Changes are saved on the device and are not lost offline." } }
+  - { id: FR-02, type: FR, priority: Must, text: { ru: "Правка на одном устройстве появляется на других за несколько секунд.", en: "An edit on one device appears on the others within seconds." } }
+  - { id: FR-03, type: FR, priority: Must, text: { ru: "Пользователь видит и меняет только свои данные.", en: "A user sees and changes only their own data." } }
+  - { id: FR-04, type: FR, priority: Must, text: { ru: "План от ментора попадает в календарь только после подтверждения.", en: "The mentor's plan reaches the calendar only after confirmation." } }
+  - { id: FR-05, type: FR, priority: Should, text: { ru: "Если модель не ответила, запрос уходит следующей модели.", en: "If a model fails, the request goes to the next one." } }
+  - { id: NFR-01, type: NFR, priority: Must, text: { ru: "Ключи AI-моделей только на сервере, IP-адреса — только в виде хеша.", en: "AI keys stay on the server; IP addresses are stored only as hashes." } }
+  - { id: NFR-02, type: NFR, priority: Must, text: { ru: "Лимит ментора: 10 запросов в минуту и 60 в сутки с адреса, 800 в сутки на всех.", en: "Mentor limits: 10 requests per minute and 60 per day per address, 800 per day overall." } }
+  - { id: NFR-03, type: NFR, priority: Must, text: { ru: "Браузер обращается только к домену Mito.", en: "The browser talks only to the Mito domain." } }
+  - { id: NFR-04, type: NFR, priority: Should, text: { ru: "Выкладка только после проверки типов, линтера и тестов.", en: "Deploy only after type checks, lint and tests pass." } }
+scenarios:
+  - title: { ru: "Синхронизация между устройствами", en: "Sync across devices" }
+    actor: { ru: "Пользователь с аккаунтом", en: "Signed-in user" }
+    steps:
+      - { ru: "Меняет задачу на телефоне — изменение сохраняется на устройстве и встаёт в очередь", en: "Edits a task on the phone — the change is saved locally and queued" }
+      - { ru: "Через 0,8 с очередь уходит на сервер одним запросом", en: "After 0.8 s the queue goes to the server in one request" }
+      - { ru: "Сервер сохраняет версию, если она новее серверной", en: "The server keeps the version if it is newer" }
+      - { ru: "Ноутбук получает уведомление и забирает изменения", en: "The laptop gets a notification and pulls the changes" }
+  - title: { ru: "План дня от AI-ментора", en: "Day plan from the AI mentor" }
+    actor: { ru: "Гость или пользователь", en: "Guest or user" }
+    steps:
+      - { ru: "Нажимает «Составить план» и пишет пожелание", en: "Clicks “Plan my day” and adds a wish" }
+      - { ru: "Сервер ментора проверяет лимит и спрашивает модель", en: "The mentor server checks the limit and asks a model" }
+      - { ru: "Сервер убирает из ответа блоки с ошибками", en: "The server drops invalid blocks from the answer" }
+      - { ru: "Пользователь выбирает блоки — они попадают в календарь", en: "The user picks blocks — they land in the calendar" }
+stages:
+  - period: '2026.09'
+    title: { ru: "Этапы 0–4: основа", en: "Stages 0–4: foundation" }
+    text: { ru: "Дизайн-система, слой данных на IndexedDB, задачи, таймер, календарь.", en: "Design system, IndexedDB data layer, tasks, timer, calendar." }
+  - period: '2026.09'
+    title: { ru: "Этапы 5–6: зум и аналитика", en: "Stages 5–6: zoom and analytics" }
+    text: { ru: "Календарь с непрерывным масштабом от дня до года; план и факт; свои графики.", en: "A calendar with continuous zoom from day to year; plan vs actual; custom charts." }
+  - period: '2026.09'
+    title: { ru: "Этап 7: аккаунты и синхронизация", en: "Stage 7: accounts and sync" }
+    text: { ru: "Supabase, очередь изменений, серверные ревизии, Realtime. Первая выкладка на VPS.", en: "Supabase, change queue, server revisions, Realtime. First deploy to the VPS." }
+  - period: '2026.09'
+    title: { ru: "Этап 8: AI-ментор", en: "Stage 8: AI mentor" }
+    text: { ru: "Свой Node-сервис, цепочка моделей, план дня, чат и брифинг.", en: "Own Node service, model chain, day plan, chat and briefing." }
+  - period: '2026.10'
+    title: { ru: "Этап 9: ментор обучения", en: "Stage 9: learning mentor" }
+    text: { ru: "Цели с этапами, еженедельные встречи, проверка знаний, режимы «Ментор» и «Ассистент».", en: "Goals with stages, weekly reviews, knowledge checks, “Mentor” and “Assistant” modes." }
+  - period: { ru: "Далее", en: "Next" }
+    title: { ru: "Этапы 10–11", en: "Stages 10–11" }
+    text: { ru: "PWA и производительность, затем Windows и Android на Tauri.", en: "PWA and performance, then Windows and Android with Tauri." }
+challenges:
+  - title: { ru: "Supabase недоступен в части сетей РФ", en: "Supabase is unreachable on some Russian networks" }
+    text: { ru: "Браузер ходит только на свой домен: Caddy проксирует REST, Auth и Realtime под /sb, ссылки из писем ведут на /auth/confirm.", en: "The browser only talks to our domain: Caddy proxies REST, Auth and Realtime under /sb, and email links point to /auth/confirm." }
+  - title: { ru: "Модели ошибаются и выдумывают", en: "Models make mistakes and invent things" }
+    text: { ru: "Сервер проверяет ответ и убирает блоки с неверным временем и чужими задачами. Модель видит задачи под ссылками t1, t2, а дни занятий сдвигает код, а не модель.", en: "The server validates the answer and drops blocks with wrong times or unknown tasks. The model sees tasks as refs t1, t2, and study days are enforced by code, not by the model." }
+  - title: { ru: "Лимиты бесплатных LLM", en: "Free-tier LLM limits" }
+    text: { ru: "Цепочка Groq 120b → Groq 20b → Gemini Flash → Flash-Lite с переключением при лимите, перегрузке или ошибке. Порядок выбран по замерам.", en: "A chain Groq 120b → Groq 20b → Gemini Flash → Flash-Lite that switches on limits, overload or errors. The order is based on measurements." }
+  - title: { ru: "Курсор синхронизации не должен пропускать изменения", en: "The sync cursor must not skip changes" }
+    text: { ru: "Ревизии выдаёт сервер, а записи одного пользователя сериализуются advisory-блокировкой — ревизии идут в порядке коммита.", en: "Revisions are server-assigned, and one user's writes are serialised with an advisory lock, so revisions follow commit order." }
+results:
+  text:
+    ru: Приложение работает в продакшене — гостевой режим, аккаунты с синхронизацией, AI-ментор на реальных моделях. Готово 9 этапов из 11, около 20 тысяч строк TypeScript и 160 автотестов.
+    en: The app runs in production — guest mode, accounts with sync, an AI mentor on real models. 9 of 11 stages are done — about 20,000 lines of TypeScript and 160 automated tests.
+  state:
+    ru: Дальше — PWA и десктопная и мобильная версии на Tauri.
+    en: Next — a PWA and desktop and mobile versions with Tauri.
+
+architecture:
+  diagram: d-mito-c4
+  text:
+    ru: Local-first — данные живут в IndexedDB на устройстве и синхронизируются в фоне. Браузер обращается только к домену Mito, а Caddy раздаёт приложение и проксирует Supabase и сервер ментора.
+    en: Local-first — data lives in IndexedDB on the device and syncs in the background. The browser talks only to the Mito domain, and Caddy serves the app and proxies Supabase and the mentor server.
+  flows: [d-sync-flow, d-plan-flow]
+dataModel:
+  diagram: d-mito-erd
+  text:
+    ru: У всех сущностей UUIDv7, updatedAt и мягкое удаление deletedAt — на этом держится синхронизация. TimeBlock — план и может пересекаться, TimeEntry — факт, записи не пересекаются и идёт максимум одна.
+    en: Every entity has a UUIDv7, updatedAt and soft deletion via deletedAt — that is what sync relies on. TimeBlock is the plan and may overlap; TimeEntry is the fact — entries never overlap and at most one is running.
+api:
+  endpoints:
+    - { method: POST, path: /sb/rest/v1/rpc/push_records, text: { ru: "Отправить пачку изменений (до 200); сохраняются только более новые версии", en: "Push a batch of changes (up to 200); only newer versions are kept" } }
+    - { method: GET, path: '/sb/rest/v1/records?rev=gt.{N}', text: { ru: "Изменения после ревизии N (до 500)", en: "Changes after revision N (up to 500)" } }
+    - { method: POST, path: /api/mentor, text: { ru: "Запрос к ментору: plan, chat, brief, intake, roadmap, coach", en: "Mentor request: plan, chat, brief, intake, roadmap, coach" } }
+    - { method: GET, path: /api/mentor/health, text: { ru: "Какие провайдеры моделей доступны", en: "Which model providers are available" } }
+  integrations:
+    - name: Supabase Cloud
+      protocol: { ru: "HTTPS через прокси /sb", en: "HTTPS via the /sb proxy" }
+      text: { ru: "PostgreSQL с RLS, Auth, Realtime-уведомления других устройств.", en: "PostgreSQL with RLS, Auth, Realtime notifications to other devices." }
+    - name: Groq → Gemini
+      protocol: { ru: "OpenAI-совместимый API", en: "OpenAI-compatible API" }
+      text: { ru: "Цепочка провайдеров с автопереключением; ключи только на сервере.", en: "Provider chain with automatic fallback; keys stay on the server." }
+    - name: GitHub Actions → VPS
+      protocol: SSH · rsync
+      text: { ru: "Проверки → миграции → атомарная смена релиза → smoke-тест.", en: "Checks → migrations → atomic release switch → smoke test." }
+decisions:
+  - title: { ru: "Local-first на IndexedDB", en: "Local-first on IndexedDB" }
+    choice: { ru: "Данные сначала на устройстве, сервер — только для синхронизации.", en: "Data lives on the device first; the server is only for sync." }
+    why: { ru: "Приложение работает без сети и отвечает мгновенно, а гостю не нужен аккаунт.", en: "The app works offline and responds instantly, and a guest needs no account." }
+    alternatives: { ru: "Классический клиент-сервер — проще, но без сети не работает.", en: "Classic client-server — simpler, but useless offline." }
+  - title: { ru: "Одна таблица records с jsonb", en: "One records table with jsonb" }
+    choice: { ru: "Все сущности — строки одной таблицы с полями для синхронизации.", en: "All entities are rows of one table with sync fields." }
+    why: { ru: "Один курсор и одна подписка Realtime; клиент меняет документы без серверных миграций.", en: "One cursor and one Realtime subscription; the client evolves documents without server migrations." }
+    alternatives: { ru: "Таблица на сущность — больше миграций и подписок.", en: "A table per entity — more migrations and subscriptions." }
+  - title: { ru: "Last-write-wins вместо выбора версии", en: "Last-write-wins instead of picking a version" }
+    pros:
+      - { ru: "Простота и никаких лишних вопросов пользователю", en: "Simple, no extra questions for the user" }
+    cons:
+      - { ru: "Время берётся с часов устройства", en: "Time comes from the device clock" }
+      - { ru: "Правки в одну и ту же миллисекунду расходятся (редкий случай)", en: "Edits in the same millisecond diverge (rare)" }
+  - title: { ru: "Ментор без доступа к базе", en: "Mentor without database access" }
+    choice: { ru: "Сводку данных собирает приложение ядром аналитики и отправляет вместе с запросом.", en: "The app builds the data summary with its analytics core and sends it with the request." }
+    why: { ru: "Данные local-first — у гостей их на сервере нет; на сервере меньше персональных данных.", en: "Data is local-first — guests have none on the server, and the server holds less personal data." }
+  - title: { ru: "Подтверждение перед записью в календарь", en: "Confirmation before writing to the calendar" }
+    choice: { ru: "План сначала показывается, пользователь сам выбирает блоки.", en: "The plan is shown first; the user picks the blocks." }
+    why: { ru: "Модель может ошибиться, а календарь — личное пространство: лишний клик дешевле потерянного доверия.", en: "A model can be wrong and the calendar is personal space — an extra click is cheaper than lost trust." }
+
+diagrams:
+  - id: d-mito-c4
+    kind: components
+    title: { ru: "Компоненты Mito", en: "Mito components" }
+    nodes:
+      - { id: app, label: APP, sub: react · indexeddb, x: 0, y: 0, w: 2, d: 2, h: 1 }
+      - { id: caddy, label: CADDY, sub: vps · /sb · /api, x: 6, y: 0, w: 2, d: 2, h: 0.5 }
+      - { id: mentor, label: MENTOR, sub: node.js, x: 12, y: 0, w: 2, d: 2, h: 1 }
+      - { id: supabase, label: SUPABASE, sub: postgres · auth · realtime, x: 6, y: 6, w: 2, d: 2, h: 1 }
+      - { id: llm, label: LLM, sub: groq → gemini, x: 12, y: 6, w: 2, d: 2, h: 1 }
+      - { id: ci, label: CI/CD, sub: github actions, x: 0, y: 6, w: 2, d: 1, h: 0.5 }
+    links: [[app, caddy], [caddy, mentor], [caddy, supabase], [mentor, llm], [ci, supabase]]
+    notes:
+      app: { ru: "React-приложение. Данные в IndexedDB, запись только через репозитории, исходящая очередь изменений.", en: "React app. Data in IndexedDB, writes only through repositories, an outgoing change queue." }
+      caddy: { ru: "Раздаёт приложение, проксирует Supabase под /sb и ментора под /api, сам ставит X-Real-IP.", en: "Serves the app, proxies Supabase under /sb and the mentor under /api, sets X-Real-IP itself." }
+      mentor: { ru: "Node-сервис без доступа к базе: лимиты по хешу IP, промпты, проверка ответов модели.", en: "A Node service without database access: limits by IP hash, prompts, validation of model answers." }
+      supabase: { ru: "Таблица records с RLS, функция push_records, серверные ревизии, Realtime.", en: "A records table with RLS, the push_records function, server revisions, Realtime." }
+      llm: { ru: "Groq 120b → Groq 20b → Gemini Flash → Flash-Lite, переключение при сбое.", en: "Groq 120b → Groq 20b → Gemini Flash → Flash-Lite, fallback on failure." }
+      ci: { ru: "Проверки, миграции базы, атомарная выкладка релиза на VPS и smoke-тест.", en: "Checks, database migrations, atomic release deploy to the VPS and a smoke test." }
+  - id: d-sync-flow
+    kind: flow
+    title: { ru: "Синхронизация между устройствами", en: "Sync across devices" }
+    steps:
+      - { lane: APP, title: { ru: "Сохранить локально", en: "Save locally" }, text: { ru: "Запись в IndexedDB и в очередь outbox. Работает и без сети.", en: "Write to IndexedDB and the outbox queue. Works offline too." } }
+      - { lane: APP, title: { ru: "Отправить пакет", en: "Push a batch" }, text: { ru: "Через 0,8 с правки уходят одним вызовом push_records.", en: "After 0.8 s the edits go out in one push_records call." } }
+      - { lane: SUPABASE, title: { ru: "Проверить доступ", en: "Check access" }, text: { ru: "RLS: пользователь пишет только свои строки.", en: "RLS: a user writes only their own rows." } }
+      - { lane: SUPABASE, title: Last-write-wins, text: { ru: "Остаётся версия с более поздним updatedAt, ревизия растёт.", en: "The version with the later updatedAt wins; the revision grows." } }
+      - { lane: APP, title: { ru: "Забрать новое", en: "Pull new changes" }, text: { ru: "Записи после последней ревизии применяются без эха в очередь.", en: "Records after the last revision are applied without echoing into the queue." } }
+      - { lane: { ru: "ДРУГОЕ УСТРОЙСТВО", en: "OTHER DEVICE" }, title: Realtime, text: { ru: "Уведомление — и то же получение изменений.", en: "A notification — then the same pull." } }
+  - id: d-plan-flow
+    kind: flow
+    title: { ru: "План дня от AI-ментора", en: "Day plan from the AI mentor" }
+    steps:
+      - { lane: { ru: "ПОЛЬЗОВАТЕЛЬ", en: "USER" }, title: { ru: "Составить план", en: "Plan my day" }, text: { ru: "Сегодня или завтра, пожелание до 500 символов.", en: "Today or tomorrow, a wish of up to 500 characters." } }
+      - { lane: APP, title: { ru: "Собрать контекст", en: "Build context" }, text: { ru: "Задачи, календарь на 4 дня, статистика за 2 недели. Задачи — под ссылками t1, t2.", en: "Tasks, a 4-day calendar, 2 weeks of stats. Tasks go as refs t1, t2." } }
+      - { lane: MENTOR, title: { ru: "Проверить лимит", en: "Check the limit" }, text: { ru: "10 в минуту и 60 в сутки с адреса; адрес хранится только как хеш.", en: "10 per minute and 60 per day per address; the address is stored only as a hash." } }
+      - { lane: LLM, title: { ru: "Ответ модели", en: "Model answer" }, text: { ru: "Groq → Gemini; при ошибке — следующая модель.", en: "Groq → Gemini; on failure — the next model." } }
+      - { lane: MENTOR, title: { ru: "Проверить ответ", en: "Validate the answer" }, text: { ru: "Убрать блоки с неверным временем и несуществующими задачами.", en: "Drop blocks with wrong times or unknown tasks." } }
+      - { lane: { ru: "ПОЛЬЗОВАТЕЛЬ", en: "USER" }, title: { ru: "Подтвердить", en: "Confirm" }, text: { ru: "Выбрать блоки — они попадают в календарь с origin = mentor.", en: "Pick blocks — they land in the calendar with origin = mentor." } }
+  - id: d-mito-erd
+    kind: erd
+    title: { ru: "Модель данных приложения", en: "App data model" }
+    entities:
+      - { id: project, name: PROJECT, fields: [[id, uuidv7, PK], [name, text], [color, tint], [order, int]] }
+      - { id: task, name: TASK, fields: [[id, uuidv7, PK], [projectId, uuid, FK], [parentId, uuid, FK], [goalId, uuid, FK], [title, text], [status, enum], [priority, '0..3'], [estimateMin, int], [plannedDate, date], [dueDate, date]] }
+      - { id: block, name: TIME_BLOCK, fields: [[id, uuidv7, PK], [taskId, uuid, FK], [kind, enum], [start, timestamp], [end, timestamp], [origin, 'user|mentor']] }
+      - { id: entry, name: TIME_ENTRY, fields: [[id, uuidv7, PK], [taskId, uuid, FK], [start, timestamp], [end, 'timestamp?'], [source, enum]] }
+      - { id: goal, name: GOAL, fields: [[id, uuidv7, PK], [projectId, uuid, FK], [title, text], [status, enum], [stages, json], [weeklyMinutes, int], [studyDays, 'int[]']] }
+      - { id: note, name: MENTOR_NOTE, fields: [[id, uuidv7, PK], [goalId, uuid, FK], [text, text], [source, 'mentor|user']] }
+    relations: [[project, task, '1 : N'], [task, task, '1 : N'], [task, block, '1 : N'], [task, entry, '1 : N'], [goal, task, '1 : N'], [goal, note, '1 : N'], [project, goal, '1 : 0..1']]
+  - id: d-records
+    kind: erd
+    title: { ru: "Хранилище синхронизации", en: "Sync storage" }
+    entities:
+      - { id: users, name: AUTH.USERS, fields: [[id, uuid, PK]] }
+      - { id: records, name: RECORDS, fields: [[id, uuid, PK], [user_id, uuid, FK], [collection, text], [doc, jsonb], [updated_at, bigint], [deleted_at, bigint], [rev, bigint]] }
+      - { id: outbox, name: OUTBOX (device), fields: [[key, text, PK], [table, text], [id, uuid], [seq, number]] }
+      - { id: state, name: SYNC_STATE (device), fields: [[key, text, PK], [cursor, rev], [owner, uuid]] }
+    relations: [[users, records, '1 : N']]
+
+# Артефакты: документы — artifacts/<id>.ru.md и .en.md, остальное — файлы в artifacts/
+artifacts:
+  - id: case-sync
+    code: SRS-01
+    type: srs
+    view: doc
+    updated: '2026.10'
+    title: { ru: "Кейс: синхронизация между устройствами", en: "Case: sync across devices" }
+    summary: { ru: "User Stories с критериями приёмки, Use Case с исключениями, API, задача на разработку и замечания аналитика.", en: "User stories with acceptance criteria, a use case with exceptions, the API, a development task and analyst notes." }
+  - id: case-plan
+    code: SRS-02
+    type: srs
+    view: doc
+    updated: '2026.10'
+    title: { ru: "Кейс: AI-ментор составляет план дня", en: "Case: the AI mentor plans the day" }
+    summary: { ru: "User Stories, Use Case, исключения с кодами ответов, контракт API, задача на разработку и замечания аналитика.", en: "User stories, a use case, exceptions with response codes, the API contract, a development task and analyst notes." }
+  - id: dd-sync
+    code: DD-01
+    type: erd
+    view: doc
+    updated: '2026.10'
+    title: { ru: "Словарь данных: синхронизация", en: "Data dictionary: sync" }
+    summary: { ru: "Таблица records, очередь outbox и служебное состояние на устройстве.", en: "The records table, the outbox queue and on-device sync state." }
+  - id: dd-plan
+    code: DD-02
+    type: erd
+    view: doc
+    updated: '2026.10'
+    title: { ru: "Словарь данных: план дня", en: "Data dictionary: day plan" }
+    summary: { ru: "Блоки календаря, поля задач для плана, счётчики лимитов и маппинг ответа модели.", en: "Calendar blocks, task fields used by the plan, limit counters and mapping of the model answer." }
+  - id: bpmn-sync
+    code: BPMN-01
+    type: bpmn
+    view: code
+    file: sync.bpmn
+    updated: '2026.10'
+    title: { ru: "BPMN 2.0: синхронизация", en: "BPMN 2.0: sync" }
+    summary: { ru: "Полная схема процесса. Файл открывается в demo.bpmn.io.", en: "The full process model. Opens in demo.bpmn.io." }
+  - id: bpmn-plan
+    code: BPMN-02
+    type: bpmn
+    view: code
+    file: day-plan.bpmn
+    updated: '2026.10'
+    title: { ru: "BPMN 2.0: план дня", en: "BPMN 2.0: day plan" }
+    summary: { ru: "Полная схема процесса. Файл открывается в demo.bpmn.io.", en: "The full process model. Opens in demo.bpmn.io." }
+  - id: sql-records
+    code: SQL-01
+    type: db
+    view: code
+    file: records.sql
+    updated: '2026.09'
+    title: { ru: "Миграция: таблица records и push_records", en: "Migration: the records table and push_records" }
+    summary: { ru: "RLS-политики, серверные ревизии через триггер, last-write-wins и advisory-блокировка на пользователя.", en: "RLS policies, trigger-based server revisions, last-write-wins and a per-user advisory lock." }
+  - id: erd-records
+    code: ERD-01
+    type: erd
+    view: erd
+    diagram: d-records
+    updated: '2026.09'
+    title: { ru: "Хранилище синхронизации", en: "Sync storage" }
+    summary: { ru: "Серверная таблица records и служебные таблицы на устройстве.", en: "The server records table and on-device service tables." }
+  - id: adr-log
+    code: ADR-01
+    type: other
+    view: doc
+    updated: '2026.10'
+    title: { ru: "Журнал архитектурных решений", en: "Architecture decision log" }
+    summary: { ru: "Решения проекта с датами: от выбора стека до цепочки AI-провайдеров.", en: "Project decisions with dates: from the stack to the AI provider chain." }
+  - id: c4-mito
+    code: C4-01
+    type: arch
+    view: components
+    diagram: d-mito-c4
+    updated: '2026.10'
+    title: { ru: "Схема компонентов", en: "Component diagram" }
+    summary: { ru: "Приложение, Caddy, сервер ментора, Supabase, AI-модели и CI/CD.", en: "The app, Caddy, the mentor server, Supabase, AI models and CI/CD." }
+  - id: sa-portfolio
+    code: REF-01
+    type: note
+    view: link
+    href: https://github.com/Sumchenko/SA-Portfolio/tree/main/sa-docs-Mito
+    title: { ru: "Аналитика Mito на GitHub", en: "Mito analysis on GitHub" }
+    summary: { ru: "Исходники кейсов в репозитории SA-Portfolio: Use Case, Sequence и ER-диаграммы в Mermaid (GitHub их отрисовывает) и BPMN.", en: "Case sources in the SA-Portfolio repository: use case, sequence and ER diagrams in Mermaid (rendered by GitHub) and BPMN." }

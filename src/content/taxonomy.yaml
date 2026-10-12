@@ -49,6 +49,11 @@ technologies:
   - { id: erd, label: ERD, group: { ru: "Нотации", en: "Notations" } }
   - { id: openapi, label: OpenAPI, group: { ru: "Нотации", en: "Notations" } }
   - { id: c4, label: C4, group: { ru: "Нотации", en: "Notations" } }
+  - { id: zustand, label: Zustand, group: { ru: "Интерфейс", en: "Frontend" } }
+  - { id: dexie, label: Dexie / IndexedDB, group: { ru: "Данные", en: "Data" } }
+  - { id: supabase, label: Supabase, group: { ru: "Данные", en: "Data" } }
+  - { id: github-actions, label: GitHub Actions, group: { ru: "Инфраструктура", en: "Infrastructure" } }
+  - { id: caddy, label: Caddy, group: { ru: "Инфраструктура", en: "Infrastructure" } }
 
 artifactTypes:
   - { id: srs, code: SRS, label: { ru: "ТЗ и требования", en: "Specs and requirements" } }
@@ -59,4 +64,5 @@ artifactTypes:
   - { id: apidoc, code: DOC, label: { ru: "Документация API", en: "API documentation" } }
   - { id: arch, code: C4, label: { ru: "Архитектурные схемы", en: "Architecture diagrams" } }
   - { id: note, code: NOTE, label: { ru: "Заметки и исследования", en: "Notes and research" } }
-  - { id: other, code: ADR, label: { ru: "Другие материалы СА", en: "Other analysis materials" } }
+  - { id: other, code: ADR, label: { ru: "Архитектурные решения", en: "Architecture decisions" } }
+  - { id: db, code: SQL, label: { ru: "Схемы БД и миграции", en: "Database schemas and migrations" } }

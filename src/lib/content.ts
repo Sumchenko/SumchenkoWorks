@@ -15,7 +15,7 @@ import siteRaw from '@/content/site.yaml?raw';
 import taxonomyRaw from '@/content/taxonomy.yaml?raw';
 
 const projectFiles = import.meta.glob<string>('/src/content/projects/*/project.yaml', { query: '?raw', import: 'default', eager: true });
-const textFiles = import.meta.glob<string>('/src/content/projects/*/artifacts/*.{md,yaml,yml,json,txt,sql,puml,plantuml,mmd,xml,graphql,proto,ts,js,py,go,java,cs}', { query: '?raw', import: 'default', eager: true });
+const textFiles = import.meta.glob<string>('/src/content/projects/*/artifacts/*.{md,yaml,yml,json,txt,sql,bpmn,puml,plantuml,mmd,xml,graphql,proto,ts,js,py,go,java,cs}', { query: '?raw', import: 'default', eager: true });
 const assetFiles = import.meta.glob<string>('/src/content/projects/*/artifacts/*.{png,jpg,jpeg,webp,gif,svg,pdf}', { query: '?url', import: 'default', eager: true });
 
 /* ---------- локализация ---------- */
