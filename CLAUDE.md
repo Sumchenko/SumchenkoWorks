@@ -2,7 +2,7 @@
 
 Статический сайт на Astro 7 + React-островки. Двуязычный: RU по умолчанию (`/`), EN под `/en/`. Деплой — статикой на VPS (см. `deploy/README.md`).
 
-- `npm run dev` — локальный сервер, `npm run build` — сборка в `dist/`, `npx tsc --noEmit -p .` — проверка типов.
+- `npm run dev` — локальный сервер, `npm run build` — сборка в `dist/`, `npm run check` — проверка типов.
 - `sumchenko-works/` — исходный прототип из Claude Design (эталон вида, в сборку не входит).
 
 ## Где что лежит
