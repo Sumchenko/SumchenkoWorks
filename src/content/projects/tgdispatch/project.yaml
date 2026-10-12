@@ -1,0 +1,246 @@
+# AI-диспетчер задач — источник: локальная папка VibeCoding/TgDispatch (README.md, app/, scripts/). Git-репозитория нет.
+code: P—03
+order: 3
+demo: false
+featured: true
+title: { ru: "AI-диспетчер задач", en: "AI task dispatcher" }
+summary:
+  ru: Telegram-бот для команды ивентов — превращает текст и голосовые в карточки задач в Notion с дедлайном, приоритетом и исполнителем.
+  en: A Telegram bot for an events team — turns text and voice messages into Notion task cards with a deadline, priority and assignee.
+category: dev
+status: wip
+year: 2026
+period: '2026.09'
+role:
+  ru: Постановка, промпт-инжиниринг, разработка в Claude Code
+  en: Requirements, prompt engineering, development with Claude Code
+tech: [python, fastapi, aiogram, llm, whisper, notion, sqlite]
+cover: d-tg-components
+links:
+  docs: artifacts
+
+problem:
+  ru: В команде, которая делает крупные мероприятия, задачи ставятся в чатах на бегу — текстом и голосовыми, с «до пятницы» и «передай Кате». Переносить их в трекер вручную некому, поэтому часть теряется, а сроки и ответственные остаются в переписке.
+  en: In a team running large events, tasks are set on the fly in chats — as text and voice messages, with "by Friday" and "tell Katya". Nobody has time to copy them into a tracker by hand, so some get lost, and deadlines and owners stay buried in the chat.
+overview:
+  ru: Сотрудник пишет боту как коллеге. LLM разбивает сообщение на отдельные задачи и вытаскивает название, описание, срок, приоритет, исполнителя и категорию; точную дату считает отдельный модуль. Бот показывает черновик, его можно поправить прямо в Telegram, и только после подтверждения карточка уходит на канбан-доску в Notion, а исполнитель получает уведомление.
+  en: An employee writes to the bot as to a colleague. The LLM splits the message into separate tasks and extracts the title, description, deadline, priority, assignee and category; the exact date is calculated by a separate module. The bot shows a draft that can be edited right in Telegram, and only after confirmation does the card go to the Notion kanban board while the assignee gets a notification.
+purpose:
+  ru: MVP, собранный за один день в Claude Code. Моя часть — постановка, правила разбора в промпте, решение считать даты кодом, а не моделью, и сценарии отказов. Ниже отдельно — замечания, которые я нашёл, разбирая код для портфолио.
+  en: An MVP built in one day with Claude Code. My part was the requirements, the parsing rules in the prompt, the decision to calculate dates in code rather than in the model, and the failure scenarios. A separate document lists the issues I found while reviewing the code for this portfolio.
+goals:
+  - { ru: "Поставить задачу одним сообщением — текстом или голосом", en: "Set a task in one message — text or voice" }
+  - { ru: "Не терять сроки и ответственных из переписки", en: "Keep deadlines and owners from getting lost in chats" }
+  - { ru: "Ничего не публиковать в трекер без проверки человеком", en: "Publish nothing to the tracker without a human check" }
+  - { ru: "Не терять задачи, даже когда Notion недоступен", en: "Lose no tasks even when Notion is down" }
+features:
+  - { ru: "Текст и голосовые (Whisper)", en: "Text and voice messages (Whisper)" }
+  - { ru: "Несколько задач из одного сообщения", en: "Several tasks from one message" }
+  - { ru: "Дедлайн из фраз «до пятницы», «послезавтра утром»", en: "Deadlines from phrases like 'by Friday', 'the day after tomorrow in the morning'" }
+  - { ru: "Черновик с правкой любого поля", en: "A draft with any field editable" }
+  - { ru: "Канбан-доска в Notion", en: "A kanban board in Notion" }
+  - { ru: "Уведомление исполнителю", en: "Assignee notification" }
+  - { ru: "Резерв в SQLite и досылка в Notion", en: "SQLite fallback and later sync to Notion" }
+  - { ru: "Доступ только по белому списку", en: "Whitelist-only access" }
+requirements:
+  - { id: FR-01, type: FR, priority: Must, text: { ru: "Из одного сообщения создаётся столько задач, сколько в нём независимых дел; уточнения по ходу сообщения не дробят задачу.", en: "One message yields as many tasks as it has independent items; corrections within a message do not split a task." } }
+  - { id: FR-02, type: FR, priority: Must, text: { ru: "Срок считается от времени отправки сообщения; если фразу не удалось разобрать, она сохраняется текстом.", en: "The deadline is calculated from the message time; if a phrase cannot be parsed, it is kept as text." } }
+  - { id: FR-03, type: FR, priority: Must, text: { ru: "Карточка создаётся только после подтверждения автора; любое поле можно изменить.", en: "A card is created only after the author confirms; any field can be changed." } }
+  - { id: FR-04, type: FR, priority: Must, text: { ru: "Если Notion недоступен, задача сохраняется локально и досылается позже.", en: "If Notion is unavailable, the task is saved locally and sent later." } }
+  - { id: FR-05, type: FR, priority: Should, text: { ru: "Исполнитель получает уведомление, если он уже писал боту.", en: "The assignee is notified if they have written to the bot before." } }
+  - { id: NFR-01, type: NFR, priority: Must, text: { ru: "Бот отвечает только пользователям из белого списка.", en: "The bot answers only whitelisted users." } }
+  - { id: NFR-02, type: NFR, priority: Must, text: { ru: "Ответ модели проверяется схемой; при невалидном JSON — одна повторная попытка.", en: "The model's answer is validated against a schema; on invalid JSON — one retry." } }
+  - { id: NFR-03, type: NFR, priority: Should, text: { ru: "Ошибка внешнего сервиса не роняет бота: пользователь видит понятное сообщение.", en: "An external service error does not crash the bot: the user sees a clear message." } }
+scenarios:
+  - title: { ru: "Голосовое с тремя задачами", en: "A voice message with three tasks" }
+    actor: { ru: "Сотрудник", en: "Employee" }
+    steps:
+      - { ru: "«Закажи капкейки до завтра, передай Кате доделать анонс к пятнице и напомни мне послезавтра утром созвониться с площадкой»", en: "\"Order cupcakes by tomorrow, tell Katya to finish the announcement by Friday, and remind me to call the venue the day after tomorrow in the morning\"" }
+      - { ru: "Whisper распознаёт речь, LLM находит три задачи с разными сроками", en: "Whisper transcribes the speech, the LLM finds three tasks with different deadlines" }
+      - { ru: "Бот по очереди показывает три черновика 1/3, 2/3, 3/3", en: "The bot shows three drafts in turn: 1/3, 2/3, 3/3" }
+      - { ru: "После подтверждения Катя получает уведомление о своей задаче", en: "After confirmation Katya is notified of her task" }
+  - title: { ru: "Notion недоступен", en: "Notion is down" }
+    actor: { ru: "Сотрудник", en: "Employee" }
+    steps:
+      - { ru: "Подтверждает черновик", en: "Confirms a draft" }
+      - { ru: "Запрос в Notion падает — задача сохраняется в SQLite", en: "The Notion request fails — the task is saved to SQLite" }
+      - { ru: "Бот сообщает: «Notion недоступен — сохранено локально (id #12)»", en: "The bot replies: \"Notion unavailable — saved locally (id #12)\"" }
+      - { ru: "При следующей задаче или перезапуске outbox досылается в Notion", en: "On the next task or restart the outbox is sent to Notion" }
+challenges:
+  - title: { ru: "Модель плохо считает даты", en: "The model is bad at date maths" }
+    text: { ru: "LLM путает «эту пятницу» со «следующей». Модель только извлекает формулировку срока, а дату считает dateparser с нормализацией падежей, «утром»/«после обеда» и «на неделе».", en: "LLMs confuse \"this Friday\" with \"next Friday\". The model only extracts the deadline phrase; the date is calculated by dateparser with normalisation of word forms, \"in the morning\"/\"after lunch\" and \"this week\"." }
+  - title: { ru: "Одна задача или несколько", en: "One task or several" }
+    text: { ru: "«…а ещё передай Кате» — это новая задача, а «в четверг… а нет, давай пятницу» — та же самая. Правила разбиения и примеры обоих случаев вынесены в промпт.", en: "\"…and also tell Katya\" is a new task, while \"on Thursday… no, let's do Friday\" is the same one. The splitting rules and examples of both cases live in the prompt." }
+  - title: { ru: "Бот не может написать первым", en: "The bot cannot write first" }
+    text: { ru: "Telegram запрещает боту начинать диалог. Бот запоминает всех, кто ему писал, ищет исполнителя по имени или @username и честно сообщает, если уведомить не получилось.", en: "Telegram does not let a bot start a conversation. The bot remembers everyone who has written to it, finds the assignee by name or @username, and says so honestly if it could not notify them." }
+  - title: { ru: "Notion недоступен", en: "Notion is unavailable" }
+    text: { ru: "Задача не должна пропасть из-за внешнего сервиса: SQLite как outbox, досылка при старте и перед каждой новой задачей, остановка на первой сетевой ошибке.", en: "A task must not vanish because of an external service: SQLite as an outbox, resent on start and before each new task, stopping at the first network error." }
+results:
+  text:
+    ru: Рабочий MVP примерно на 1 400 строк Python — бот, разбор через LLM, расчёт сроков, Notion с резервом в SQLite. Отдельно — разбор кода с 6 замечаниями и предложениями по доработке.
+    en: A working MVP of about 1,400 lines of Python — the bot, LLM parsing, deadline calculation, Notion with an SQLite fallback. Plus a code review with 6 findings and improvement proposals.
+  state:
+    ru: Бот не развёрнут на сервере; следующий шаг — исправить замечания, хранить черновики вне памяти процесса и перейти на дату в Notion вместо текста.
+    en: The bot is not deployed; next steps are fixing the findings, keeping drafts outside process memory and switching to a Notion date property instead of text.
+
+architecture:
+  diagram: d-tg-components
+  text:
+    ru: Один процесс Python. FastAPI отдаёт health-check и при старте запускает бота aiogram в режиме long polling. Разбор и распознавание речи — Groq по OpenAI-совместимому API, хранение — Notion, резерв и справочник пользователей — SQLite.
+    en: A single Python process. FastAPI serves a health check and on start launches the aiogram bot in long-polling mode. Parsing and speech recognition go to Groq via an OpenAI-compatible API; storage is Notion, with SQLite as the fallback and user directory.
+  flows: [d-tg-flow, d-tg-outbox]
+dataModel:
+  diagram: d-tg-erd
+  text:
+    ru: Задача живёт в Notion; в SQLite — её копия, пока она не доехала до Notion, и справочник тех, кто писал боту. Срок хранится строкой ISO или исходной фразой, если её не удалось разобрать.
+    en: A task lives in Notion; SQLite holds its copy until it reaches Notion, plus a directory of everyone who has written to the bot. The deadline is stored as an ISO string, or as the original phrase if it could not be parsed.
+api:
+  endpoints:
+    - { method: GET, path: /health, text: { ru: "Проверка, что сервис жив", en: "Service liveness check" } }
+    - { method: BOT, path: /start, text: { ru: "Приветствие и правила: как ставить задачи и почему коллегам нужно написать боту", en: "Welcome and rules: how to set tasks and why colleagues must message the bot first" } }
+    - { method: BOT, path: /team, text: { ru: "Кто уже писал боту — им можно назначать задачи с уведомлением", en: "Who has messaged the bot — they can be assigned tasks with a notification" } }
+    - { method: BOT, path: 'text · voice', text: { ru: "Сообщение с задачей → черновики с кнопками «Подтвердить», «Изменить», «Отменить»", en: "A message with a task → drafts with Confirm, Edit and Cancel buttons" } }
+  integrations:
+    - name: Telegram Bot API
+      protocol: aiogram · long polling
+      text: { ru: "Сообщения, голосовые, inline-кнопки, состояния черновика (FSM).", en: "Messages, voice, inline buttons, draft states (FSM)." }
+    - name: Groq
+      protocol: { ru: "OpenAI-совместимый API", en: "OpenAI-compatible API" }
+      text: { ru: "gpt-oss-120b в режиме JSON для разбора, whisper-large-v3-turbo для голосовых.", en: "gpt-oss-120b in JSON mode for parsing, whisper-large-v3-turbo for voice." }
+    - name: Notion API
+      protocol: REST · POST /v1/pages
+      text: { ru: "Карточка в базе со статусом «Не начато» — по нему строится канбан.", en: "A card in a database with status Not started — the kanban groups by it." }
+decisions:
+  - title: { ru: "Даты считает код, а не модель", en: "Dates are calculated by code, not the model" }
+    choice: { ru: "LLM возвращает исходную фразу срока, dateparser переводит её в дату относительно времени сообщения.", en: "The LLM returns the original deadline phrase; dateparser turns it into a date relative to the message time." }
+    why: { ru: "Арифметика с датами у моделей нестабильна, а детерминированный код можно проверить и поправить.", en: "Models are unreliable at date arithmetic, while deterministic code can be tested and fixed." }
+    alternatives: { ru: "Просить модель вернуть готовую дату — проще, но ошибки «эта/следующая пятница».", en: "Ask the model for a ready date — simpler, but \"this/next Friday\" errors." }
+  - title: { ru: "Черновик перед публикацией", en: "A draft before publishing" }
+    choice: { ru: "Каждая задача показывается с кнопками; ничего не уходит в Notion без подтверждения.", en: "Each task is shown with buttons; nothing reaches Notion without confirmation." }
+    why: { ru: "Модель может ошибиться с исполнителем или сроком, а лишняя карточка на общей доске дороже одного клика.", en: "The model can get the owner or deadline wrong, and a stray card on a shared board costs more than one click." }
+  - title: { ru: "SQLite как outbox", en: "SQLite as an outbox" }
+    pros:
+      - { ru: "Задача не теряется при сбое Notion", en: "No task is lost when Notion fails" }
+      - { ru: "Без Notion бот работает целиком локально", en: "Without Notion the bot works fully locally" }
+    cons:
+      - { ru: "Досылка блокирует подтверждение, пока идёт синхронизация", en: "Resending blocks confirmation while sync runs" }
+  - title: { ru: "Бот и API в одном процессе", en: "Bot and API in one process" }
+    choice: { ru: "Long polling запускается фоновой задачей в lifespan FastAPI.", en: "Long polling runs as a background task in the FastAPI lifespan." }
+    why: { ru: "Не нужен публичный адрес для вебхука — для MVP достаточно одной команды uvicorn.", en: "No public address is needed for a webhook — one uvicorn command is enough for an MVP." }
+    alternatives: { ru: "Вебхук — быстрее и масштабируемее, но требует HTTPS-домена.", en: "A webhook — faster and more scalable, but needs an HTTPS domain." }
+
+diagrams:
+  - id: d-tg-components
+    kind: components
+    title: { ru: "Компоненты диспетчера", en: "Dispatcher components" }
+    nodes:
+      - { id: tg, label: TELEGRAM, sub: { ru: "текст · голос", en: "text · voice" }, x: 0, y: 6, w: 2, d: 2, h: 0.5 }
+      - { id: bot, label: BOT, sub: fastapi · aiogram, x: 6, y: 6, w: 2, d: 2, h: 1 }
+      - { id: groq, label: GROQ, sub: llm · whisper, x: 12, y: 6, w: 2, d: 2, h: 1 }
+      - { id: notion, label: NOTION, sub: { ru: "канбан", en: "kanban" }, x: 6, y: 0, w: 2, d: 2, h: 1 }
+      - { id: sqlite, label: SQLITE, sub: outbox · users, x: 6, y: 12, w: 2, d: 1, h: 0.5 }
+    links: [[tg, bot], [bot, groq], [bot, notion], [bot, sqlite]]
+    notes:
+      tg: { ru: "Сотрудники пишут боту текстом или голосом; бот отвечает только белому списку.", en: "Employees write to the bot by text or voice; the bot answers only the whitelist." }
+      bot: { ru: "FastAPI + aiogram в одном процессе: разбор, расчёт сроков, черновики, уведомления.", en: "FastAPI + aiogram in one process: parsing, deadline calculation, drafts, notifications." }
+      groq: { ru: "gpt-oss-120b в режиме JSON разбивает сообщение на задачи, Whisper распознаёт голосовые.", en: "gpt-oss-120b in JSON mode splits the message into tasks, Whisper transcribes voice." }
+      notion: { ru: "База задач со статусом — из неё строится канбан-доска команды.", en: "A task database with a status — the team's kanban board is built from it." }
+      sqlite: { ru: "Задачи, не доехавшие до Notion, и все, кто писал боту.", en: "Tasks that have not reached Notion, and everyone who has written to the bot." }
+  - id: d-tg-flow
+    kind: flow
+    title: { ru: "От сообщения до карточки", en: "From a message to a card" }
+    steps:
+      - { lane: { ru: "СОТРУДНИК", en: "EMPLOYEE" }, title: { ru: "Написать задачу", en: "Write a task" }, text: { ru: "Текстом или голосом; голосовое распознаёт Whisper.", en: "By text or voice; Whisper transcribes voice." } }
+      - { lane: GROQ, title: { ru: "Разбить и извлечь", en: "Split and extract" }, text: { ru: "JSON со списком задач и полями; невалидный ответ — одна повторная попытка.", en: "JSON with a list of tasks and fields; an invalid answer gets one retry." } }
+      - { lane: BOT, title: { ru: "Посчитать срок", en: "Calculate the deadline" }, text: { ru: "dateparser от времени сообщения; не разобрал — оставить фразу.", en: "dateparser from the message time; if unparsed, keep the phrase." } }
+      - { lane: { ru: "СОТРУДНИК", en: "EMPLOYEE" }, title: { ru: "Проверить черновик", en: "Review the draft" }, text: { ru: "Подтвердить, изменить любое поле или отменить.", en: "Confirm, edit any field or cancel." } }
+      - { lane: NOTION, title: { ru: "Создать карточку", en: "Create the card" }, text: { ru: "Статус «Не начато»; при сбое — в SQLite.", en: "Status Not started; on failure — into SQLite." } }
+      - { lane: { ru: "ИСПОЛНИТЕЛЬ", en: "ASSIGNEE" }, title: { ru: "Уведомление", en: "Notification" }, text: { ru: "Если он уже писал боту; иначе автор видит, что уведомить не удалось.", en: "If they have written to the bot; otherwise the author sees it could not be sent." } }
+  - id: d-tg-outbox
+    kind: flow
+    title: { ru: "Резерв и досылка в Notion", en: "Fallback and resend to Notion" }
+    steps:
+      - { lane: BOT, title: { ru: "Notion не ответил", en: "Notion did not answer" }, text: { ru: "Сетевая ошибка или ошибка API — задача пишется в SQLite с synced = 0.", en: "A network or API error — the task is written to SQLite with synced = 0." } }
+      - { lane: { ru: "СОТРУДНИК", en: "EMPLOYEE" }, title: { ru: "Видит результат", en: "Sees the result" }, text: { ru: "«Notion недоступен — сохранено локально (id #N)».", en: "\"Notion unavailable — saved locally (id #N)\"." } }
+      - { lane: BOT, title: { ru: "Повод досылки", en: "Resend trigger" }, text: { ru: "Старт сервиса или подтверждение следующей задачи.", en: "Service start or confirmation of the next task." } }
+      - { lane: NOTION, title: { ru: "Отправка по порядку", en: "Send in order" }, text: { ru: "Задачи outbox по id; первая сетевая ошибка останавливает проход.", en: "Outbox tasks by id; the first network error stops the pass." } }
+      - { lane: SQLITE, title: { ru: "Отметить", en: "Mark" }, text: { ru: "synced = 1 и ссылка на страницу Notion.", en: "synced = 1 and the Notion page link." } }
+  - id: d-tg-erd
+    kind: erd
+    title: { ru: "Модель данных", en: "Data model" }
+    entities:
+      - { id: page, name: NOTION_PAGE, fields: [[Название, title], [Описание, text], [Дедлайн, text], [Приоритет, select], [Ответственный, text], [Категория, select], [Автор, text], [Статус, select]] }
+      - { id: tasks, name: TASKS (sqlite), fields: [[id, integer, PK], [title, text], [description, text], [deadline, text], [priority, text], [assignee, text], [category, text], [author_username, text], [created_at, text], [synced_to_notion, '0|1'], [notion_page_url, text]] }
+      - { id: users, name: KNOWN_USERS (sqlite), fields: [[telegram_user_id, integer, PK], [username, text], [first_name, text], [last_name, text], [updated_at, text]] }
+    relations: [[tasks, page, '1 : 0..1'], [users, tasks, '1 : N']]
+
+# Артефакты: документы — artifacts/<id>.ru.md и .en.md, остальное — файлы в artifacts/
+artifacts:
+  - id: spec-dispatch
+    code: SRS-01
+    type: srs
+    view: doc
+    updated: '2026.09'
+    title: { ru: "Постановка: задача из сообщения", en: "Spec: a task from a message" }
+    summary: { ru: "User Stories с критериями приёмки, основной сценарий, исключения, поля задачи и правила уведомлений.", en: "User stories with acceptance criteria, the main flow, exceptions, task fields and notification rules." }
+  - id: review-dispatch
+    code: NOTE-01
+    type: note
+    view: doc
+    updated: '2026.10'
+    title: { ru: "Замечания по коду: 6 находок", en: "Code review: 6 findings" }
+    summary: { ru: "Что нашлось при разборе кода: сценарий, риск и предложение по каждому пункту.", en: "What the code review found: scenario, risk and a proposal for each item." }
+  - id: deadlines
+    code: DOC-01
+    type: apidoc
+    view: doc
+    updated: '2026.09'
+    title: { ru: "Расчёт дедлайнов", en: "Deadline calculation" }
+    summary: { ru: "Почему даты считает код, как нормализуется фраза и реальные результаты на 14 формулировках.", en: "Why code calculates dates, how a phrase is normalised, and real results for 14 phrases." }
+  - id: prompt
+    code: NOTE-02
+    type: note
+    view: code
+    file: prompt.txt
+    updated: '2026.09'
+    title: { ru: "Системный промпт разбора", en: "Parsing system prompt" }
+    summary: { ru: "Правила разбиения на задачи, извлечения срока, приоритета и исполнителя, формат JSON-ответа.", en: "Rules for splitting into tasks, extracting the deadline, priority and assignee, and the JSON answer format (in Russian)." }
+  - id: schema-task
+    code: API-01
+    type: openapi
+    view: code
+    file: schemas.py
+    updated: '2026.09'
+    title: { ru: "Схема задачи (Pydantic)", en: "Task schema (Pydantic)" }
+    summary: { ru: "TaskSchema, по которой проверяется ответ модели: поля, приоритеты и категории.", en: "TaskSchema used to validate the model's answer: fields, priorities and categories." }
+  - id: sql-local
+    code: SQL-01
+    type: db
+    view: code
+    file: local.sql
+    updated: '2026.09'
+    title: { ru: "Локальное хранилище SQLite", en: "SQLite local storage" }
+    summary: { ru: "Таблица-outbox задач для Notion и справочник пользователей для уведомлений.", en: "The task outbox table for Notion and the user directory for notifications." }
+  - id: erd-tg
+    code: ERD-01
+    type: erd
+    view: erd
+    diagram: d-tg-erd
+    updated: '2026.09'
+    title: { ru: "Модель данных", en: "Data model" }
+    summary: { ru: "Карточка Notion, outbox задач и известные боту пользователи.", en: "The Notion card, the task outbox and users known to the bot." }
+  - id: adr-tg
+    code: ADR-01
+    type: other
+    view: doc
+    updated: '2026.09'
+    title: { ru: "Архитектурные решения", en: "Architecture decisions" }
+    summary: { ru: "Стек, разбор через LLM, расчёт дат, черновики, резерв в SQLite и доступ.", en: "Stack, LLM parsing, date calculation, drafts, SQLite fallback and access." }
+  - id: c4-tg
+    code: C4-01
+    type: arch
+    view: components
+    diagram: d-tg-components
+    updated: '2026.09'
+    title: { ru: "Схема компонентов", en: "Component diagram" }
+    summary: { ru: "Telegram, бот на FastAPI и aiogram, Groq, Notion и SQLite.", en: "Telegram, the FastAPI and aiogram bot, Groq, Notion and SQLite." }

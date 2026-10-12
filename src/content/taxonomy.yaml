@@ -55,6 +55,10 @@ technologies:
   - { id: github-actions, label: GitHub Actions, group: { ru: "Инфраструктура", en: "Infrastructure" } }
   - { id: caddy, label: Caddy, group: { ru: "Инфраструктура", en: "Infrastructure" } }
   - { id: nginx, label: Nginx, group: { ru: "Инфраструктура", en: "Infrastructure" } }
+  - { id: aiogram, label: aiogram / Telegram, group: { ru: "Сервер", en: "Backend" } }
+  - { id: whisper, label: Whisper, group: AI }
+  - { id: notion, label: Notion API, group: { ru: "Интеграции", en: "Integrations" } }
+  - { id: sqlite, label: SQLite, group: { ru: "Данные", en: "Data" } }
 
 artifactTypes:
   - { id: srs, code: SRS, label: { ru: "ТЗ и требования", en: "Specs and requirements" } }
