@@ -228,6 +228,70 @@ artifacts:
     updated: '2026.10'
     title: { ru: "Кейс: AI-ментор составляет план дня", en: "Case: the AI mentor plans the day" }
     summary: { ru: "User Stories, Use Case, исключения с кодами ответов, контракт API, задача на разработку и замечания аналитика.", en: "User stories, a use case, exceptions with response codes, the API contract, a development task and analyst notes." }
+  - id: screen-today
+    code: UI-01
+    type: ui
+    view: image
+    file: screen-today.png
+    updated: '2026.10'
+    title: { ru: "Сегодня", en: "Today" }
+    summary: { ru: "Главный экран: сводка дня, план по часам и утренний брифинг ментора с подсказкой, с чего начать.", en: "The home screen: the day at a glance, an hourly plan and the mentor’s morning briefing on where to start." }
+  - id: screen-calendar-week
+    code: UI-02
+    type: ui
+    view: image
+    file: screen-calendar-week.png
+    updated: '2026.10'
+    title: { ru: "Календарь: неделя", en: "Calendar: week" }
+    summary: { ru: "План и факт на одной сетке: блоки задач, перерывы и отслеженное время, справа — задачи без времени.", en: "Plan and fact on one grid: task blocks, breaks and tracked time, with unscheduled tasks on the right." }
+  - id: screen-calendar-month
+    code: UI-03
+    type: ui
+    view: image
+    file: screen-calendar-month.png
+    updated: '2026.10'
+    title: { ru: "Календарь: месяц", en: "Calendar: month" }
+    summary: { ru: "Тот же календарь при отдалении: дни превращаются в плитки со списком дел и суммой часов.", en: "The same calendar zoomed out: days turn into tiles with their tasks and total hours." }
+  - id: screen-calendar-year
+    code: UI-04
+    type: ui
+    view: image
+    file: screen-calendar-year.png
+    updated: '2026.10'
+    title: { ru: "Календарь: год", en: "Calendar: year" }
+    summary: { ru: "Ещё дальше — тепловая карта года: видно ритм занятий по неделям.", en: "Further out — a heat map of the year showing the weekly rhythm." }
+  - id: screen-stats
+    code: UI-05
+    type: ui
+    view: image
+    file: screen-stats.png
+    updated: '2026.10'
+    title: { ru: "Статистика", en: "Statistics" }
+    summary: { ru: "Время по дням и проектам, выполнение плана и точность попадания в запланированные часы — на собственных SVG-графиках.", en: "Time by day and project, plan completion and accuracy against planned hours — on custom SVG charts." }
+  - id: screen-mentor-plan
+    code: UI-06
+    type: ui
+    view: image
+    file: screen-mentor-plan.png
+    updated: '2026.10'
+    title: { ru: "План дня от AI-ментора", en: "Day plan from the AI mentor" }
+    summary: { ru: "Пользователь просит план с учётом созвона — ментор предлагает изменения, и каждое применяется только после подтверждения.", en: "The user asks for a plan around a call — the mentor proposes changes, each applied only after confirmation." }
+  - id: screen-goal
+    code: UI-07
+    type: ui
+    view: image
+    file: screen-goal.png
+    updated: '2026.10'
+    title: { ru: "Цель обучения", en: "Learning goal" }
+    summary: { ru: "Путь из этапов с результатами, проверка знаний после этапа, задачи на ближайшие дни и что ментор знает о пользователе.", en: "A path of stages with outcomes, a knowledge check after each stage, tasks for the coming days and what the mentor knows about the user." }
+  - id: screen-welcome
+    code: UI-08
+    type: ui
+    view: image
+    file: screen-welcome.png
+    updated: '2026.10'
+    title: { ru: "Первый запуск", en: "First launch" }
+    summary: { ru: "Выбор режима: ментор, который ведёт к цели обучения, или ассистент для планирования дел и времени.", en: "Choosing a mode: a mentor that leads to a learning goal, or an assistant for planning tasks and time." }
   - id: dd-sync
     code: DD-01
     type: erd
