@@ -72,7 +72,7 @@ export function ArtifactViewer({ a, lang }: { a: ArtifactVM; lang: Lang }) {
       {a.view === 'image' && a.src ? (
         <figure style={{ margin: 0, border: '1px solid var(--line)', background: 'var(--surface)', padding: 16 }}>
           <a href={a.src} target="_blank" rel="noopener" style={{ display: 'block', cursor: 'zoom-in' }}>
-            <img src={a.src} alt={a.title} style={{ maxWidth: '100%', maxHeight: '60vh', margin: '0 auto', objectFit: 'contain' }} />
+            <img src={a.src} alt={a.title} style={{ maxWidth: '100%', maxHeight: '72vh', margin: '0 auto', objectFit: 'contain' }} />
           </a>
         </figure>
       ) : null}

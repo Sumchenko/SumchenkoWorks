@@ -8,7 +8,7 @@ summary:
   ru: CRM для аренды спецтехники — бронирование с проверкой доступности, календарь парка, платежи, права менеджеров и журнал действий.
   en: A CRM for construction equipment rental — booking with availability checks, a fleet calendar, payments, manager permissions and an audit log.
 category: sa
-status: wip
+status: live
 year: 2026
 period: '2026.06 → 2026.10'
 role:

@@ -156,6 +156,9 @@ const ru = {
     related: 'Связанные проекты',
     next: (code: string) => `Следующий · ${code}`,
     artifactLabel: (code: string) => `Артефакт / ${code}`,
+    screens: 'Интерфейс',
+    screensAria: 'Экраны проекта',
+    screensOpen: 'Открыть экран',
   },
   artifact: {
     download: (ext: string) => `Скачать .${ext}`,
@@ -332,6 +335,9 @@ const en: UI = {
     related: 'Related projects',
     next: (code: string) => `Next · ${code}`,
     artifactLabel: (code: string) => `Artifact / ${code}`,
+    screens: 'Interface',
+    screensAria: 'Project screens',
+    screensOpen: 'Open screen',
   },
   artifact: {
     download: (ext: string) => `Download .${ext}`,

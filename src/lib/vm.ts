@@ -80,6 +80,8 @@ export type ProjectBodyVM = {
     decisions: { idx: string; items: DecisionVM[] } | null;
   } | null;
   artifacts: ArtifactVM[];
+  /** Экраны интерфейса (артефакты type: ui, view: image) — галерея в начале «Обзора». */
+  screens: ArtifactVM[];
 };
 
 export function projectBodyVM(p: Project, c: Content): ProjectBodyVM {
@@ -127,5 +129,6 @@ export function projectBodyVM(p: Project, c: Content): ProjectBodyVM {
       flows, erd, api, decisions,
     } : null,
     artifacts: p.artifacts.map((a) => ({ ...a })),
+    screens: p.artifacts.filter((a) => a.type === 'ui' && a.view === 'image' && a.src).map((a) => ({ ...a })),
   };
 }

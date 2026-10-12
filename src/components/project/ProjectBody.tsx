@@ -10,6 +10,7 @@ import { IsoDiagram } from '@/components/ds/IsoDiagram';
 import { ErdView } from './ErdView';
 import { FlowView } from './FlowView';
 import { ArtifactViewer } from './ArtifactViewer';
+import { ScreensGallery } from './ScreensGallery';
 
 type Tab = 'overview' | 'arch' | 'artifacts';
 
@@ -25,6 +26,8 @@ export default function ProjectBody({ vm }: { vm: ProjectBodyVM }) {
   const [tab, setTabState] = useState<Tab>('overview');
   const [doc, setDoc] = useState<string | null>(null);
   const [hot, setHot] = useState<string | null>(null);
+  const tabRef = useRef<Tab>('overview');
+  tabRef.current = tab;
 
   const tabs: TabItem[] = [{ id: 'overview', label: T.tabs.overview }];
   if (vm.arch) tabs.push({ id: 'arch', label: T.tabs.arch });
@@ -37,7 +40,7 @@ export default function ProjectBody({ vm }: { vm: ProjectBodyVM }) {
     const tb = p.get('tab');
     if (valid(tb)) setTabState(tb);
     const d = p.get('doc');
-    if (d && vm.artifacts.some((a) => a.id === d)) { setTabState('artifacts'); setDoc(d); }
+    if (d && vm.artifacts.some((a) => a.id === d)) { setTabState(valid(tb) ? tb : vm.screens.some((a) => a.id === d) ? 'overview' : 'artifacts'); setDoc(d); }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -56,9 +59,10 @@ export default function ProjectBody({ vm }: { vm: ProjectBodyVM }) {
   const openDoc = (id: string) => (e: MouseEvent) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
     e.preventDefault();
-    setDoc(id); sync('artifacts', id);
+    setDoc(id); sync(tabRef.current, id);
   };
-  const closeDoc = useCallback(() => { setDoc(null); sync('artifacts', null); }, []);
+  // Окно открывается поверх текущей вкладки (из «Обзора» — экраны, из «Артефактов» — любой), вкладка не меняется
+  const closeDoc = useCallback(() => { setDoc(null); sync(tabRef.current, null); }, []);
 
   const panel = (id: Tab) => ({ id: 'pb-panel-' + id, role: 'tabpanel', 'aria-labelledby': 'pb-tab-' + id, hidden: tab !== id });
   const A = vm.arch;
@@ -69,6 +73,7 @@ export default function ProjectBody({ vm }: { vm: ProjectBodyVM }) {
 
       {/* ---------- Обзор ---------- */}
       <div {...panel('overview')} style={{ display: tab === 'overview' ? 'flex' : 'none', flexDirection: 'column', paddingTop: 16 }}>
+        {vm.screens.length ? <ScreensGallery items={vm.screens} lang={lang} onOpen={openDoc} /> : null}
         {vm.rows.map((r, i) => <Row key={i} r={r} lang={lang} />)}
         {A || vm.artifacts.length ? (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, paddingTop: 28 }}>
