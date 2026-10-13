@@ -22,6 +22,9 @@ const alt = altLang(lang);
 const ogImage = new URL('/og-image.png', site).href;
 // Тексты для скриптов страницы (копирование email, уведомления)
 const clientTexts = { copyFail: T.toast.copyFail, copyFailMsg: T.toast.copyFailMsg, close: T.close };
+// Обезличенная статистика без cookie (GoatCounter на своём сервере), только в рабочей сборке.
+const STATS = 'https://stats.sumchenko-tech.ru';
+const stats = import.meta.env.PROD;
 ---
 <!doctype html>
 <html lang={T.htmlLang}>
@@ -46,6 +49,7 @@ const clientTexts = { copyFail: T.toast.copyFail, copyFailMsg: T.toast.copyFailM
   <meta name="theme-color" content="#080808" media="(prefers-color-scheme: dark)" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="sitemap" href="/sitemap-index.xml" />
+  {stats && <script is:inline async data-goatcounter={STATS + '/count'} src={STATS + '/count.js'}></script>}
   <script is:inline>
     // Тема ставится до отрисовки, чтобы не было вспышки светлой страницы в тёмной теме
     try {
@@ -63,13 +67,20 @@ const clientTexts = { copyFail: T.toast.copyFail, copyFailMsg: T.toast.copyFailM
   <Footer lang={lang} />
   <script type="application/json" id="sw-texts" set:html={JSON.stringify(clientTexts)} />
   <script>
-    import { copyText, initReveal } from '@/lib/client';
+    import { copyText, initReveal, track } from '@/lib/client';
     initReveal();
     const texts = JSON.parse(document.getElementById('sw-texts')?.textContent || '{}');
     // Кнопки вида <button data-copy="текст" data-copy-done="Скопировано">
     document.addEventListener('click', (e) => {
+      // Статистика: переходы на внешние сайты (демо, код, контакты) и письма
+      const a = (e.target as Element).closest<HTMLAnchorElement>('a[href]');
+      if (a) {
+        if (a.protocol === 'mailto:') track('contact / email', a.href.slice(7));
+        else if (/^https?:$/.test(a.protocol) && a.host !== location.host) track('out / ' + a.host + a.pathname.replace(/\/$/, ''), a.textContent?.trim());
+      }
       const b = (e.target as Element).closest<HTMLElement>('[data-copy]');
       if (!b) return;
+      track('contact / email-copy');
       copyText(b.dataset.copy || '', { done: b.dataset.copyDone || '', fail: texts.copyFail, failMsg: texts.copyFailMsg, close: texts.close });
     });
   </script>

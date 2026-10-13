@@ -77,3 +77,20 @@ export function initReveal(root: Element = document.body) {
   scan();
   new MutationObserver(scan).observe(root, { childList: true, subtree: true });
 }
+
+type GoatCounter = { count?: (v: { path: string; title?: string; event?: boolean }) => void };
+
+/**
+ * Событие обезличенной статистики (GoatCounter на stats.sumchenko-tech.ru, без cookie).
+ * Если счётчик не загрузился (локальная разработка, блокировщик), вызов просто ничего не делает.
+ */
+export function track(path: string, title?: string, attempt = 0) {
+  try {
+    const gc = (window as unknown as { goatcounter?: GoatCounter }).goatcounter;
+    // Скрипт счётчика грузится асинхронно: событие при открытии страницы может прийти раньше — ждём до ~5 с
+    if (!gc?.count) { if (attempt < 10) setTimeout(() => track(path, title, attempt + 1), 500); return; }
+    gc.count({ path, title, event: true });
+  } catch {
+    /* статистика не должна ломать сайт */
+  }
+}

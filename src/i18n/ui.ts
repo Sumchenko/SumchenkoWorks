@@ -23,6 +23,12 @@ const ru = {
     sections: 'Разделы',
     contacts: 'Контакты',
     notSet: 'не указан',
+    privacy: 'Конфиденциальность',
+  },
+  privacy: {
+    meta: 'Конфиденциальность',
+    label: 'Сайт · данные',
+    title: 'Конфиденциальность',
   },
   toast: {
     copied: 'Скопировано',
@@ -204,6 +210,12 @@ const en: UI = {
     sections: 'Sections',
     contacts: 'Contacts',
     notSet: 'not set',
+    privacy: 'Privacy',
+  },
+  privacy: {
+    meta: 'Privacy',
+    label: 'Site · data',
+    title: 'Privacy',
   },
   toast: {
     copied: 'Copied',

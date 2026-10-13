@@ -1,0 +1,23 @@
+# GoatCounter — обезличенная статистика sumchenko-tech.ru (без cookie, IP не хранятся).
+# Ставится скриптом setup-stats.sh в /etc/systemd/system/goatcounter.service.
+[Unit]
+Description=GoatCounter — статистика sumchenko-tech.ru
+After=network.target
+
+[Service]
+User=goatcounter
+Group=goatcounter
+WorkingDirectory=/var/lib/goatcounter
+# Слушает только localhost: снаружи доступен через Caddy на stats.sumchenko-tech.ru.
+ExecStart=/usr/local/bin/goatcounter serve -listen 127.0.0.1:8090 -tls http -automigrate -db sqlite+/var/lib/goatcounter/db.sqlite3
+Restart=always
+RestartSec=5
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/goatcounter
+
+[Install]
+WantedBy=multi-user.target

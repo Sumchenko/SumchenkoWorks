@@ -1,0 +1,13 @@
+# Статистика сайта (GoatCounter). На сервере: /etc/caddy/sites/stats.caddy.
+# Журнал посещений здесь намеренно не ведётся: IP-адреса посетителей нигде не сохраняются.
+stats.sumchenko-tech.ru {
+	encode zstd gzip
+	# Caddy сам передаёт X-Forwarded-For и X-Forwarded-Proto — GoatCounter берёт из них страну
+	# и признак HTTPS, а сам адрес не записывает.
+	reverse_proxy 127.0.0.1:8090
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+}

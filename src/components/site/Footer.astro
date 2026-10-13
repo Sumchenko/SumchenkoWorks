@@ -32,6 +32,7 @@ const contacts = contactLinks(c.site.profile.links).filter((l) => l.id !== 'cv')
         : <span class="sw-label" style="color:var(--fg-3)">{l.label} · {T.footer.notSet}</span>)}
     </div>
     <div style="display:flex; flex-direction:column; gap:10px; justify-content:flex-end">
+      <a href={localePath(lang, '/privacy/')} class="sw-label plain-link" style="width:fit-content">{T.footer.privacy}</a>
       <Coord>© {new Date().getFullYear()} · {c.site.name}</Coord>
     </div>
   </div>

@@ -11,6 +11,7 @@ import { ErdView } from './ErdView';
 import { FlowView } from './FlowView';
 import { ArtifactViewer } from './ArtifactViewer';
 import { ScreensGallery } from './ScreensGallery';
+import { track } from '@/lib/client';
 
 type Tab = 'overview' | 'arch' | 'artifacts';
 
@@ -40,7 +41,11 @@ export default function ProjectBody({ vm }: { vm: ProjectBodyVM }) {
     const tb = p.get('tab');
     if (valid(tb)) setTabState(tb);
     const d = p.get('doc');
-    if (d && vm.artifacts.some((a) => a.id === d)) { setTabState(valid(tb) ? tb : vm.screens.some((a) => a.id === d) ? 'overview' : 'artifacts'); setDoc(d); }
+    if (d && vm.artifacts.some((a) => a.id === d)) {
+      setTabState(valid(tb) ? tb : vm.screens.some((a) => a.id === d) ? 'overview' : 'artifacts'); setDoc(d);
+      // Ссылка сразу на документ: в просмотре страницы адрес без параметров, поэтому документ — отдельным событием
+      track(`${vm.slug} / doc / ${d}`, vm.artifacts.find((a) => a.id === d)?.title);
+    } else if (valid(tb) && tb !== 'overview') track(`${vm.slug} / tab / ${tb}`, T.tabs[tb]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -51,7 +56,11 @@ export default function ProjectBody({ vm }: { vm: ProjectBodyVM }) {
     const qs = p.toString();
     history.replaceState(null, '', location.pathname + (qs ? '?' + qs : ''));
   };
-  const setTab = (id: string) => { if (!valid(id)) return; setTabState(id); setDoc(null); setHot(null); sync(id, null); };
+  const setTab = (id: string) => {
+    if (!valid(id)) return;
+    if (id !== tab) track(`${vm.slug} / tab / ${id}`, T.tabs[id]);
+    setTabState(id); setDoc(null); setHot(null); sync(id, null);
+  };
   const scrollToTabs = () => {
     const el = rootRef.current?.querySelector('[role=tablist]');
     if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 72 });
@@ -60,6 +69,7 @@ export default function ProjectBody({ vm }: { vm: ProjectBodyVM }) {
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
     e.preventDefault();
     setDoc(id); sync(tabRef.current, id);
+    track(`${vm.slug} / doc / ${id}`, vm.artifacts.find((a) => a.id === id)?.title);
   };
   // Окно открывается поверх текущей вкладки (из «Обзора» — экраны, из «Артефактов» — любой), вкладка не меняется
   const closeDoc = useCallback(() => { setDoc(null); sync(tabRef.current, null); }, []);
@@ -73,7 +83,7 @@ export default function ProjectBody({ vm }: { vm: ProjectBodyVM }) {
 
       {/* ---------- Обзор ---------- */}
       <div {...panel('overview')} style={{ display: tab === 'overview' ? 'flex' : 'none', flexDirection: 'column', paddingTop: 16 }}>
-        {vm.screens.length ? <ScreensGallery items={vm.screens} lang={lang} /> : null}
+        {vm.screens.length ? <ScreensGallery items={vm.screens} lang={lang} slug={vm.slug} /> : null}
         {vm.rows.map((r, i) => <Row key={i} r={r} lang={lang} />)}
         {A || vm.artifacts.length ? (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, paddingTop: 28 }}>

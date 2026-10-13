@@ -3,12 +3,13 @@ import { createPortal } from 'react-dom';
 import { t, pad2, type Lang } from '@/i18n';
 import type { ArtifactVM } from '@/lib/vm';
 import { Icon } from '@/components/ds/Icon';
+import { track } from '@/lib/client';
 
 /*
  * Галерея экранов в начале «Обзора»: превью со стрелками по бокам и миниатюры.
  * Нажатие на превью открывает полноэкранный просмотр — проект можно посмотреть, даже если он не развёрнут.
  */
-export function ScreensGallery({ items, lang }: { items: ArtifactVM[]; lang: Lang }) {
+export function ScreensGallery({ items, lang, slug }: { items: ArtifactVM[]; lang: Lang; slug: string }) {
   const T = t(lang).project;
   const [cur, setCur] = useState(0);
   const [open, setOpen] = useState(false);
@@ -35,7 +36,7 @@ export function ScreensGallery({ items, lang }: { items: ArtifactVM[]; lang: Lan
       </div>
 
       <div style={{ position: 'relative', width: '100%', maxWidth: W }}>
-        <button type="button" onClick={() => setOpen(true)} aria-label={`${T.screensOpen}: ${a.title}`} title={T.screensOpen}
+        <button type="button" onClick={() => { setOpen(true); track(`${slug} / screens`, a.title); }} aria-label={`${T.screensOpen}: ${a.title}`} title={T.screensOpen}
           style={{ display: 'block', width: '100%', padding: 0, border: '1px solid var(--line)', background: 'var(--surface)', aspectRatio: '16 / 10', overflow: 'hidden', cursor: 'zoom-in' }}>
           <img src={a.src ?? undefined} alt={a.title} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
         </button>

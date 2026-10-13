@@ -88,3 +88,14 @@ rsync -az --delete dist/ deploy@13.143.64.158:/var/www/sumchenko-works/
 - Сайт открывается с мобильного интернета в России без VPN.
 - Превью ссылки: вставьте её в Telegram, должны подтянуться заголовок, описание и картинка.
 - Другой проект на сервере работает как раньше.
+
+## Статистика (GoatCounter)
+
+Обезличенная статистика без cookie: https://stats.sumchenko-tech.ru (вход — email и пароль владельца). IP-адреса не сохраняются ни GoatCounter, ни Caddy — у сайта и статистики журнал посещений не включён.
+
+- `deploy/stats/goatcounter.service` — служба systemd, слушает `127.0.0.1:8090`, база `/var/lib/goatcounter/db.sqlite3`.
+- `deploy/stats/stats.caddy` — `/etc/caddy/sites/stats.caddy`, проксирует поддомен на службу.
+- `deploy/stats/setup-stats.sh` — установка под root, один раз. Программу (релиз GoatCounter с проверкой SHA-256), службу и конфиг заранее кладёт deploy в `/home/deploy/stats-setup/`, скрипт — в `/home/deploy/`. Пароль для входа скрипт спрашивает интерактивно.
+- Обновление: deploy кладёт новую программу и выполняет `sudo systemctl restart goatcounter` (это право выдаёт скрипт); заменить файл в `/usr/local/bin` может только root.
+
+На сайте счётчик подключается в `src/layouts/Base.astro` только в рабочей сборке; события страниц — `track()` из `src/lib/client.ts`. Метки для откликов: `https://sumchenko-tech.ru/?ref=название` — видны в разделе источников (Referrers).
