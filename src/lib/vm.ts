@@ -11,14 +11,14 @@ export type BadgeVM = { label: string; variant: BadgeVariant; dot: boolean; puls
 export type LinkVM = { label: string; href: string; icon: string; external: boolean };
 
 const BADGE: Record<string, Omit<BadgeVM, 'label'>> = {
-  live: { variant: 'outline', dot: false, pulse: false },
+  deployed: { variant: 'outline', dot: false, pulse: false },
   done: { variant: 'outline', dot: false, pulse: false },
   wip: { variant: 'solid', dot: true, pulse: true },
   concept: { variant: 'dashed', dot: false, pulse: false },
   archive: { variant: 'subtle', dot: false, pulse: false },
 };
 
-export const badgeOf = (p: Project): BadgeVM => ({ label: p.statusLabel, ...(BADGE[p.status] ?? BADGE.live) });
+export const badgeOf = (p: Project): BadgeVM => ({ label: p.statusLabel, ...(BADGE[p.status] ?? BADGE.done) });
 
 export function projectLinks(p: Project, lang: Lang): LinkVM[] {
   const T = t(lang).card;

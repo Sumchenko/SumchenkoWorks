@@ -20,7 +20,7 @@ categories:
 
 # Вид бейджа задаётся в коде: live и done — контур, wip — мигающая точка, concept — пунктир, archive — серый.
 statuses:
-  - { id: live, label: Production }
+  - { id: deployed, label: { ru: "Развёрнут", en: "Deployed" } }
   - { id: done, label: { ru: "Готов", en: "Completed" } }
   - { id: wip, label: { ru: "В работе", en: "In progress" } }
   - { id: concept, label: { ru: "Концепт", en: "Concept" } }

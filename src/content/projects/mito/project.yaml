@@ -8,7 +8,7 @@ summary:
   ru: Задачи, таймер, календарь с семантическим зумом и AI-ментор в одном local-first приложении.
   en: Tasks, a timer, a semantic-zoom calendar and an AI mentor in one local-first app.
 category: dev
-status: live
+status: deployed
 year: 2026
 period: 2026.09 → …
 role:
@@ -97,8 +97,8 @@ challenges:
     text: { ru: "Ревизии выдаёт сервер, а записи одного пользователя сериализуются advisory-блокировкой — ревизии идут в порядке коммита.", en: "Revisions are server-assigned, and one user's writes are serialised with an advisory lock, so revisions follow commit order." }
 results:
   text:
-    ru: Приложение работает в продакшене — гостевой режим, аккаунты с синхронизацией, AI-ментор на реальных моделях. Готово 9 этапов из 11, около 20 тысяч строк TypeScript и 160 автотестов.
-    en: The app runs in production — guest mode, accounts with sync, an AI mentor on real models. 9 of 11 stages are done — about 20,000 lines of TypeScript and 160 automated tests.
+    ru: Приложение развёрнуто на сервере и открывается по ссылке — гостевой режим, аккаунты с синхронизацией, AI-ментор на реальных моделях. Готово 9 этапов из 11, около 20 тысяч строк TypeScript и 160 автотестов.
+    en: The app is deployed on a server and opens from a link — guest mode, accounts with sync, an AI mentor on real models. 9 of 11 stages are done — about 20,000 lines of TypeScript and 160 automated tests.
   state:
     ru: Дальше — PWA и десктопная и мобильная версии на Tauri.
     en: Next — a PWA and desktop and mobile versions with Tauri.
