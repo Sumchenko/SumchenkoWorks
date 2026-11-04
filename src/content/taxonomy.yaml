@@ -61,6 +61,8 @@ technologies:
   - { id: whisper, label: Whisper, group: AI }
   - { id: notion, label: Notion API, group: { ru: "Интеграции", en: "Integrations" } }
   - { id: sqlite, label: SQLite, group: { ru: "Данные", en: "Data" } }
+  - { id: asterisk, label: Asterisk, group: { ru: "Инфраструктура", en: "Infrastructure" } }
+  - { id: prometheus, label: Prometheus, group: { ru: "Инфраструктура", en: "Infrastructure" } }
 
 artifactTypes:
   - { id: srs, code: SRS, label: { ru: "ТЗ и требования", en: "Specs and requirements" } }

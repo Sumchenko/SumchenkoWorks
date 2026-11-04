@@ -1,0 +1,188 @@
+# Голосовой ассистент регистратуры — источник: приватный репозиторий хакатона «Точка сборки» 2026 (Gitea, team-047)
+# и локальная рабочая копия VibeCoding/Сlinic assistant. Ссылку на код добавить после публикации на GitHub.
+code: P—05
+order: 5
+demo: false
+featured: false
+title: { ru: "Голосовой ассистент регистратуры", en: "Clinic reception voice assistant" }
+summary:
+  ru: "Хакатон «Точка сборки» 2026: ассистент отвечает на звонки поликлиники — записывает к врачу, обзванивает с напоминаниями и передаёт сложное регистратору. Команда из двух, моя зона — бэкенд и телефония."
+  en: A hackathon project ("Tochka Sborki" 2026) — a voice assistant that answers a polyclinic's calls, books appointments, makes reminder calls and hands complex cases to a human registrar. A team of two; my zone was the backend and telephony.
+category: dev
+status: done
+year: 2026
+period: '2026.10'
+role:
+  ru: BE-зона — бэкенд FastAPI, телефония Asterisk, панель регистратора; разработка с Claude Code
+  en: BE zone — the FastAPI backend, Asterisk telephony and the registrar panel; development with Claude Code
+tech: [python, fastapi, postgres, docker, llm, asterisk, prometheus]
+cover: d-ca-components
+links:
+  docs: artifacts
+
+problem:
+  ru: "По данным кейса, у поликлиники на 120 тысяч прикреплённых — 12 регистраторов на телефоне: 30–40% звонков остаются без ответа, а 18–25% пациентов не приходят на приём, потому что напоминать им некому. При этом 60% обращений типовые — запись, перенос, справка."
+  en: "Per the case brief, a polyclinic with 120,000 attached patients has 12 registrars on the phone: 30–40% of calls go unanswered, and 18–25% of patients miss their appointments because nobody can remind them. Meanwhile 60% of requests are routine — booking, rescheduling, reference questions."
+overview:
+  ru: "Пациент звонит и говорит с ассистентом как с регистратором. Речь распознаётся локально, диалогом управляет конечный автомат по регламенту, а LLM через function calling только понимает реплику. Ассистент находит свободные слоты, записывает, переносит и отменяет приём, накануне обзванивает с напоминаниями, предлагает освободившееся время первому в листе ожидания и отвечает на справочные вопросы. Фраза об угрозе жизни — красный флаг: ассистент называет 103/112 и переводит на человека; сложное уходит регистратору с карточкой обращения."
+  en: "A patient calls and talks to the assistant as to a registrar. Speech is recognised locally; a finite-state machine drives the dialogue per the clinic's regulations, while the LLM only understands each utterance via function calling. The assistant finds free slots, books, reschedules and cancels appointments, makes reminder calls the day before, offers freed time to the first person on the waiting list and answers reference questions. A life-threatening phrase is a red flag: the assistant names 103/112 and transfers to a human; complex cases go to a registrar with a case card."
+purpose:
+  ru: Командный проект хакатона «Точка сборки» 2026 (кейс регистратуры поликлиники), команда из двух. Моя BE-зона — бэкенд FastAPI, телефония Asterisk, панель регистратора и пульт тестирования; напарник вёл ML-зону — голос, диалог и LLM. Зоны связаны контрактом с OpenAPI-схемой, весь код писали через Claude Code.
+  en: A team project for the "Tochka Sborki" 2026 hackathon (a polyclinic reception desk case), built by two people. My BE zone was the FastAPI backend, Asterisk telephony, the registrar panel and the testing console; my teammate owned the ML zone — voice, dialogue and the LLM. The zones met in a contract with an OpenAPI schema; all the code was written with Claude Code.
+goals:
+  - { ru: "Отвечать на звонок сразу, без очереди на регистратуре", en: "Answer every call immediately, with no reception queue" }
+  - { ru: "Записывать, переносить и отменять приём без регистратора", en: "Book, reschedule and cancel appointments without a registrar" }
+  - { ru: "Напоминать о визите и предлагать освободившееся время из листа ожидания", en: "Remind patients about visits and offer freed time from the waiting list" }
+  - { ru: "Опасное и сложное — человеку: красные флаги, переводы с карточкой", en: "Dangerous and complex cases go to a human: red flags, transfers with a case card" }
+features:
+  - { ru: "Запись, перенос и отмена приёма в МИС", en: "Booking, rescheduling and cancelling visits in the HIS" }
+  - { ru: "Идентификация пациента по ФИО и дате рождения", en: "Patient identification by full name and date of birth" }
+  - { ru: "Справочные вопросы: график, цены, подготовка к анализам", en: "Reference questions: hours, prices, lab test preparation" }
+  - { ru: "Вызов врача на дом", en: "Requesting a doctor's home visit" }
+  - { ru: "Обзвон-напоминание накануне (С-10) и лист ожидания (С-11)", en: "Reminder calls the day before and the waiting list" }
+  - { ru: "Красные флаги: 103/112 и перевод на человека", en: "Red flags: 103/112 and transfer to a human" }
+  - { ru: "Панель регистратора /panel и пульт тестирования /pult", en: "The registrar panel /panel and the testing console /pult" }
+  - { ru: "Записи звонков, обезличенные стенограммы, журнал доступа к ПДн", en: "Call recordings, masked transcripts and a personal-data access log" }
+scenarios:
+  - title: { ru: "Запись к терапевту", en: "Booking a therapist" }
+    actor: { ru: "Пациент", en: "Patient" }
+    steps:
+      - { ru: "«Хочу записаться к терапевту на этой неделе»", en: "\"I'd like to see a therapist this week\"" }
+      - { ru: "Идентификация по ФИО и дате рождения; проверка правил записи", en: "Identification by name and birth date; booking rules checked" }
+      - { ru: "Ассистент называет свободные слоты, пациент выбирает день и время", en: "The assistant offers free slots; the patient picks a day and time" }
+      - { ru: "«Вы записаны» звучит только после ответа МИС — с датой и кабинетом", en: "\"You are booked\" is said only after the HIS answers — with date and room" }
+  - title: { ru: "Красный флаг", en: "A red flag" }
+    actor: { ru: "Пациент", en: "Patient" }
+    steps:
+      - { ru: "«Давит в груди и отдаёт в руку»", en: "\"My chest is tight and it goes into my arm\"" }
+      - { ru: "Детектор кодом, до LLM: категория А — угроза жизни", en: "The code detector, before the LLM: category A — a life threat" }
+      - { ru: "Ассистент немедленно называет 103/112", en: "The assistant immediately names 103/112" }
+      - { ru: "Перевод на регистратора, в журнал уходит карточка обращения", en: "Transfer to a registrar; a case card goes into the log" }
+results:
+  text:
+    ru: "Две недели, 723 коммита, около 44 тысяч строк Python (из них 14 тысяч — тесты: 779 автотестов) и eval на живой LLM — 84 из 84 контрольных диалогов без пропущенных красных флагов, выдуманных фактов и действий в МИС без подтверждения. Продуктовый чекпоинт — 8 баллов; из отборочного тура прошли в финал и заняли 6-е место."
+    en: "Two weeks, 723 commits, about 44 thousand lines of Python (14 thousand of them tests — 779 automated tests) and an eval on a live LLM: 84 of 84 control dialogs with no missed red flags, invented facts or unconfirmed HIS actions. We scored 8 points on the product checkpoint, made the final from the qualifying round and finished 6th."
+  state:
+    ru: "Система целиком работала на живой телефонии на ВМ хакатона — входящие на номер 047, обзвон, панель и пульт. Код пока в приватном репозитории хакатона: ссылка появится, когда выложу проект на GitHub."
+    en: The whole system ran live on the hackathon VM — inbound calls to number 047, outbound calls, the panel and the console. The code still sits in the hackathon's private repository; the link will appear once I publish the project on GitHub.
+
+architecture:
+  diagram: d-ca-components
+  text:
+    ru: "Одна ВМ без GPU (4 vCPU, 7,8 ГБ) и docker compose. Звонок приходит через SIP-шлюз организаторов на Asterisk 18; голос идёт в агента по AudioSocket (TCP, 8 кГц), а команды телефонии — по ARI. Агент — Python и asyncio: Silero VAD, локальный ASR GigaAM, проверки до LLM, диалоговый автомат и Silero TTS. В МИС агент ходит не напрямую, а через бэкенд FastAPI: там очередь к стенду с лимитом 10 запросов в минуту (живой звонок важнее обзвона), расписание из Excel, панель регистратора и пульт. Данные — Postgres 16."
+    en: "A single GPU-less VM (4 vCPU, 7.8 GB) and docker compose. Calls arrive through the organisers' SIP gateway at Asterisk 18; audio flows to the agent over AudioSocket (TCP, 8 kHz) and telephony commands over ARI. The agent is Python and asyncio: Silero VAD, local GigaAM ASR, pre-LLM checks, a dialogue FSM and Silero TTS. The agent never talks to the HIS directly — everything goes through the FastAPI backend, which owns the queue to the stand (capped at 10 requests per minute, live calls ahead of robocalls), the Excel-imported schedule, the registrar panel and the testing console. Data lives in Postgres 16."
+  flows: [d-ca-call, d-ca-outbound]
+dataModel:
+  diagram: d-ca-erd
+  text:
+    ru: "Расписание — специальности, врачи, слоты — перезаливается из Excel и не знает про записи. Собственные сущности — записи, обзвон, переводы, лист ожидания и реестр звонков — ссылаются на стенд по id. У активной записи частичный уникальный индекс по слоту: два параллельных звонка не запишут двоих на одно время."
+    en: "The schedule — specialties, doctors, slots — is re-imported from Excel and knows nothing about bookings. Our own entities — visits, reminder calls, transfers, the waiting list and the call registry — reference the stand by id. Active visits carry a partial unique index per slot: two parallel calls cannot book two people into the same time."
+api:
+  endpoints:
+    - { method: GET, path: "/api/calls/{call_id}/context", text: { ru: "Контекст звонка в начале: направление, недавний звонок, операторы на месте", en: "Call context at the start: direction, a recent call, operators available" } }
+    - { method: POST, path: "/api/calls/{call_id}/finish", text: { ru: "Итог звонка: интенты, результат действия, стенограмма", en: "The call's outcome: intents, the action's result, the transcript" } }
+    - { method: POST, path: /api/patients/identify, text: { ru: "Идентификация по ФИО и дате рождения; двусмысленность — уточнить", en: "Identification by name and birth date; ambiguity asks for more" } }
+    - { method: POST, path: /api/slots/search, text: { ru: "Свободные слоты по специальности и датам", en: "Free slots by specialty and dates" } }
+    - { method: POST, path: /api/visits, text: { ru: "Запись в два шага: резерв слота локально, затем создание в стенде", en: "Booking in two steps: reserve the slot locally, then create it in the stand" } }
+    - { method: POST, path: /api/transfers, text: { ru: "Перевод на сотрудника или задача без перевода, с карточкой обращения", en: "Transfer to a staff member or a task without one, with a case card" } }
+    - { method: POST, path: /api/waitlist, text: { ru: "Лист ожидания; предложение слота держит время 15 минут", en: "The waiting list; a slot offer holds the time for 15 minutes" } }
+  integrations:
+    - name: Asterisk ARI
+      protocol: "REST · WebSocket"
+      text: { ru: "Исходящий обзвон (originate), переводы на сотрудников, статусы каналов.", en: "Outbound calls (originate), transfers to staff, channel statuses." }
+    - name: LLM-шлюз организаторов
+      protocol: { ru: "OpenAI-совместимый API", en: "OpenAI-compatible API" }
+      text: { ru: "gpt-oss-120b основная, GigaChat-3-Pro резервная; только function calling текущего шага.", en: "gpt-oss-120b primary, GigaChat-3-Pro backup; function calling of the current step only." }
+    - name: Стенд «Регистратура»
+      protocol: REST · /api/v1
+      text: { ru: "Пациенты, записи, заявки; лимит 10 запросов/мин — бэкенд держит очередь с приоритетами.", en: "Patients, visits, requests; a 10 requests/min limit — the backend keeps a priority queue." }
+    - name: SIP-шлюз организаторов
+      protocol: SIP
+      text: { ru: "Входящие звонки на номер 047 с софтфона жюри и пациентов.", en: "Inbound calls to number 047 from the jury's and patients' softphones." }
+decisions:
+  - title: { ru: "Автомат, а не агент на LLM", en: "A state machine, not an LLM agent" }
+    choice: { ru: "Диалог ведёт конечный автомат «сценарий → шаг»; LLM только понимает реплику через function calling.", en: "A finite-state machine of scenarios and steps drives the dialogue; the LLM only understands the utterance via function calling." }
+    why: { ru: "Регламент и запрет диагнозов нужны с гарантиями: шаг автомата можно протестировать, свободную модель — нет.", en: "The regulations and the no-diagnosis rule need guarantees: an FSM step can be tested, a free-form model cannot." }
+    alternatives: { ru: "LangChain / LangGraph — быстрее начать, но поведение диалога перестаёт быть проверяемым.", en: "LangChain / LangGraph — faster to start, but the dialogue stops being verifiable." }
+  - title: { ru: "Красные флаги проверяет код, до LLM", en: "Red flags are checked in code, before the LLM" }
+    choice: { ru: "Каждая реплика проходит детектор на леммах pymorphy3 до отправки в модель.", en: "Every utterance passes a lemma-based detector (pymorphy3) before reaching the model." }
+    why: { ru: "Ложная тревога допустима, пропуск — нет; коду можно доверить то, что нельзя доверить вероятностям.", en: "A false alarm is acceptable, a miss is not; code can be trusted with what probabilities cannot." }
+  - title: { ru: "Звук не покидает ВМ", en: "Audio never leaves the VM" }
+    choice: { ru: "ASR GigaAM и TTS Silero — локально, на CPU; наружу уходят только тексты для LLM-шлюза.", en: "GigaAM ASR and Silero TTS run locally on the CPU; only text for the LLM gateway leaves." }
+    why: { ru: "Персональные данные и записи разговоров остаются в контуре — требование 152-ФЗ.", en: "Personal data and call recordings stay inside the perimeter — a 152-FZ requirement." }
+  - title: { ru: "Агент не ходит в МИС напрямую", en: "The agent never touches the HIS directly" }
+    choice: { ru: "Все обращения к стенду — через бэкенд с очередью и лимитом 10 запросов в минуту.", en: "All calls to the stand go through the backend's queue with its 10-requests-per-minute limit." }
+    why: { ru: "Живой звонок важнее обзвона, обзвон важнее фона; стенд не падает от параллельных диалогов.", en: "A live call outranks robocalls, robocalls outrank the background; the stand does not fall over under parallel dialogues." }
+
+diagrams:
+  - id: d-ca-components
+    kind: components
+    title: { ru: "Компоненты ассистента", en: "Assistant components" }
+    nodes:
+      - { id: sip, label: SIP GW, sub: { ru: "входящие · 047", en: "inbound · 047" }, x: 0, y: 0, w: 2, d: 2, h: 0.5 }
+      - { id: ast, label: ASTERISK, sub: "ari · audioSocket", x: 6, y: 0, w: 2, d: 2, h: 1 }
+      - { id: agent, label: AGENT, sub: { ru: "vad · asr · автомат · tts", en: "vad · asr · fsm · tts" }, x: 6, y: 6, w: 2, d: 2, h: 1.5 }
+      - { id: llm, label: LLM GW, sub: "gpt-oss · gigachat", x: 0, y: 6, w: 2, d: 2, h: 0.5 }
+      - { id: backend, label: BACKEND, sub: "fastapi · очередь · панель", x: 12, y: 6, w: 2, d: 2, h: 1 }
+      - { id: pg, label: POSTGRES, sub: { ru: "слоты · звонки · обзвон", en: "slots · calls · robocalls" }, x: 18, y: 6, w: 2, d: 2, h: 1 }
+      - { id: mis, label: MIS STAND, sub: { ru: "записи · клиенты", en: "visits · clients" }, x: 18, y: 0, w: 2, d: 2, h: 0.5 }
+      - { id: panel, label: "PANEL · PULT", sub: "/panel · /pult", x: 12, y: 12, w: 2, d: 1, h: 0.5 }
+    links: [[sip, ast], [ast, agent], [agent, llm], [agent, backend], [backend, pg], [backend, mis], [panel, backend]]
+    notes:
+      sip: { ru: "SIP-шлюз организаторов: звонки с софтфонов жюри и пациентов на номер 047.", en: "The organisers' SIP gateway: calls from the jury's and patients' softphones to number 047." }
+      ast: { ru: "Asterisk 18 на хосте: диалплан, AudioSocket в агента, ARI для обзвона и переводов, записи разговоров.", en: "Asterisk 18 on the host: the dialplan, AudioSocket to the agent, ARI for robocalls and transfers, call recordings." }
+      agent: { ru: "Задача asyncio на звонок: Silero VAD, локальный ASR GigaAM, красные флаги до LLM, автомат с function calling, Silero TTS.", en: "One asyncio task per call: Silero VAD, local GigaAM ASR, red flags before the LLM, an FSM with function calling, Silero TTS." }
+      llm: { ru: "LLM-шлюз организаторов: gpt-oss-120b, резерв GigaChat-3-Pro; функции только текущего шага.", en: "The organisers' LLM gateway: gpt-oss-120b, GigaChat-3-Pro backup; only the current step's functions." }
+      backend: { ru: "FastAPI: расписание из Excel, слоты, запись в два шага, переводы, обзвон С-10/С-11, панель и пульт.", en: "FastAPI: the Excel schedule, slots, two-step booking, transfers, С-10/С-11 robocalls, the panel and the console." }
+      pg: { ru: "Postgres 16: расписание и слоты, записи, обзвон, переводы, лист ожидания, реестр звонков.", en: "Postgres 16: the schedule and slots, visits, robocalls, transfers, the waiting list, the call registry." }
+      mis: { ru: "Стенд «Регистратура» — мок МИС организаторов: клиенты, записи, заявки; лимит 10 запросов/мин.", en: "The Reception stand — the organisers' HIS mock: clients, visits, requests; a 10-requests-per-minute limit." }
+      panel: { ru: "Панель регистратора и пульт тестирования — Jinja2-страницы бэкенда, без SPA.", en: "The registrar panel and the testing console — the backend's Jinja2 pages, no SPA." }
+  - id: d-ca-call
+    kind: flow
+    title: { ru: "Входящий звонок: от речи до записи", en: "An inbound call: from speech to a booking" }
+    steps:
+      - { lane: { ru: "ПАЦИЕНТ", en: "PATIENT" }, title: { ru: "Звонит на 047", en: "Calls 047" }, text: { ru: "Софтфон → SIP-шлюз → Asterisk; диалплан создаёт call_id.", en: "Softphone → SIP gateway → Asterisk; the dialplan mints a call_id." } }
+      - { lane: ASTERISK, title: { ru: "Голос в агента", en: "Audio into the agent" }, text: { ru: "AudioSocket, TCP, 8 кГц; падение агента — запасной путь на регистратора.", en: "AudioSocket, TCP, 8 kHz; if the agent is down, a fallback route to a registrar." } }
+      - { lane: AGENT, title: { ru: "Речь в текст", en: "Speech to text" }, text: { ru: "Silero VAD находит реплику, GigaAM распознаёт локально (~0,2 с).", en: "Silero VAD finds the utterance, GigaAM recognises it locally (~0.2 s)." } }
+      - { lane: AGENT, title: { ru: "Красные флаги до LLM", en: "Red flags before the LLM" }, text: { ru: "Код по леммам; категория А — 103/112 и перевод, сценарий прерван.", en: "Code over lemmas; category A — 103/112 and a transfer, the scenario is aborted." } }
+      - { lane: LLM, title: { ru: "Понять реплику", en: "Understand the utterance" }, text: { ru: "Function calling, только функции текущего шага автомата.", en: "Function calling, only the current step's functions." } }
+      - { lane: BACKEND, title: { ru: "Слот и запись", en: "Slot and booking" }, text: { ru: "Резерв слота локально, затем создание в стенде; таймаут 5 с.", en: "Reserve the slot locally, then create it in the stand; a 5-second timeout." } }
+      - { lane: MIS STAND, title: { ru: "Запись создана", en: "Visit created" }, text: { ru: "Только теперь ассистент говорит «вы записаны» — с датой и кабинетом.", en: "Only now does the assistant say \"you are booked\" — with the date and room." } }
+  - id: d-ca-outbound
+    kind: flow
+    title: { ru: "Обзвон: напоминание и лист ожидания", en: "Robocalls: reminders and the waiting list" }
+    steps:
+      - { lane: BACKEND, title: { ru: "Накануне визита", en: "The day before" }, text: { ru: "По записи создаётся звонок-напоминание (С-10); без телефона — только SMS.", en: "A reminder call is created per visit (С-10); without a phone — SMS only." } }
+      - { lane: BACKEND, title: { ru: "Originate через ARI", en: "Originate via ARI" }, text: { ru: "Исходящий канал в Asterisk; call_id создаёт бэкенд, не диалплан.", en: "An outbound channel in Asterisk; the call_id comes from the backend, not the dialplan." } }
+      - { lane: AGENT, title: { ru: "Диалог по сценарию", en: "The scripted dialogue" }, text: { ru: "С-10: подтвердить, перенести или отменить; С-11 — предложить освободившийся слот.", en: "С-10: confirm, reschedule or cancel; С-11 — offer a freed slot." } }
+      - { lane: { ru: "ПАЦИЕНТ", en: "PATIENT" }, title: { ru: "Отвечает", en: "Answers" }, text: { ru: "Слот листа ожидания держится за ним 15 минут; после двух отказов звонит регистратор.", en: "A waiting-list slot is held for them for 15 minutes; after two refusals a registrar calls." } }
+      - { lane: BACKEND, title: { ru: "Итог", en: "The outcome" }, text: { ru: "Не дозвонились за 2 попытки — SMS-журнал; результат — в реестр звонков.", en: "Two failed attempts — the SMS log; the result goes into the call registry." } }
+  - id: d-ca-erd
+    kind: erd
+    title: { ru: "Модель данных", en: "Data model" }
+    entities:
+      - { id: doctors, name: DOCTORS, fields: [[code, varchar, PK], [specialty, varchar, FK], [department, varchar], [is_active, bool]] }
+      - { id: slots, name: SLOTS, fields: [[id, varchar, PK], [doctor_code, varchar, FK], [start, datetime], [end, datetime], [excel_status, varchar]] }
+      - { id: visits, name: VISITS, fields: [[id, serial, PK], [stand_visit_id, int, UK], [patient_id, int], [slot_id, varchar], [status, enum], [confirmed, bool]] }
+      - { id: patients, name: PATIENTS, fields: [[stand_client_id, int, PK], [phone, varchar], [reminder_calls, bool], [reminder_sms, bool]] }
+      - { id: calls, name: CALLS, fields: [[call_id, varchar, PK], [direction, enum], [ani, varchar], [result_code, varchar], [transferred, bool], [transcript_masked, json]] }
+      - { id: transfers, name: TRANSFERS, fields: [[id, serial, PK], [call_id, varchar, FK], [rule, varchar], [priority, varchar], [status, varchar], [justified, 'bool?']] }
+      - { id: reminders, name: REMINDERS, fields: [[id, serial, PK], [visit_id, int, FK], [status, varchar], [attempt, int], [next_at, datetime], [sms_sent, bool]] }
+    relations: [[doctors, slots, '1 : N'], [slots, visits, '1 : 0..1'], [patients, visits, '1 : N'], [visits, reminders, '1 : N'], [calls, transfers, '1 : N']]
+
+# Артефакты: документы — artifacts/<id>.ru.md и .en.md, остальное — файлы в artifacts/
+artifacts:
+  - id: arch-clinic
+    code: C4-01
+    type: arch
+    view: doc
+    updated: '2026.10'
+    title: { ru: "Архитектура: путь звонка", en: "Architecture: the call path" }
+    summary: { ru: "Телефония Asterisk, голосовой конвейер агента, очередь к стенду МИС и данные — как зоны BE и ML собрали на одной ВМ.", en: "Asterisk telephony, the agent's voice pipeline, the queue to the HIS stand and the data — how the BE and ML zones fit on one VM." }
+  - id: safety-clinic
+    code: NOTE-01
+    type: note
+    view: doc
+    updated: '2026.10'
+    title: { ru: "Безопасность: красные флаги", en: "Safety: red flags" }
+    summary: { ru: "Детектор на леммах до LLM: категории угрозы жизни и острого состояния, угроза себе, «скорее ложный» и корпус-инвариант.", en: "The pre-LLM lemma-based detector: life-threat and acute categories, self-harm, the probably-false nuance and the corpus invariant." }
