@@ -37,6 +37,7 @@ const works = localePath(lang, '/works/');
       <div style="flex:8 1 480px; min-width:0; display:flex; flex-direction:column; gap:20px">
         <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
           <span class="sw-label">{p.code} · {p.categoryLabel}</span>
+          {p.badge && <Badge variant="solid">{p.badge}</Badge>}
           <Badge variant={badge.variant} dot={badge.dot} pulse={badge.pulse}>{badge.label}</Badge>
           {p.demo && <Badge variant="dashed" title={T.demoTitle}>{t(lang).card.demo}</Badge>}
         </div>

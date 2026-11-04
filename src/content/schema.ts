@@ -100,6 +100,7 @@ export const ProjectSchema = z.object({
   status: str,
   year: z.number(),
   period: str.optional(),
+  badge: str.optional(),
   role: str.optional(),
   tech: z.array(str).default([]),
   cover: str.optional(),

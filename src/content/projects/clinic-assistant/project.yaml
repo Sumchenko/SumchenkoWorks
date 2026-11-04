@@ -3,7 +3,8 @@
 code: P—05
 order: 5
 demo: false
-featured: false
+featured: true
+badge: { ru: "Хакатон · 6 место", en: "Hackathon · 6th place" }
 title: { ru: "Голосовой ассистент регистратуры", en: "Clinic reception voice assistant" }
 summary:
   ru: "Хакатон «Точка сборки» 2026: ассистент отвечает на звонки поликлиники — записывает к врачу, обзванивает с напоминаниями и передаёт сложное регистратору. Команда из двух человек, моя зона — бэкенд и телефония."
@@ -11,7 +12,7 @@ summary:
 category: dev
 status: done
 year: 2026
-period: '2026.10'
+period: '2026.10.13 → 2026.10.29'
 role:
   ru: BE-зона — бэкенд FastAPI, телефония Asterisk, панель регистратора; разработка с Claude Code
   en: BE zone — the FastAPI backend, Asterisk telephony and the registrar panel; development with Claude Code
@@ -60,8 +61,8 @@ scenarios:
       - { ru: "Перевод на регистратора, в журнал уходит карточка обращения", en: "Transfer to a registrar; a case card goes into the log" }
 results:
   text:
-    ru: "Две недели, 723 коммита, около 44 тысяч строк Python (из них 14 тысяч — тесты: 779 автотестов) и eval на живой LLM — 84 из 84 контрольных диалогов без пропущенных красных флагов, выдуманных фактов и действий в МИС без подтверждения. Продуктовый чекпоинт — 8 баллов; из отборочного тура прошли в финал и заняли 6-е место."
-    en: "Two weeks, 723 commits, about 44 thousand lines of Python (14 thousand of them tests — 779 automated tests) and an eval on a live LLM: 84 of 84 control dialogs with no missed red flags, invented facts or unconfirmed HIS actions. We scored 8 points on the product checkpoint, made the final from the qualifying round and finished 6th."
+    ru: "17 дней, 723 коммита, около 44 тысяч строк Python (из них 14 тысяч — тесты: 779 автотестов) и eval на живой LLM — 84 из 84 контрольных диалогов без пропущенных красных флагов, выдуманных фактов и действий в МИС без подтверждения. Продуктовый чекпоинт — 8 баллов; из отборочного тура прошли в финал и заняли 6-е место."
+    en: "17 days, 723 commits, about 44 thousand lines of Python (14 thousand of them tests — 779 automated tests) and an eval on a live LLM: 84 of 84 control dialogs with no missed red flags, invented facts or unconfirmed HIS actions. We scored 8 points on the product checkpoint, made the final from the qualifying round and finished 6th."
   state:
     ru: "Система целиком работала на живой телефонии на ВМ хакатона — входящие на номер 047, обзвон, панель и пульт. Код пока в приватном репозитории хакатона: ссылка появится, когда выложу проект на GitHub."
     en: The whole system ran live on the hackathon VM — inbound calls to number 047, outbound calls, the panel and the console. The code still sits in the hackathon's private repository; the link will appear once I publish the project on GitHub.

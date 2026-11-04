@@ -14,6 +14,7 @@ export function ProjectCard({ p, lang }: { p: CardVM; lang: Lang }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
         <span className="sw-label">{p.code} · {p.year} · {p.categoryLabel}</span>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {p.highlight ? <Badge variant="solid">{p.highlight}</Badge> : null}
           {p.demo ? <Badge variant="dashed" title={T.demoTitle}>{T.demo}</Badge> : null}
           <Badge variant={p.badge.variant} dot={p.badge.dot} pulse={p.badge.pulse}>{p.badge.label}</Badge>
         </div>

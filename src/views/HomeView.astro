@@ -17,7 +17,8 @@ const H = T.home;
 const c = getContent(lang);
 const P = c.site.profile;
 const years = c.projects.map((p) => p.year);
-const featured = c.projects.filter((p) => p.featured).slice(0, 3).map((p) => cardVM(p, lang));
+// Избранное: до трёх проектов, новые выше (order растёт с добавлением проектов)
+const featured = c.projects.filter((p) => p.featured).sort((a, b) => b.order - a.order).slice(0, 3).map((p) => cardVM(p, lang));
 const links = contactLinks(P.links);
 const email = links.find((l) => l.id === 'email')?.href?.replace(/^mailto:/, '') || '';
 const eyebrow = P.name ? P.name + (P.location ? ' · ' + P.location : '') : H.eyebrowFallback;

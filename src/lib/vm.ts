@@ -33,7 +33,7 @@ export function projectLinks(p: Project, lang: Lang): LinkVM[] {
 
 export type CardVM = {
   id: string; href: string; code: string; year: number; categoryLabel: string; category: string;
-  title: string; summary: string; demo: boolean; badge: BadgeVM;
+  title: string; summary: string; demo: boolean; badge: BadgeVM; highlight: string | null;
   tech: string[]; techList: { id: string; label: string }[];
   coverNodes: ComponentsDiagram['nodes']; coverLinks: ComponentsDiagram['links'];
   links: LinkVM[];
@@ -45,7 +45,7 @@ export function cardVM(p: Project, lang: Lang): CardVM {
   const comp = cover && cover.kind === 'components' ? cover : null;
   return {
     id: p.id, href: p.href, code: p.code, year: p.year, categoryLabel: p.categoryLabel, category: p.category,
-    title: p.title, summary: p.summary, demo: p.demo, badge: badgeOf(p),
+    title: p.title, summary: p.summary, demo: p.demo, badge: badgeOf(p), highlight: p.badge ?? null,
     tech: p.tech, techList: p.techList,
     coverNodes: comp?.nodes ?? [], coverLinks: comp?.links ?? [],
     links: projectLinks(p, lang),

@@ -2,7 +2,7 @@
 code: P—03
 order: 3
 demo: false
-featured: true
+featured: false
 title: { ru: "AI-диспетчер задач", en: "AI task dispatcher" }
 summary:
   ru: Telegram-бот для команды ивентов — превращает текст и голосовые в карточки задач в Notion с дедлайном, приоритетом и исполнителем.
