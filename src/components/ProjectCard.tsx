@@ -8,13 +8,19 @@ export function ProjectCard({ p, lang }: { p: CardVM; lang: Lang }) {
   const T = t(lang).card;
   return (
     <Card as="article" interactive style={{ flex: 1, width: '100%', gap: 18, height: '100%' }}>
-      <div aria-hidden="true" style={{ height: 180, margin: '-24px -24px 0', borderBottom: '1px solid var(--line)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px 24px', background: 'var(--bg)' }}>
-        <IsoDiagram nodes={p.coverNodes} links={p.coverLinks} unit={16} animate={false} labels={false} style={{ maxHeight: 148 }} />
+      <div style={{ position: 'relative', margin: '-24px -24px 0', borderBottom: '1px solid var(--line)', background: 'var(--bg)' }}>
+        <div aria-hidden="true" style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px 24px' }}>
+          <IsoDiagram nodes={p.coverNodes} links={p.coverLinks} unit={16} animate={false} labels={false} style={{ maxHeight: 148 }} />
+        </div>
+        {p.highlight ? (
+          <div style={{ position: 'absolute', top: 12, right: 12 }}>
+            <Badge variant="solid">{p.highlight}</Badge>
+          </div>
+        ) : null}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
         <span className="sw-label">{p.code} · {p.year} · {p.categoryLabel}</span>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {p.highlight ? <Badge variant="solid">{p.highlight}</Badge> : null}
           {p.demo ? <Badge variant="dashed" title={T.demoTitle}>{T.demo}</Badge> : null}
           <Badge variant={p.badge.variant} dot={p.badge.dot} pulse={p.badge.pulse}>{p.badge.label}</Badge>
         </div>
