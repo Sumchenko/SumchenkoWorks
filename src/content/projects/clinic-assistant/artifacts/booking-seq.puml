@@ -1,0 +1,34 @@
+@startuml
+skinparam defaultFontSize 13
+title Двухшаговая запись: сначала резерв слота в своей БД, затем создание записи в МИС
+
+actor "Пациент" as P
+participant "Ассистент\n(VAD → GigaAM → автомат)" as A
+participant "LLM-шлюз" as L
+participant "Бэкенд FastAPI" as B
+database "Postgres" as DB
+participant "Стенд «Регистратура»\n(МИС)" as M
+
+P -> A : реплика (речь)
+A -> A : красные флаги (код, до LLM)
+A -> L : function calling шага intent
+L --> A : вызов функции с полями запроса
+A -> B : POST /api/slots/search
+B -> DB : свободные слоты\n(excel_status = «Свободен», частичный индекс)
+B --> A : slots[] (до 3)
+A -> P : «Есть время 8:00, кабинет 102…»
+P -> A : выбор дня и времени
+A -> B : POST /api/visits (slot_id)
+B -> DB : INSERT visits — резерв слота\n(частичный уникальный индекс по слоту)
+B -> M : создание записи
+M --> B : 201, stand_visit_id
+B -> M : отметка о SMS (фон, Прил. Б)
+B --> A : 201 Visit (id, врач, время, кабинет)
+A -> P : «Вы записаны…» — только после 201
+
+note over B, M
+  Повтор после 503 MIS_UNAVAILABLE безопасен:
+  бэкенд сверяет запись со стендом и вернёт
+  уже созданную, дубля не будет
+end note
+@enduml

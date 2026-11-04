@@ -1,0 +1,40 @@
+@startuml
+skinparam defaultFontSize 13
+skinparam state {
+  BackgroundColor #FDFDFD
+  BorderColor #333333
+}
+title Фрагмент диалогового автомата: сценарий записи на приём (С-01)\nДиалогом управляет конечный автомат «сценарий → шаг», LLM понимает реплику через function calling
+
+state "Приветствие\n(3.3: приветствие, согласие на запись)" as Greeting
+state "Понимание реплики\n(LLM: только функции текущего шага)" as Intent
+state "Идентификация\n(ФИО + дата рождения, 3.5)" as Identify
+state "Поиск слотов\n(slots/search)" as Slots
+state "Предложение времени" as Offer
+state "Запись\n(резерв слота + МИС)" as Book
+state "«Вы записаны»\n(только после 201 от МИС)" as Confirm
+state "Перенос записи (С-03)" as Reschedule
+state "Красный флаг\n(103/112 и перевод, R-01)" as Emergency
+state "Перевод на регистратора\n(карточка Прил. В)" as Transfer
+state "Завершение\n(finish: итог, стенограмма)" as Finish
+
+[*] --> Greeting
+Greeting --> Intent : реплика пациента\n(красные флаги проверены кодом до LLM)
+Intent --> Emergency : красный флаг категории А
+Intent --> Transfer : просьба о сотруднике (R-02)
+Intent --> Identify : intent = запись
+Intent --> Finish : справка, анализы, дом…\n(другие сценарии)
+Identify --> Slots : пациент найден
+Identify --> Transfer : не найден / неоднозначно (R-07)
+Slots --> Offer : есть время
+Slots --> Reschedule : ALREADY_BOOKED
+Slots --> Finish : времён нет — лист ожидания (С-11)
+Offer --> Book : пациент выбрал слот
+Book --> Confirm : 201 от МИС
+Book --> Transfer : сбой МИС (R-06)
+Confirm --> Finish
+Reschedule --> Finish
+Emergency --> [*]
+Transfer --> [*]
+Finish --> [*]
+@enduml

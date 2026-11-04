@@ -6,7 +6,7 @@ demo: false
 featured: false
 title: { ru: "Голосовой ассистент регистратуры", en: "Clinic reception voice assistant" }
 summary:
-  ru: "Хакатон «Точка сборки» 2026: ассистент отвечает на звонки поликлиники — записывает к врачу, обзванивает с напоминаниями и передаёт сложное регистратору. Команда из двух, моя зона — бэкенд и телефония."
+  ru: "Хакатон «Точка сборки» 2026: ассистент отвечает на звонки поликлиники — записывает к врачу, обзванивает с напоминаниями и передаёт сложное регистратору. Команда из двух человек, моя зона — бэкенд и телефония."
   en: A hackathon project ("Tochka Sborki" 2026) — a voice assistant that answers a polyclinic's calls, books appointments, makes reminder calls and hands complex cases to a human registrar. A team of two; my zone was the backend and telephony.
 category: dev
 status: done
@@ -27,7 +27,7 @@ overview:
   ru: "Пациент звонит и говорит с ассистентом как с регистратором. Речь распознаётся локально, диалогом управляет конечный автомат по регламенту, а LLM через function calling только понимает реплику. Ассистент находит свободные слоты, записывает, переносит и отменяет приём, накануне обзванивает с напоминаниями, предлагает освободившееся время первому в листе ожидания и отвечает на справочные вопросы. Фраза об угрозе жизни — красный флаг: ассистент называет 103/112 и переводит на человека; сложное уходит регистратору с карточкой обращения."
   en: "A patient calls and talks to the assistant as to a registrar. Speech is recognised locally; a finite-state machine drives the dialogue per the clinic's regulations, while the LLM only understands each utterance via function calling. The assistant finds free slots, books, reschedules and cancels appointments, makes reminder calls the day before, offers freed time to the first person on the waiting list and answers reference questions. A life-threatening phrase is a red flag: the assistant names 103/112 and transfers to a human; complex cases go to a registrar with a case card."
 purpose:
-  ru: Командный проект хакатона «Точка сборки» 2026 (кейс регистратуры поликлиники), команда из двух. Моя BE-зона — бэкенд FastAPI, телефония Asterisk, панель регистратора и пульт тестирования; напарник вёл ML-зону — голос, диалог и LLM. Зоны связаны контрактом с OpenAPI-схемой, весь код писали через Claude Code.
+  ru: Командный проект хакатона «Точка сборки» 2026 (кейс регистратуры поликлиники), команда из двух человек. Моя BE-зона — бэкенд FastAPI, телефония Asterisk, панель регистратора и пульт тестирования; напарник вёл ML-зону — голос, диалог и LLM. Зоны связаны контрактом с OpenAPI-схемой, весь код писали через Claude Code.
   en: A team project for the "Tochka Sborki" 2026 hackathon (a polyclinic reception desk case), built by two people. My BE zone was the FastAPI backend, Asterisk telephony, the registrar panel and the testing console; my teammate owned the ML zone — voice, dialogue and the LLM. The zones met in a contract with an OpenAPI schema; all the code was written with Claude Code.
 goals:
   - { ru: "Отвечать на звонок сразу, без очереди на регистратуре", en: "Answer every call immediately, with no reception queue" }
@@ -171,7 +171,48 @@ diagrams:
     relations: [[doctors, slots, '1 : N'], [slots, visits, '1 : 0..1'], [patients, visits, '1 : N'], [visits, reminders, '1 : N'], [calls, transfers, '1 : N']]
 
 # Артефакты: документы — artifacts/<id>.ru.md и .en.md, остальное — файлы в artifacts/
+# Скриншоты сняты локально (docker compose, demo-профиль, вымышленные пациенты из demo_data), 1440×900.
 artifacts:
+  - id: screen-panel-board
+    code: UI-01
+    type: ui
+    view: image
+    file: screen-panel-board.png
+    updated: '2026.11'
+    title: { ru: "Панель регистратора", en: "Registrar panel" }
+    summary: { ru: "Входящие переводы, задачи с карточкой обращения, лист ожидания и обзвон-напоминания — всё, что ассистент передал людям.", en: "Incoming transfers, tasks with the case card, the waiting list and reminder calls — everything the assistant handed to humans." }
+  - id: screen-panel-transcript
+    code: UI-02
+    type: ui
+    view: image
+    file: screen-panel-transcript.png
+    updated: '2026.11'
+    title: { ru: "Стенограмма разговора", en: "Call transcript" }
+    summary: { ru: "Диалог записи к терапевту в журнале звонков: реплики ассистента и пациента с таймингами, кнопка «Пациент против записи».", en: "A therapist-booking dialogue in the call journal: assistant and patient lines with timings, and the \"patient against recording\" button." }
+  - id: screen-panel-journal
+    code: UI-03
+    type: ui
+    view: image
+    file: screen-panel-journal.png
+    updated: '2026.11'
+    title: { ru: "Журнал переводов и звонков", en: "Transfers and calls journal" }
+    summary: { ru: "Переводы с правилом и приоритетом, задачи регистратору, звонки с итогом и длительностью; у переводов — отметка «обоснован».", en: "Transfers with rule and priority, registrar tasks, calls with outcome and duration; transfers carry a \"justified\" mark." }
+  - id: screen-panel-sms
+    code: UI-04
+    type: ui
+    view: image
+    file: screen-panel-sms.png
+    updated: '2026.11'
+    title: { ru: "SMS и показатели", en: "SMS and metrics" }
+    summary: { ru: "SMS-журнал с маскированными номерами (текст по Прил. Б) и показатели за 7 дней: доля звонков без сотрудника, время записи, экстренные звонки.", en: "The SMS log with masked numbers (texts per the template) and 7-day metrics: calls without a human, booking time, emergency calls." }
+  - id: screen-pult-data
+    code: UI-05
+    type: ui
+    view: image
+    file: screen-pult-data.png
+    updated: '2026.11'
+    title: { ru: "Пульт тестирования", en: "Testing console" }
+    summary: { ru: "Таблицы «наших данных» — записи, звонки, переводы, напоминания; живой лог звонка и чат с ассистентом рядом (ML-зона).", en: "The \"our data\" tables — visits, calls, transfers, reminders; the live call log and the assistant chat live next to it (the ML zone)." }
   - id: arch-clinic
     code: C4-01
     type: arch
@@ -186,3 +227,43 @@ artifacts:
     updated: '2026.10'
     title: { ru: "Безопасность: красные флаги", en: "Safety: red flags" }
     summary: { ru: "Детектор на леммах до LLM: категории угрозы жизни и острого состояния, угроза себе, «скорее ложный» и корпус-инвариант.", en: "The pre-LLM lemma-based detector: life-threat and acute categories, self-harm, the probably-false nuance and the corpus invariant." }
+  - id: bpmn-booking
+    code: BPMN-01
+    type: bpmn
+    view: code
+    file: booking.bpmn
+    updated: '2026.11'
+    title: { ru: "BPMN: запись пациента (С-01)", en: "BPMN: booking a visit" }
+    summary: { ru: "Процесс от звонка до «вы записаны»: красные флаги до LLM, идентификация, ALREADY_BOOKED, лист ожидания, запись в МИС с проверкой 201. Открывается в demo.bpmn.io.", en: "From the call to \"you are booked\": red flags before the LLM, identification, ALREADY_BOOKED, the waiting list, the HIS write with a 201 check. Opens in demo.bpmn.io." }
+  - id: bpmn-reminder
+    code: BPMN-02
+    type: bpmn
+    view: code
+    file: reminder-call.bpmn
+    updated: '2026.11'
+    title: { ru: "BPMN: обзвон-напоминание (С-10)", en: "BPMN: reminder call" }
+    summary: { ru: "Накануне визита: согласие на звонки, originate через ARI, две попытки, ответ пациента — подтвердить, перенести, отменить; без ответа — SMS и задача.", en: "The day before the visit: call consent, originate via ARI, two attempts, the patient confirms, reschedules or cancels; no answer — an SMS and a task." }
+  - id: uml-fsm
+    code: UML-01
+    type: uml
+    view: code
+    file: dialog-fsm.puml
+    updated: '2026.11'
+    title: { ru: "UML: автомат сценария записи", en: "UML: booking scenario FSM" }
+    summary: { ru: "Состояния диалога от приветствия до finish: красный флаг прерывает любой шаг, LLM не управляет переходами, только понимает реплику.", en: "Dialogue states from greeting to finish: a red flag interrupts any step; the LLM drives no transitions, it only understands the utterance." }
+  - id: uml-seq
+    code: UML-02
+    type: uml
+    view: code
+    file: booking-seq.puml
+    updated: '2026.11'
+    title: { ru: "UML: двухшаговая запись", en: "UML: two-step booking" }
+    summary: { ru: "Последовательность записи: резерв слота в своей БД, затем создание в МИС; повтор после 503 безопасен, дубля не будет.", en: "The booking sequence: reserve the slot in our DB, then create it in the HIS; a retry after 503 is safe and makes no duplicate." }
+  - id: openapi-agent
+    code: API-01
+    type: openapi
+    view: code
+    file: agent-backend-api.openapi.json
+    updated: '2026.11'
+    title: { ru: "OpenAPI: контракт агент ↔ бэкенд", en: "OpenAPI: agent ↔ backend contract" }
+    summary: { ru: "Машиночитаемая схема 21 ручки контракта, выгружается из pydantic-схем бэкенда; по нему работают зоны ML и BE.", en: "The machine-readable schema of the contract's 21 endpoints, exported from the backend's pydantic models; both ML and BE zones work against it." }

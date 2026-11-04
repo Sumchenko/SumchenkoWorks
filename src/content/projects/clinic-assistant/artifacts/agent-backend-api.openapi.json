@@ -1,0 +1,3851 @@
+{
+  "components": {
+    "schemas": {
+      "CallContext": {
+        "properties": {
+          "ani": {
+            "title": "Ani",
+            "type": "string"
+          },
+          "answered_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answered S"
+          },
+          "call_id": {
+            "title": "Call Id",
+            "type": "string"
+          },
+          "direction": {
+            "enum": [
+              "inbound",
+              "outbound"
+            ],
+            "title": "Direction",
+            "type": "string"
+          },
+          "now": {
+            "title": "Now",
+            "type": "string"
+          },
+          "operators_available": {
+            "title": "Operators Available",
+            "type": "boolean"
+          },
+          "previous_call": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PreviousCall"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recent_call": {
+            "title": "Recent Call",
+            "type": "boolean"
+          },
+          "reminder": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Reminder"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "transcript": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/TranscriptLine"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transcript"
+          },
+          "transfer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TransferBrief"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "waitlist_offer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WaitlistOffer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "call_id",
+          "direction",
+          "ani",
+          "now",
+          "operators_available",
+          "recent_call"
+        ],
+        "title": "CallContext",
+        "type": "object"
+      },
+      "CallFinish": {
+        "properties": {
+          "intents": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Intents",
+            "type": "array"
+          },
+          "notes": {
+            "default": "",
+            "title": "Notes",
+            "type": "string"
+          },
+          "patient_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Patient Id"
+          },
+          "recording_consent": {
+            "default": true,
+            "title": "Recording Consent",
+            "type": "boolean"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CallResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "result_code": {
+            "enum": [
+              "BOOKED",
+              "BOOKED_GP",
+              "BOOKED_PAID",
+              "RESCHEDULED",
+              "CANCELLED",
+              "CONFIRMED",
+              "INFO_GIVEN",
+              "WAITLISTED",
+              "HOME_VISIT_REQUESTED",
+              "ESCALATED",
+              "CALLBACK",
+              "EMERGENCY",
+              "COMPLAINT",
+              "GRATITUDE",
+              "WRONG_PERSON",
+              "VOICEMAIL",
+              "NO_ANSWER",
+              "OPT_OUT",
+              "DROPPED"
+            ],
+            "title": "Result Code",
+            "type": "string"
+          },
+          "resume": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Resume"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rule": {
+            "anyOf": [
+              {
+                "pattern": "^R-\\d{2}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rule"
+          },
+          "satisfaction": {
+            "title": "Satisfaction"
+          },
+          "transcript": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/TranscriptLine"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transcript"
+          },
+          "transcript_masked": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/TranscriptLine"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transcript Masked"
+          },
+          "transferred": {
+            "default": false,
+            "title": "Transferred",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "result_code"
+        ],
+        "title": "CallFinish",
+        "type": "object"
+      },
+      "CallFinishResult": {
+        "properties": {
+          "call_id": {
+            "title": "Call Id",
+            "type": "string"
+          },
+          "saved": {
+            "title": "Saved",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "call_id",
+          "saved"
+        ],
+        "title": "CallFinishResult",
+        "type": "object"
+      },
+      "CallResult": {
+        "additionalProperties": true,
+        "description": "Итог действия с записью (v0.6.1, v0.7): для записи — visit_id, doctor, specialty, start, room, sms_sent; для\nлиста ожидания — waitlist_id, specialty.",
+        "properties": {
+          "action": {
+            "enum": [
+              "booked",
+              "rescheduled",
+              "cancelled",
+              "confirmed",
+              "waitlisted",
+              "waitlist_declined",
+              "waitlist_slot_lost",
+              "waitlist_removed"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "doctor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doctor"
+          },
+          "room": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Room"
+          },
+          "sms_sent": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sms Sent"
+          },
+          "specialty": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Specialty"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "ГГГГ-ММ-ДДTЧЧ:ММ",
+            "title": "Start"
+          },
+          "visit_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visit Id"
+          },
+          "waitlist_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waitlist Id"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "title": "CallResult",
+        "type": "object"
+      },
+      "CallbackCreate": {
+        "properties": {
+          "patient_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Patient Id"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "pattern": "^\\+7\\d{10}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "preferred_time": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preferred Time"
+          },
+          "transfer_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transfer Id"
+          }
+        },
+        "title": "CallbackCreate",
+        "type": "object"
+      },
+      "CallbackResult": {
+        "properties": {
+          "callback_id": {
+            "title": "Callback Id",
+            "type": "string"
+          },
+          "eta": {
+            "title": "Eta",
+            "type": "string"
+          }
+        },
+        "required": [
+          "callback_id",
+          "eta"
+        ],
+        "title": "CallbackResult",
+        "type": "object"
+      },
+      "ClinicInfo": {
+        "additionalProperties": false,
+        "description": "`clinic`: название, номер и часовой пояс поликлиники (BE-54).",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "short_name": {
+            "title": "Short Name",
+            "type": "string"
+          },
+          "utc_offset_hours": {
+            "title": "Utc Offset Hours",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "short_name",
+          "number",
+          "utc_offset_hours"
+        ],
+        "title": "ClinicInfo",
+        "type": "object"
+      },
+      "Contacts": {
+        "additionalProperties": false,
+        "description": "`contacts`: адрес, телефон, добавочные, экстренные номера (раздел 2.1).",
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "children_entrance": {
+            "title": "Children Entrance",
+            "type": "string"
+          },
+          "emergency": {
+            "items": {
+              "$ref": "#/components/schemas/Phone"
+            },
+            "title": "Emergency",
+            "type": "array"
+          },
+          "extensions": {
+            "items": {
+              "$ref": "#/components/schemas/Extension"
+            },
+            "title": "Extensions",
+            "type": "array"
+          },
+          "ministry_hotline": {
+            "$ref": "#/components/schemas/Phone"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "online_booking": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Online Booking",
+            "type": "array"
+          },
+          "phone": {
+            "title": "Phone",
+            "type": "string"
+          },
+          "phone_note": {
+            "title": "Phone Note",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "address",
+          "children_entrance",
+          "phone",
+          "phone_note",
+          "extensions",
+          "emergency",
+          "ministry_hotline",
+          "online_booking"
+        ],
+        "title": "Contacts",
+        "type": "object"
+      },
+      "Department": {
+        "additionalProperties": false,
+        "description": "Элемент `departments`: отделение, специалисты, порядок записи и возраст (раздел 2.3).",
+        "properties": {
+          "age_max": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age Max"
+          },
+          "age_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age Min"
+          },
+          "booking": {
+            "enum": [
+              "direct",
+              "referral",
+              "paid"
+            ],
+            "title": "Booking",
+            "type": "string"
+          },
+          "department": {
+            "title": "Department",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "specialists": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Specialists",
+            "type": "array"
+          }
+        },
+        "required": [
+          "department",
+          "specialists",
+          "booking",
+          "age_min",
+          "age_max"
+        ],
+        "title": "Department",
+        "type": "object"
+      },
+      "Doctor": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "full_name": {
+            "title": "Full Name",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "room": {
+            "title": "Room",
+            "type": "string"
+          },
+          "short_name": {
+            "title": "Short Name",
+            "type": "string"
+          },
+          "specialty": {
+            "title": "Specialty",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "full_name",
+          "short_name",
+          "specialty",
+          "room",
+          "is_active"
+        ],
+        "title": "Doctor",
+        "type": "object"
+      },
+      "DoctorSchedule": {
+        "properties": {
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/ScheduleDay"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "doctor": {
+            "$ref": "#/components/schemas/Doctor"
+          }
+        },
+        "required": [
+          "doctor",
+          "days"
+        ],
+        "title": "DoctorSchedule",
+        "type": "object"
+      },
+      "ErrorDetail": {
+        "properties": {
+          "code": {
+            "description": "код ошибки контракта: VALIDATION, SLOT_TAKEN, MIS_UNAVAILABLE, …",
+            "title": "Code",
+            "type": "string"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Details"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "description": "Ошибка в формате контракта (`app/errors.py`): `{\"error\": {\"code\", \"message\", \"details\"}}`.",
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "Extension": {
+        "additionalProperties": false,
+        "properties": {
+          "ext": {
+            "title": "Ext",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "ext"
+        ],
+        "title": "Extension",
+        "type": "object"
+      },
+      "Holiday": {
+        "additionalProperties": false,
+        "properties": {
+          "date": {
+            "description": "ГГГГ-ММ-ДД",
+            "title": "Date",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "date",
+          "name"
+        ],
+        "title": "Holiday",
+        "type": "object"
+      },
+      "Hours": {
+        "additionalProperties": false,
+        "description": "`hours`: часы работы подразделений и праздники (раздел 2.2).",
+        "properties": {
+          "holidays": {
+            "items": {
+              "$ref": "#/components/schemas/Holiday"
+            },
+            "title": "Holidays",
+            "type": "array"
+          },
+          "holidays_note": {
+            "title": "Holidays Note",
+            "type": "string"
+          },
+          "units": {
+            "items": {
+              "$ref": "#/components/schemas/HoursUnit"
+            },
+            "title": "Units",
+            "type": "array"
+          }
+        },
+        "required": [
+          "units",
+          "holidays",
+          "holidays_note"
+        ],
+        "title": "Hours",
+        "type": "object"
+      },
+      "HoursUnit": {
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "saturday": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Span"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sunday": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Span"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sunday_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sunday Note"
+          },
+          "weekdays": {
+            "$ref": "#/components/schemas/Span"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "weekdays",
+          "saturday",
+          "sunday"
+        ],
+        "title": "HoursUnit",
+        "type": "object"
+      },
+      "IdentifyResult": {
+        "properties": {
+          "candidates_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidates Count"
+          },
+          "patient": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Patient"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "found",
+              "not_found",
+              "multiple"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "IdentifyResult",
+        "type": "object"
+      },
+      "LabTime": {
+        "additionalProperties": false,
+        "description": "Элемент `lab_times`: срок готовности анализа, дней (раздел 2.5).",
+        "properties": {
+          "days_max": {
+            "title": "Days Max",
+            "type": "integer"
+          },
+          "days_min": {
+            "title": "Days Min",
+            "type": "integer"
+          },
+          "test": {
+            "title": "Test",
+            "type": "string"
+          }
+        },
+        "required": [
+          "test",
+          "days_min",
+          "days_max"
+        ],
+        "title": "LabTime",
+        "type": "object"
+      },
+      "Patient": {
+        "properties": {
+          "age": {
+            "title": "Age",
+            "type": "integer"
+          },
+          "birth_date": {
+            "format": "date",
+            "title": "Birth Date",
+            "type": "string"
+          },
+          "first_name": {
+            "title": "First Name",
+            "type": "string"
+          },
+          "has_phone": {
+            "default": false,
+            "title": "Has Phone",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "last_name": {
+            "title": "Last Name",
+            "type": "string"
+          },
+          "middle_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Middle Name"
+          },
+          "reminder_calls": {
+            "title": "Reminder Calls",
+            "type": "boolean"
+          },
+          "reminder_sms": {
+            "default": true,
+            "title": "Reminder Sms",
+            "type": "boolean"
+          },
+          "trusted_person": {
+            "title": "Trusted Person",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "last_name",
+          "first_name",
+          "middle_name",
+          "birth_date",
+          "age",
+          "trusted_person",
+          "reminder_calls"
+        ],
+        "title": "Patient",
+        "type": "object"
+      },
+      "PatientQuery": {
+        "properties": {
+          "birth_date": {
+            "format": "date",
+            "title": "Birth Date",
+            "type": "string"
+          },
+          "first_name": {
+            "minLength": 1,
+            "title": "First Name",
+            "type": "string"
+          },
+          "last_name": {
+            "minLength": 1,
+            "title": "Last Name",
+            "type": "string"
+          },
+          "middle_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Middle Name"
+          }
+        },
+        "required": [
+          "last_name",
+          "first_name",
+          "birth_date"
+        ],
+        "title": "PatientQuery",
+        "type": "object"
+      },
+      "PggTerm": {
+        "additionalProperties": false,
+        "description": "Элемент `pgg_terms`: срок ожидания по ПГГ (раздел 2.4).",
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "max_wait": {
+            "title": "Max Wait",
+            "type": "string"
+          },
+          "unit": {
+            "enum": [
+              "hours",
+              "days",
+              "working_days"
+            ],
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "kind",
+          "max_wait",
+          "value",
+          "unit"
+        ],
+        "title": "PggTerm",
+        "type": "object"
+      },
+      "Phone": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "number": {
+            "title": "Number",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "number"
+        ],
+        "title": "Phone",
+        "type": "object"
+      },
+      "PhoneUpdate": {
+        "properties": {
+          "phone": {
+            "pattern": "^\\+7\\d{10}$",
+            "title": "Phone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "phone"
+        ],
+        "title": "PhoneUpdate",
+        "type": "object"
+      },
+      "PreferencesUpdate": {
+        "properties": {
+          "reminder_calls": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reminder Calls"
+          },
+          "reminder_sms": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reminder Sms"
+          }
+        },
+        "title": "PreferencesUpdate",
+        "type": "object"
+      },
+      "PreviousCall": {
+        "description": "Прошлый завершённый звонок с того же номера за 30 минут (3.3, v0.7.6). Сведений о пациенте нет: с номера может\nзвонить другой человек.",
+        "properties": {
+          "ended_at": {
+            "title": "Ended At",
+            "type": "string"
+          },
+          "intents": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Intents",
+            "type": "array"
+          },
+          "result_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result Code"
+          },
+          "resume": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Resume"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "ended_at",
+          "result_code",
+          "intents",
+          "resume"
+        ],
+        "title": "PreviousCall",
+        "type": "object"
+      },
+      "Price": {
+        "additionalProperties": false,
+        "description": "Элемент `prices`: платная услуга (раздел 2.6).",
+        "properties": {
+          "price_from": {
+            "title": "Price From",
+            "type": "boolean"
+          },
+          "price_rub": {
+            "title": "Price Rub",
+            "type": "integer"
+          },
+          "service": {
+            "title": "Service",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service",
+          "price_rub",
+          "price_from"
+        ],
+        "title": "Price",
+        "type": "object"
+      },
+      "Reminder": {
+        "properties": {
+          "attempt": {
+            "title": "Attempt",
+            "type": "integer"
+          },
+          "patient_age": {
+            "title": "Patient Age",
+            "type": "integer"
+          },
+          "patient_first_name": {
+            "title": "Patient First Name",
+            "type": "string"
+          },
+          "patient_middle_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Patient Middle Name"
+          },
+          "visit": {
+            "$ref": "#/components/schemas/Visit"
+          }
+        },
+        "required": [
+          "visit",
+          "patient_first_name",
+          "patient_middle_name",
+          "patient_age",
+          "attempt"
+        ],
+        "title": "Reminder",
+        "type": "object"
+      },
+      "Resume": {
+        "additionalProperties": true,
+        "description": "Недоведённый вопрос (v0.7.6): цель звонка и врач, о котором шла речь. ФИО, дат и записей нет.",
+        "properties": {
+          "intent": {
+            "description": "код интента I-xx",
+            "title": "Intent",
+            "type": "string"
+          },
+          "specialty": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Specialty"
+          }
+        },
+        "required": [
+          "intent"
+        ],
+        "title": "Resume",
+        "type": "object"
+      },
+      "ScheduleDay": {
+        "properties": {
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From"
+          },
+          "status": {
+            "enum": [
+              "work",
+              "day_off",
+              "vacation",
+              "sick",
+              "training",
+              "holiday"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To"
+          }
+        },
+        "required": [
+          "date",
+          "status"
+        ],
+        "title": "ScheduleDay",
+        "type": "object"
+      },
+      "Slot": {
+        "properties": {
+          "doctor": {
+            "$ref": "#/components/schemas/Doctor"
+          },
+          "duration_min": {
+            "title": "Duration Min",
+            "type": "integer"
+          },
+          "room": {
+            "title": "Room",
+            "type": "string"
+          },
+          "slot_id": {
+            "title": "Slot Id",
+            "type": "string"
+          },
+          "start": {
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slot_id",
+          "doctor",
+          "start",
+          "duration_min",
+          "room"
+        ],
+        "title": "Slot",
+        "type": "object"
+      },
+      "SlotSearch": {
+        "properties": {
+          "date_from": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date From"
+          },
+          "date_to": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date To"
+          },
+          "doctor_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doctor Id"
+          },
+          "exclude_weekdays": {
+            "default": [],
+            "items": {
+              "maximum": 7.0,
+              "minimum": 1.0,
+              "type": "integer"
+            },
+            "title": "Exclude Weekdays",
+            "type": "array"
+          },
+          "limit": {
+            "default": 3,
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "part_of_day": {
+            "default": "any",
+            "enum": [
+              "any",
+              "morning",
+              "afternoon",
+              "evening"
+            ],
+            "title": "Part Of Day",
+            "type": "string"
+          },
+          "patient_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Patient Id"
+          },
+          "prefer": {
+            "default": "earliest",
+            "enum": [
+              "earliest",
+              "latest"
+            ],
+            "title": "Prefer",
+            "type": "string"
+          },
+          "specialty": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Specialty"
+          }
+        },
+        "title": "SlotSearch",
+        "type": "object"
+      },
+      "SlotSearchResult": {
+        "properties": {
+          "active_visit": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Visit"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "pgg_violation": {
+            "title": "Pgg Violation",
+            "type": "boolean"
+          },
+          "slots": {
+            "items": {
+              "$ref": "#/components/schemas/Slot"
+            },
+            "title": "Slots",
+            "type": "array"
+          },
+          "waitlist_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waitlist Id"
+          }
+        },
+        "required": [
+          "slots",
+          "pgg_violation"
+        ],
+        "title": "SlotSearchResult",
+        "type": "object"
+      },
+      "SmsCreate": {
+        "properties": {
+          "patient_id": {
+            "title": "Patient Id",
+            "type": "integer"
+          },
+          "template": {
+            "enum": [
+              "booked",
+              "rescheduled",
+              "cancelled",
+              "reminder",
+              "visits",
+              "waitlist",
+              "callback_failed",
+              "address"
+            ],
+            "title": "Template",
+            "type": "string"
+          },
+          "visit_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visit Id"
+          }
+        },
+        "required": [
+          "patient_id",
+          "template"
+        ],
+        "title": "SmsCreate",
+        "type": "object"
+      },
+      "SmsResult": {
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "no_phone",
+                  "no_visits"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "sent": {
+            "title": "Sent",
+            "type": "boolean"
+          },
+          "sms_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sms Id"
+          }
+        },
+        "required": [
+          "sms_id",
+          "sent"
+        ],
+        "title": "SmsResult",
+        "type": "object"
+      },
+      "Span": {
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "description": "ЧЧ:ММ",
+            "title": "From",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "to": {
+            "description": "ЧЧ:ММ",
+            "title": "To",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ],
+        "title": "Span",
+        "type": "object"
+      },
+      "Specialty": {
+        "properties": {
+          "age_max": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age Max"
+          },
+          "age_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age Min"
+          },
+          "booking": {
+            "enum": [
+              "direct",
+              "referral",
+              "paid"
+            ],
+            "title": "Booking",
+            "type": "string"
+          },
+          "department": {
+            "title": "Department",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "slot_minutes": {
+            "title": "Slot Minutes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "department",
+          "age_min",
+          "age_max",
+          "booking",
+          "slot_minutes"
+        ],
+        "title": "Specialty",
+        "type": "object"
+      },
+      "StatedIdentity": {
+        "properties": {
+          "birth_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Birth Date"
+          },
+          "first_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "middle_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Middle Name"
+          }
+        },
+        "title": "StatedIdentity",
+        "type": "object"
+      },
+      "TranscriptLine": {
+        "additionalProperties": true,
+        "description": "Реплика стенограммы (v0.8.0): кто, что и когда — секунды от ответа на звонок.",
+        "properties": {
+          "at_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At S"
+          },
+          "role": {
+            "enum": [
+              "patient",
+              "assistant"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "text"
+        ],
+        "title": "TranscriptLine",
+        "type": "object"
+      },
+      "TransferBrief": {
+        "properties": {
+          "priority": {
+            "pattern": "^P[1-4]$",
+            "title": "Priority",
+            "type": "string"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "connecting",
+              "no_operators",
+              "after_hours",
+              "task_created",
+              "answered",
+              "timeout"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "transfer_id": {
+            "title": "Transfer Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "transfer_id",
+          "status",
+          "priority",
+          "rule"
+        ],
+        "title": "TransferBrief",
+        "type": "object"
+      },
+      "TransferCreate": {
+        "properties": {
+          "connect": {
+            "default": true,
+            "title": "Connect",
+            "type": "boolean"
+          },
+          "dissatisfied": {
+            "default": false,
+            "title": "Dissatisfied",
+            "type": "boolean"
+          },
+          "intent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intent"
+          },
+          "params": {
+            "additionalProperties": true,
+            "default": {},
+            "title": "Params",
+            "type": "object"
+          },
+          "patient_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Patient Id"
+          },
+          "priority": {
+            "pattern": "^P[1-4]$",
+            "title": "Priority",
+            "type": "string"
+          },
+          "recording_consent": {
+            "default": true,
+            "title": "Recording Consent",
+            "type": "boolean"
+          },
+          "rule": {
+            "pattern": "^R-\\d{2}$",
+            "title": "Rule",
+            "type": "string"
+          },
+          "stated_identity": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StatedIdentity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "summary": {
+            "default": "",
+            "title": "Summary",
+            "type": "string"
+          },
+          "target": {
+            "enum": [
+              "M2",
+              "M3",
+              "M4-S",
+              "M4-P",
+              "M4-N"
+            ],
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rule",
+          "priority",
+          "target"
+        ],
+        "title": "TransferCreate",
+        "type": "object"
+      },
+      "TransferResult": {
+        "properties": {
+          "callback_eta_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Callback Eta Min"
+          },
+          "priority": {
+            "pattern": "^P[1-4]$",
+            "title": "Priority",
+            "type": "string"
+          },
+          "sms_sent": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sms Sent"
+          },
+          "status": {
+            "enum": [
+              "connecting",
+              "no_operators",
+              "after_hours",
+              "task_created",
+              "answered",
+              "timeout"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "transfer_id": {
+            "title": "Transfer Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "transfer_id",
+          "status",
+          "callback_eta_min",
+          "priority"
+        ],
+        "title": "TransferResult",
+        "type": "object"
+      },
+      "Visit": {
+        "properties": {
+          "confirmed": {
+            "title": "Confirmed",
+            "type": "boolean"
+          },
+          "doctor": {
+            "$ref": "#/components/schemas/Doctor"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "patient_id": {
+            "title": "Patient Id",
+            "type": "integer"
+          },
+          "room": {
+            "title": "Room",
+            "type": "string"
+          },
+          "sms_sent": {
+            "default": false,
+            "title": "Sms Sent",
+            "type": "boolean"
+          },
+          "start": {
+            "title": "Start",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "planned",
+              "cancelled",
+              "completed"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "patient_id",
+          "doctor",
+          "start",
+          "room",
+          "status",
+          "confirmed"
+        ],
+        "title": "Visit",
+        "type": "object"
+      },
+      "VisitCancel": {
+        "properties": {
+          "reason": {
+            "default": "patient_request",
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "title": "VisitCancel",
+        "type": "object"
+      },
+      "VisitCreate": {
+        "properties": {
+          "patient_id": {
+            "title": "Patient Id",
+            "type": "integer"
+          },
+          "slot_id": {
+            "title": "Slot Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "patient_id",
+          "slot_id"
+        ],
+        "title": "VisitCreate",
+        "type": "object"
+      },
+      "VisitReschedule": {
+        "properties": {
+          "slot_id": {
+            "title": "Slot Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slot_id"
+        ],
+        "title": "VisitReschedule",
+        "type": "object"
+      },
+      "WaitlistCreate": {
+        "properties": {
+          "doctor_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doctor Id"
+          },
+          "patient_id": {
+            "title": "Patient Id",
+            "type": "integer"
+          },
+          "preferences": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preferences"
+          },
+          "specialty": {
+            "title": "Specialty",
+            "type": "string"
+          }
+        },
+        "required": [
+          "patient_id",
+          "specialty"
+        ],
+        "title": "WaitlistCreate",
+        "type": "object"
+      },
+      "WaitlistOffer": {
+        "description": "Исходящий звонок из листа ожидания (С-11, v0.7): какое время предлагаем и до какого момента оно за пациентом.\nФамилию не передаём, как и в `reminder` (3.5).",
+        "properties": {
+          "attempt": {
+            "title": "Attempt",
+            "type": "integer"
+          },
+          "declines": {
+            "title": "Declines",
+            "type": "integer"
+          },
+          "hold_until": {
+            "title": "Hold Until",
+            "type": "string"
+          },
+          "patient_age": {
+            "title": "Patient Age",
+            "type": "integer"
+          },
+          "patient_first_name": {
+            "title": "Patient First Name",
+            "type": "string"
+          },
+          "patient_id": {
+            "title": "Patient Id",
+            "type": "integer"
+          },
+          "patient_middle_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Patient Middle Name"
+          },
+          "slot": {
+            "$ref": "#/components/schemas/Slot"
+          },
+          "specialty": {
+            "title": "Specialty",
+            "type": "string"
+          },
+          "waitlist_id": {
+            "title": "Waitlist Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "waitlist_id",
+          "patient_id",
+          "patient_first_name",
+          "patient_middle_name",
+          "patient_age",
+          "specialty",
+          "slot",
+          "hold_until",
+          "declines",
+          "attempt"
+        ],
+        "title": "WaitlistOffer",
+        "type": "object"
+      },
+      "WaitlistResult": {
+        "properties": {
+          "sms_sent": {
+            "default": false,
+            "title": "Sms Sent",
+            "type": "boolean"
+          },
+          "waitlist_id": {
+            "title": "Waitlist Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "waitlist_id"
+        ],
+        "title": "WaitlistResult",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Сгенерировано из pydantic-схем бэкенда (`python -m app.contract_schema`). Текст, смысл полей и changelog — docs/contracts/agent-backend-api.md.",
+    "title": "Контракт агент ↔ бэкенд",
+    "version": "0.8.4"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/callbacks": {
+      "post": {
+        "operationId": "create_callback_api_callbacks_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CallbackCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CallbackResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Create Callback",
+        "tags": [
+          "transfers"
+        ]
+      }
+    },
+    "/api/calls/{call_id}/context": {
+      "get": {
+        "operationId": "call_context_api_calls__call_id__context_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "call_id",
+            "required": true,
+            "schema": {
+              "title": "Call Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CallContext"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Call Context",
+        "tags": [
+          "calls"
+        ]
+      }
+    },
+    "/api/calls/{call_id}/finish": {
+      "post": {
+        "operationId": "call_finish_api_calls__call_id__finish_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "call_id",
+            "required": true,
+            "schema": {
+              "title": "Call Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CallFinish"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CallFinishResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Call Finish",
+        "tags": [
+          "calls"
+        ]
+      }
+    },
+    "/api/doctors": {
+      "get": {
+        "operationId": "doctors_api_doctors_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "specialty",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Specialty"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Doctor"
+                  },
+                  "title": "Response Doctors Api Doctors Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Doctors",
+        "tags": [
+          "reference"
+        ]
+      }
+    },
+    "/api/doctors/{doctor_id}/schedule": {
+      "get": {
+        "operationId": "doctor_schedule_api_doctors__doctor_id__schedule_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "doctor_id",
+            "required": true,
+            "schema": {
+              "title": "Doctor Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date To"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoctorSchedule"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Doctor Schedule",
+        "tags": [
+          "reference"
+        ]
+      }
+    },
+    "/api/patients": {
+      "post": {
+        "operationId": "register_patient_api_patients_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatientQuery"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Patient"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Register Patient",
+        "tags": [
+          "patients"
+        ]
+      }
+    },
+    "/api/patients/identify": {
+      "post": {
+        "operationId": "identify_patient_api_patients_identify_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatientQuery"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentifyResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Identify Patient",
+        "tags": [
+          "patients"
+        ]
+      }
+    },
+    "/api/patients/{patient_id}/phone": {
+      "put": {
+        "operationId": "set_phone_api_patients__patient_id__phone_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "patient_id",
+            "required": true,
+            "schema": {
+              "title": "Patient Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhoneUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Patient"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Set Phone",
+        "tags": [
+          "patients"
+        ]
+      }
+    },
+    "/api/patients/{patient_id}/preferences": {
+      "patch": {
+        "operationId": "set_preferences_api_patients__patient_id__preferences_patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "patient_id",
+            "required": true,
+            "schema": {
+              "title": "Patient Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreferencesUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Patient"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Set Preferences",
+        "tags": [
+          "patients"
+        ]
+      }
+    },
+    "/api/patients/{patient_id}/visits": {
+      "get": {
+        "operationId": "patient_visits_api_patients__patient_id__visits_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "patient_id",
+            "required": true,
+            "schema": {
+              "title": "Patient Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "planned",
+                    "cancelled",
+                    "completed"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Visit"
+                  },
+                  "title": "Response Patient Visits Api Patients  Patient Id  Visits Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Patient Visits",
+        "tags": [
+          "visits"
+        ]
+      }
+    },
+    "/api/reference/{topic}": {
+      "get": {
+        "description": "Справочные данные раздела 2 регламента: clinic — поликлиника, contacts — контакты, hours — режим работы и\nпраздники, departments — отделения и порядок записи, pgg_terms — сроки ПГГ, lab_times — сроки готовности\nанализов, prices — цены.",
+        "operationId": "reference_api_reference__topic__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "topic",
+            "required": true,
+            "schema": {
+              "enum": [
+                "clinic",
+                "contacts",
+                "hours",
+                "departments",
+                "pgg_terms",
+                "lab_times",
+                "prices"
+              ],
+              "title": "Topic",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ClinicInfo"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Contacts"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Hours"
+                    },
+                    {
+                      "items": {
+                        "$ref": "#/components/schemas/Department"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "items": {
+                        "$ref": "#/components/schemas/PggTerm"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "items": {
+                        "$ref": "#/components/schemas/LabTime"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "items": {
+                        "$ref": "#/components/schemas/Price"
+                      },
+                      "type": "array"
+                    }
+                  ],
+                  "title": "Response 200 Reference Api Reference  Topic  Get"
+                }
+              }
+            },
+            "description": "раздел справочника: форма — по `topic`"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Reference",
+        "tags": [
+          "reference"
+        ]
+      }
+    },
+    "/api/slots/search": {
+      "post": {
+        "operationId": "search_slots_api_slots_search_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SlotSearch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlotSearchResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Search Slots",
+        "tags": [
+          "slots"
+        ]
+      }
+    },
+    "/api/sms": {
+      "post": {
+        "description": "SMS пациенту по шаблону Прил. Б, только на номер из МИС (D-021).",
+        "operationId": "send_sms_api_sms_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmsCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmsResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Send Sms",
+        "tags": [
+          "visits"
+        ]
+      }
+    },
+    "/api/specialties": {
+      "get": {
+        "operationId": "specialties_api_specialties_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Specialty"
+                  },
+                  "title": "Response Specialties Api Specialties Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Specialties",
+        "tags": [
+          "reference"
+        ]
+      }
+    },
+    "/api/transfers": {
+      "post": {
+        "operationId": "create_transfer_api_transfers_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Create Transfer",
+        "tags": [
+          "transfers"
+        ]
+      }
+    },
+    "/api/transfers/{transfer_id}": {
+      "get": {
+        "operationId": "get_transfer_api_transfers__transfer_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "transfer_id",
+            "required": true,
+            "schema": {
+              "title": "Transfer Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Get Transfer",
+        "tags": [
+          "transfers"
+        ]
+      }
+    },
+    "/api/visits": {
+      "post": {
+        "operationId": "create_visit_api_visits_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VisitCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Visit"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Create Visit",
+        "tags": [
+          "visits"
+        ]
+      }
+    },
+    "/api/visits/{visit_id}/cancel": {
+      "post": {
+        "operationId": "cancel_visit_api_visits__visit_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "visit_id",
+            "required": true,
+            "schema": {
+              "title": "Visit Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/VisitCancel"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Visit"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Cancel Visit",
+        "tags": [
+          "visits"
+        ]
+      }
+    },
+    "/api/visits/{visit_id}/confirm": {
+      "post": {
+        "operationId": "confirm_visit_api_visits__visit_id__confirm_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "visit_id",
+            "required": true,
+            "schema": {
+              "title": "Visit Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Visit"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Confirm Visit",
+        "tags": [
+          "visits"
+        ]
+      }
+    },
+    "/api/visits/{visit_id}/reschedule": {
+      "post": {
+        "operationId": "reschedule_visit_api_visits__visit_id__reschedule_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "visit_id",
+            "required": true,
+            "schema": {
+              "title": "Visit Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VisitReschedule"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Visit"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Reschedule Visit",
+        "tags": [
+          "visits"
+        ]
+      }
+    },
+    "/api/waitlist": {
+      "post": {
+        "operationId": "add_waitlist_api_waitlist_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WaitlistCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WaitlistResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Add Waitlist",
+        "tags": [
+          "transfers"
+        ]
+      }
+    }
+  }
+}

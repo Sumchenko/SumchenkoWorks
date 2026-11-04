@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_Reminder"
+                  targetNamespace="https://sapigateam.example/bpmn/clinic-reminder">
+
+  <bpmn:collaboration id="Collaboration_Reminder">
+    <bpmn:participant id="Participant_Reminder" name="Обзвон-напоминание о приёме (С-10)" processRef="Process_Reminder" />
+  </bpmn:collaboration>
+
+  <bpmn:process id="Process_Reminder" name="Обзвон-напоминание" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_Reminder">
+      <bpmn:lane id="Lane_Planner" name="Бэкенд (планировщик)">
+        <bpmn:flowNodeRef>Start_Tomorrow</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Pick</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GW_Consent</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SmsOnly</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Sms</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Originate</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Assistant" name="Голосовой ассистент">
+        <bpmn:flowNodeRef>GW_Answered</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GW_Retry</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SmsFail</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Fail</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Dialog</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GW_Reply</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Confirm</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Confirmed</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Resched</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Rescheduled</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Cancel</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Cancelled</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Bye</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Silence</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Patient" name="Пациент">
+        <bpmn:flowNodeRef>Task_Answer</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <bpmn:startEvent id="Start_Tomorrow" name="Запись на завтра, 10:00–19:00">
+      <bpmn:outgoing>Flow_01</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_Pick" name="Выбирает записи на завтра (очередь обзвона)">
+      <bpmn:incoming>Flow_01</bpmn:incoming>
+      <bpmn:outgoing>Flow_02</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="GW_Consent" name="Согласие на звонки?">
+      <bpmn:incoming>Flow_02</bpmn:incoming>
+      <bpmn:outgoing>Flow_03</bpmn:outgoing>
+      <bpmn:outgoing>Flow_04</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Task_SmsOnly" name="SMS-напоминание по шаблону (Прил. Б)">
+      <bpmn:incoming>Flow_03</bpmn:incoming>
+      <bpmn:outgoing>Flow_05</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="End_Sms" name="Без звонка">
+      <bpmn:incoming>Flow_05</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="Task_Originate" name="Originate через ARI, call_id создаёт бэкенд">
+      <bpmn:incoming>Flow_04</bpmn:incoming>
+      <bpmn:incoming>Flow_08</bpmn:incoming>
+      <bpmn:outgoing>Flow_06</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="GW_Answered" name="Ответил?">
+      <bpmn:incoming>Flow_06</bpmn:incoming>
+      <bpmn:outgoing>Flow_07</bpmn:outgoing>
+      <bpmn:outgoing>Flow_10</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="GW_Retry" name="2-я попытка?">
+      <bpmn:incoming>Flow_07</bpmn:incoming>
+      <bpmn:outgoing>Flow_08</bpmn:outgoing>
+      <bpmn:outgoing>Flow_09</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Task_SmsFail" name="«Мы пытались дозвониться» + задача регистратору">
+      <bpmn:incoming>Flow_09</bpmn:incoming>
+      <bpmn:outgoing>Flow_09b</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="End_Fail" name="Не дозвонились">
+      <bpmn:incoming>Flow_09b</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="Task_Dialog" name="Напоминание: дата, время, кабинет (С-10)">
+      <bpmn:incoming>Flow_10</bpmn:incoming>
+      <bpmn:outgoing>Flow_11</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_Answer" name="Подтверждает, просит перенос или отмену">
+      <bpmn:incoming>Flow_11</bpmn:incoming>
+      <bpmn:outgoing>Flow_12</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="GW_Reply" name="Ответ пациента?">
+      <bpmn:incoming>Flow_12</bpmn:incoming>
+      <bpmn:outgoing>Flow_13</bpmn:outgoing>
+      <bpmn:outgoing>Flow_15</bpmn:outgoing>
+      <bpmn:outgoing>Flow_17</bpmn:outgoing>
+      <bpmn:outgoing>Flow_19</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Task_Confirm" name="Подтверждение визита (visits/confirm)">
+      <bpmn:incoming>Flow_13</bpmn:incoming>
+      <bpmn:outgoing>Flow_14</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="End_Confirmed" name="Приём подтверждён">
+      <bpmn:incoming>Flow_14</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="Task_Resched" name="Подбор нового слота (С-03)">
+      <bpmn:incoming>Flow_15</bpmn:incoming>
+      <bpmn:outgoing>Flow_16</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="End_Rescheduled" name="Приём перенесён">
+      <bpmn:incoming>Flow_16</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="Task_Cancel" name="Отмена записи (visits/cancel)">
+      <bpmn:incoming>Flow_17</bpmn:incoming>
+      <bpmn:outgoing>Flow_18</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="End_Cancelled" name="Приём отменён">
+      <bpmn:incoming>Flow_18</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="Task_Bye" name="Прощание (3.6), отбой через 3 с тишины">
+      <bpmn:incoming>Flow_19</bpmn:incoming>
+      <bpmn:outgoing>Flow_20</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="End_Silence" name="Итог в реестре звонков (finish)">
+      <bpmn:incoming>Flow_20</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_01" sourceRef="Start_Tomorrow" targetRef="Task_Pick" />
+    <bpmn:sequenceFlow id="Flow_02" sourceRef="Task_Pick" targetRef="GW_Consent" />
+    <bpmn:sequenceFlow id="Flow_03" name="нет, только SMS" sourceRef="GW_Consent" targetRef="Task_SmsOnly" />
+    <bpmn:sequenceFlow id="Flow_05" sourceRef="Task_SmsOnly" targetRef="End_Sms" />
+    <bpmn:sequenceFlow id="Flow_04" name="да" sourceRef="GW_Consent" targetRef="Task_Originate" />
+    <bpmn:sequenceFlow id="Flow_06" sourceRef="Task_Originate" targetRef="GW_Answered" />
+    <bpmn:sequenceFlow id="Flow_07" name="не ответил" sourceRef="GW_Answered" targetRef="GW_Retry" />
+    <bpmn:sequenceFlow id="Flow_08" name="да, повтор через 2 ч" sourceRef="GW_Retry" targetRef="Task_Originate" />
+    <bpmn:sequenceFlow id="Flow_09" name="нет" sourceRef="GW_Retry" targetRef="Task_SmsFail" />
+    <bpmn:sequenceFlow id="Flow_09b" sourceRef="Task_SmsFail" targetRef="End_Fail" />
+    <bpmn:sequenceFlow id="Flow_10" name="ответил" sourceRef="GW_Answered" targetRef="Task_Dialog" />
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="Task_Dialog" targetRef="Task_Answer" />
+    <bpmn:sequenceFlow id="Flow_12" sourceRef="Task_Answer" targetRef="GW_Reply" />
+    <bpmn:sequenceFlow id="Flow_13" name="подтвердит" sourceRef="GW_Reply" targetRef="Task_Confirm" />
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="Task_Confirm" targetRef="End_Confirmed" />
+    <bpmn:sequenceFlow id="Flow_15" name="перенесёт" sourceRef="GW_Reply" targetRef="Task_Resched" />
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="Task_Resched" targetRef="End_Rescheduled" />
+    <bpmn:sequenceFlow id="Flow_17" name="отменит" sourceRef="GW_Reply" targetRef="Task_Cancel" />
+    <bpmn:sequenceFlow id="Flow_18" sourceRef="Task_Cancel" targetRef="End_Cancelled" />
+    <bpmn:sequenceFlow id="Flow_19" name="молчит" sourceRef="GW_Reply" targetRef="Task_Bye" />
+    <bpmn:sequenceFlow id="Flow_20" sourceRef="Task_Bye" targetRef="End_Silence" />
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="Diagram_Reminder">
+    <bpmndi:BPMNPlane id="Plane_Reminder" bpmnElement="Collaboration_Reminder">
+      <bpmndi:BPMNShape id="Participant_Reminder_di" bpmnElement="Participant_Reminder" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1460" height="760" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Planner_di" bpmnElement="Lane_Planner" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="1430" height="220" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Assistant_di" bpmnElement="Lane_Assistant" isHorizontal="true">
+        <dc:Bounds x="190" y="300" width="1430" height="380" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Patient_di" bpmnElement="Lane_Patient" isHorizontal="true">
+        <dc:Bounds x="190" y="680" width="1430" height="160" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Start_Tomorrow_di" bpmnElement="Start_Tomorrow">
+        <dc:Bounds x="240" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="196" y="120" width="128" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Pick_di" bpmnElement="Task_Pick">
+        <dc:Bounds x="320" y="130" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Consent_di" bpmnElement="GW_Consent" isMarkerVisible="true">
+        <dc:Bounds x="500" y="145" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="465" y="100" width="120" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SmsOnly_di" bpmnElement="Task_SmsOnly">
+        <dc:Bounds x="600" y="130" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Sms_di" bpmnElement="End_Sms">
+        <dc:Bounds x="780" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="756" y="195" width="86" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Originate_di" bpmnElement="Task_Originate">
+        <dc:Bounds x="600" y="230" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Answered_di" bpmnElement="GW_Answered" isMarkerVisible="true">
+        <dc:Bounds x="635" y="345" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="610" y="400" width="100" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Retry_di" bpmnElement="GW_Retry" isMarkerVisible="true">
+        <dc:Bounds x="760" y="345" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="748" y="400" width="76" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SmsFail_di" bpmnElement="Task_SmsFail">
+        <dc:Bounds x="860" y="330" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Fail_di" bpmnElement="End_Fail">
+        <dc:Bounds x="1050" y="352" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1020" y="395" width="98" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Dialog_di" bpmnElement="Task_Dialog">
+        <dc:Bounds x="600" y="440" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Reply_di" bpmnElement="GW_Reply" isMarkerVisible="true">
+        <dc:Bounds x="830" y="455" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="812" y="510" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Confirm_di" bpmnElement="Task_Confirm">
+        <dc:Bounds x="560" y="560" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Confirmed_di" bpmnElement="End_Confirmed">
+        <dc:Bounds x="700" y="582" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="664" y="625" width="110" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Resched_di" bpmnElement="Task_Resched">
+        <dc:Bounds x="710" y="560" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Rescheduled_di" bpmnElement="End_Rescheduled">
+        <dc:Bounds x="850" y="582" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="812" y="625" width="112" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Cancel_di" bpmnElement="Task_Cancel">
+        <dc:Bounds x="860" y="560" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Cancelled_di" bpmnElement="End_Cancelled">
+        <dc:Bounds x="1000" y="582" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="962" y="625" width="112" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Bye_di" bpmnElement="Task_Bye">
+        <dc:Bounds x="1010" y="560" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Silence_di" bpmnElement="End_Silence">
+        <dc:Bounds x="1150" y="582" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1108" y="625" width="122" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Answer_di" bpmnElement="Task_Answer">
+        <dc:Bounds x="710" y="710" width="120" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_01_di" bpmnElement="Flow_01">
+        <di:waypoint x="276" y="170" />
+        <di:waypoint x="320" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02_di" bpmnElement="Flow_02">
+        <di:waypoint x="450" y="170" />
+        <di:waypoint x="500" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03_di" bpmnElement="Flow_03">
+        <di:waypoint x="550" y="170" />
+        <di:waypoint x="600" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_05_di" bpmnElement="Flow_05">
+        <di:waypoint x="720" y="170" />
+        <di:waypoint x="780" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04_di" bpmnElement="Flow_04">
+        <di:waypoint x="525" y="195" />
+        <di:waypoint x="525" y="260" />
+        <di:waypoint x="600" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06_di" bpmnElement="Flow_06">
+        <di:waypoint x="660" y="290" />
+        <di:waypoint x="660" y="345" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07_di" bpmnElement="Flow_07">
+        <di:waypoint x="685" y="370" />
+        <di:waypoint x="760" y="370" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_08_di" bpmnElement="Flow_08">
+        <di:waypoint x="785" y="345" />
+        <di:waypoint x="785" y="260" />
+        <di:waypoint x="720" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09_di" bpmnElement="Flow_09">
+        <di:waypoint x="810" y="370" />
+        <di:waypoint x="860" y="370" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09b_di" bpmnElement="Flow_09b">
+        <di:waypoint x="1000" y="370" />
+        <di:waypoint x="1050" y="370" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10_di" bpmnElement="Flow_10">
+        <di:waypoint x="660" y="395" />
+        <di:waypoint x="660" y="440" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11_di" bpmnElement="Flow_11">
+        <di:waypoint x="720" y="520" />
+        <di:waypoint x="720" y="650" />
+        <di:waypoint x="770" y="650" />
+        <di:waypoint x="770" y="710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12_di" bpmnElement="Flow_12">
+        <di:waypoint x="830" y="750" />
+        <di:waypoint x="900" y="750" />
+        <di:waypoint x="900" y="480" />
+        <di:waypoint x="880" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13">
+        <di:waypoint x="855" y="505" />
+        <di:waypoint x="855" y="530" />
+        <di:waypoint x="620" y="530" />
+        <di:waypoint x="620" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14_di" bpmnElement="Flow_14">
+        <di:waypoint x="680" y="600" />
+        <di:waypoint x="700" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15_di" bpmnElement="Flow_15">
+        <di:waypoint x="855" y="505" />
+        <di:waypoint x="855" y="530" />
+        <di:waypoint x="770" y="530" />
+        <di:waypoint x="770" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16_di" bpmnElement="Flow_16">
+        <di:waypoint x="830" y="600" />
+        <di:waypoint x="850" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17_di" bpmnElement="Flow_17">
+        <di:waypoint x="855" y="505" />
+        <di:waypoint x="855" y="530" />
+        <di:waypoint x="920" y="530" />
+        <di:waypoint x="920" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18_di" bpmnElement="Flow_18">
+        <di:waypoint x="980" y="600" />
+        <di:waypoint x="1000" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19_di" bpmnElement="Flow_19">
+        <di:waypoint x="855" y="505" />
+        <di:waypoint x="855" y="530" />
+        <di:waypoint x="1070" y="530" />
+        <di:waypoint x="1070" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_20_di" bpmnElement="Flow_20">
+        <di:waypoint x="1130" y="600" />
+        <di:waypoint x="1150" y="600" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
