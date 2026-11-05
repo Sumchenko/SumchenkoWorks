@@ -57,6 +57,18 @@ const stats = import.meta.env.PROD;
       document.documentElement.setAttribute('data-theme', s || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
     } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
   </script>
+  <script is:inline>
+    // Переход по ссылке вида /#раздел с другой страницы: smooth-анимация при загрузке обрывается,
+    // и браузер остаётся наверху. На время загрузки выключаем smooth и после неё досылаем к якорю.
+    if (location.hash) {
+      document.documentElement.style.scrollBehavior = 'auto';
+      addEventListener('load', function () {
+        var el = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+        if (el) el.scrollIntoView({ block: 'start' });
+        document.documentElement.style.scrollBehavior = '';
+      });
+    }
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main">{T.skip}</a>

@@ -54,7 +54,8 @@ const skillsPlaceholder = !!(P.skills.placeholder || P.tools.placeholder);
       </dl>
     </section>
 
-    <section id="approach" aria-labelledby="h-approach" style="padding-top:var(--space-section)">
+    <section aria-labelledby="h-approach" style="padding-top:var(--space-section)">
+      <span class="sw-anchor" id="approach" aria-hidden="true"></span>
       <SectionHead index={H.approachIdx} title={H.approachTitle} titleId="h-approach" meta={H.approachMeta} />
       <div style="margin-top:40px">
         <Lifecycle client:visible lang={lang} data={c.site.lifecycle} />
@@ -71,7 +72,8 @@ const skillsPlaceholder = !!(P.skills.placeholder || P.tools.placeholder);
       </ol>
     </section>
 
-    <section id="featured" aria-label={H.featuredAria} style="padding-top:var(--space-section)">
+    <section aria-label={H.featuredAria} style="padding-top:var(--space-section)">
+      <span class="sw-anchor" id="featured" aria-hidden="true"></span>
       <SectionHead index={H.featuredIdx} title={H.featuredTitle} meta={H.worksMeta(c.projects.length, Math.min(...years), Math.max(...years))} />
       <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr)); gap:var(--grid-gutter); margin-top:32px">
         {featured.map((p, i) => (
@@ -84,7 +86,8 @@ const skillsPlaceholder = !!(P.skills.placeholder || P.tools.placeholder);
       </div>
     </section>
 
-    <section id="skills" aria-labelledby="h-skills" style="padding-top:var(--space-section)">
+    <section aria-labelledby="h-skills" style="padding-top:var(--space-section)">
+      <span class="sw-anchor" id="skills" aria-hidden="true"></span>
       <SectionHead index={H.skillsIdx} title={H.skillsTitle} titleId="h-skills" />
       {skillsPlaceholder && <div style="margin-top:16px"><Badge variant="dashed" title={H.placeholderTitle}>{H.placeholder}</Badge></div>}
       <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); gap:32px var(--grid-gutter); margin-top:32px">
@@ -101,7 +104,8 @@ const skillsPlaceholder = !!(P.skills.placeholder || P.tools.placeholder);
       </div>
     </section>
 
-    <section id="contacts" aria-labelledby="h-contacts" style="padding:var(--space-section) 0">
+    <section aria-labelledby="h-contacts" style="padding:var(--space-section) 0">
+      <span class="sw-anchor" id="contacts" aria-hidden="true"></span>
       <div style="display:flex; flex-wrap:wrap; gap:40px var(--grid-gutter); border-top:1px solid var(--line); padding-top:28px">
         <div style="flex:5 1 360px; display:flex; flex-direction:column; gap:24px; align-items:flex-start">
           <span class="sw-label">{H.contactsIdx}</span>

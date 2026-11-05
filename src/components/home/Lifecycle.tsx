@@ -49,7 +49,7 @@ export default function Lifecycle({ lang, data }: Props) {
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)', alignItems: 'stretch' }}>
-        <div className="sw-dotgrid" style={{ flex: '1.9 1 520px', minWidth: 0, border: '1px solid var(--line)', backgroundColor: 'var(--bg)', position: 'relative', minHeight: 280 }}>
+        <div className="sw-dotgrid" style={{ flex: '1.9 1 520px', minWidth: 0, border: '1px solid var(--line)', backgroundColor: 'var(--bg)', position: 'relative', minHeight: 280, containerType: 'inline-size' }}>
           {createElement('sw-lifecycle', { focus: String(shown), paused: paused ? 'true' : 'false', label: T.canvasAria })}
         </div>
         <aside aria-live="polite" style={{ flex: '1 1 280px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 18, borderTop: '1px solid var(--line-strong)', paddingTop: 20 }}>
