@@ -16,7 +16,7 @@ import taxonomyRaw from '@/content/taxonomy.yaml?raw';
 
 const projectFiles = import.meta.glob<string>('/src/content/projects/*/project.yaml', { query: '?raw', import: 'default', eager: true });
 const textFiles = import.meta.glob<string>('/src/content/projects/*/artifacts/*.{md,yaml,yml,json,txt,sql,bpmn,puml,plantuml,mmd,xml,graphql,proto,ts,js,py,go,java,cs}', { query: '?raw', import: 'default', eager: true });
-const assetFiles = import.meta.glob<string>('/src/content/projects/*/artifacts/*.{png,jpg,jpeg,webp,gif,svg,pdf}', { query: '?url', import: 'default', eager: true });
+const assetFiles = import.meta.glob<string>('/src/content/projects/*/artifacts/*.{png,jpg,jpeg,webp,gif,svg,pdf,mp4,webm}', { query: '?url', import: 'default', eager: true });
 
 /* ---------- локализация ---------- */
 const isLocalized = (v: unknown): v is { ru: unknown; en?: unknown } => {
@@ -90,7 +90,7 @@ export type Content = {
   hasDemo: boolean;
 };
 
-const VIEW_ICON: Record<string, string> = { doc: 'article', code: 'code', erd: 'grid', components: 'layout', flow: 'git-branch', image: 'eye', pdf: 'file', link: 'external-link' };
+const VIEW_ICON: Record<string, string> = { doc: 'article', code: 'code', erd: 'grid', components: 'layout', flow: 'git-branch', image: 'eye', video: 'play', pdf: 'file', link: 'external-link' };
 
 const kb = (s: string) => Math.max(1, Math.round(new TextEncoder().encode(s).length / 1024)) + ' KB';
 
@@ -121,10 +121,10 @@ function buildArtifact(a: ArtifactData, p: { id: string; diagrams: Diagram[]; hr
     source = a.file ? textFiles[dir + a.file] ?? null : null;
     if (source == null) errors.push(`${where}: нет файла с кодом (поле file: «${a.file ?? ''}»)`);
     else { fileName = a.file!; ext = a.file!.split('.').pop() || 'txt'; format ??= ext.toUpperCase(); size ??= kb(source); }
-  } else if (a.view === 'image' || a.view === 'pdf') {
+  } else if (a.view === 'image' || a.view === 'video' || a.view === 'pdf') {
     src = a.file ? assetFiles[dir + a.file] ?? null : null;
     if (src == null) errors.push(`${where}: нет файла «${a.file ?? ''}» в папке artifacts/`);
-    format ??= a.view === 'pdf' ? T.format.pdf : T.format.image;
+    format ??= a.view === 'pdf' ? T.format.pdf : a.view === 'video' ? T.format.video : T.format.image;
   } else if (a.view === 'link') {
     if (!a.href) errors.push(`${where}: для view «link» нужно поле href`);
     format ??= T.format.link;

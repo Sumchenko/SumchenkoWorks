@@ -33,7 +33,7 @@ export function ArtifactViewer({ a, lang }: { a: ArtifactVM; lang: Lang }) {
         <span className="sw-label">{meta}</span>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           {a.ext && (a.view !== 'image' && a.view !== 'pdf') ? <Button size="sm" iconStart="download" onClick={download}>{T.download(a.ext)}</Button> : null}
-          {(a.view === 'image' || a.view === 'pdf') && a.src ? <Button size="sm" iconStart="download" href={a.src} download={a.file}>{T.download(a.file?.split('.').pop() || '')}</Button> : null}
+          {(a.view === 'image' || a.view === 'video' || a.view === 'pdf') && a.src ? <Button size="sm" iconStart="download" href={a.src} download={a.file}>{T.download(a.file?.split('.').pop() || '')}</Button> : null}
           {a.view === 'code' ? <Button variant="secondary" size="sm" iconStart="copy" onClick={() => copyText(a.source ?? '', copyTexts(L.toast.codeCopied))}>{T.copy}</Button> : null}
           {a.view === 'link' && a.href ? <Button size="sm" href={a.href} target="_blank" rel="noopener noreferrer" iconEnd="external-link">{T.open}</Button> : null}
           <Button variant="ghost" size="sm" iconStart="link" onClick={() => copyText(location.href, copyTexts(L.toast.linkCopied))}>{T.link}</Button>
@@ -74,6 +74,11 @@ export function ArtifactViewer({ a, lang }: { a: ArtifactVM; lang: Lang }) {
           <a href={a.src} target="_blank" rel="noopener" style={{ display: 'block', cursor: 'zoom-in' }}>
             <img src={a.src} alt={a.title} style={{ maxWidth: '100%', maxHeight: '72vh', margin: '0 auto', objectFit: 'contain' }} />
           </a>
+        </figure>
+      ) : null}
+      {a.view === 'video' && a.src ? (
+        <figure style={{ margin: 0, border: '1px solid var(--line)', background: 'var(--surface)', padding: 16 }}>
+          <video src={a.src} controls preload="metadata" playsInline style={{ display: 'block', width: '100%', maxHeight: '72vh', margin: '0 auto', background: '#000' }} />
         </figure>
       ) : null}
       {a.view === 'pdf' && a.src ? <iframe src={a.src} title={a.title} style={{ width: '100%', height: '60vh', border: '1px solid var(--line)', background: 'var(--surface)' }} /> : null}

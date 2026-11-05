@@ -174,8 +174,17 @@ diagrams:
 # Артефакты: документы — artifacts/<id>.ru.md и .en.md, остальное — файлы в artifacts/
 # Скриншоты сняты локально (docker compose, demo-профиль, вымышленные пациенты из demo_data), 1440×900.
 artifacts:
-  - id: screen-panel-board
+  - id: screen-demo
     code: UI-01
+    type: ui
+    view: video
+    file: demo.mp4
+    size: '6.6 MB'
+    updated: '2026.11'
+    title: { ru: "Демо: три минуты работы системы", en: "Demo: three minutes of the system" }
+    summary: { ru: "Смонтированное видео с хакатона: живые звонки, запись к врачу, обзвон-напоминания и панель регистратора — основной функционал за три минуты.", en: "An edited video from the hackathon: live calls, booking a visit, reminder robocalls and the registrar panel — the core functionality in three minutes." }
+  - id: screen-panel-board
+    code: UI-02
     type: ui
     view: image
     file: screen-panel-board.png
@@ -183,7 +192,7 @@ artifacts:
     title: { ru: "Панель регистратора", en: "Registrar panel" }
     summary: { ru: "Входящие переводы, задачи с карточкой обращения, лист ожидания и обзвон-напоминания — всё, что ассистент передал людям.", en: "Incoming transfers, tasks with the case card, the waiting list and reminder calls — everything the assistant handed to humans." }
   - id: screen-panel-transcript
-    code: UI-02
+    code: UI-03
     type: ui
     view: image
     file: screen-panel-transcript.png
@@ -191,7 +200,7 @@ artifacts:
     title: { ru: "Стенограмма разговора", en: "Call transcript" }
     summary: { ru: "Диалог записи к терапевту в журнале звонков: реплики ассистента и пациента с таймингами, кнопка «Пациент против записи».", en: "A therapist-booking dialogue in the call journal: assistant and patient lines with timings, and the \"patient against recording\" button." }
   - id: screen-panel-journal
-    code: UI-03
+    code: UI-04
     type: ui
     view: image
     file: screen-panel-journal.png
@@ -199,7 +208,7 @@ artifacts:
     title: { ru: "Журнал переводов и звонков", en: "Transfers and calls journal" }
     summary: { ru: "Переводы с правилом и приоритетом, задачи регистратору, звонки с итогом и длительностью; у переводов — отметка «обоснован».", en: "Transfers with rule and priority, registrar tasks, calls with outcome and duration; transfers carry a \"justified\" mark." }
   - id: screen-panel-sms
-    code: UI-04
+    code: UI-05
     type: ui
     view: image
     file: screen-panel-sms.png
@@ -207,7 +216,7 @@ artifacts:
     title: { ru: "SMS и показатели", en: "SMS and metrics" }
     summary: { ru: "SMS-журнал с маскированными номерами (текст по Прил. Б) и показатели за 7 дней: доля звонков без сотрудника, время записи, экстренные звонки.", en: "The SMS log with masked numbers (texts per the template) and 7-day metrics: calls without a human, booking time, emergency calls." }
   - id: screen-pult-data
-    code: UI-05
+    code: UI-06
     type: ui
     view: image
     file: screen-pult-data.png

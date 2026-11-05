@@ -66,7 +66,7 @@ export const ArtifactSchema = z.object({
   id: str,
   code: str,
   type: str,
-  view: z.enum(['doc', 'code', 'erd', 'components', 'flow', 'image', 'pdf', 'link']),
+  view: z.enum(['doc', 'code', 'erd', 'components', 'flow', 'image', 'video', 'pdf', 'link']),
   title: str,
   summary: str,
   version: str.optional(),
@@ -74,7 +74,7 @@ export const ArtifactSchema = z.object({
   format: str.optional(),
   size: str.optional(),
   diagram: str.optional(), // erd / components / flow
-  file: str.optional(), // code / image / pdf: имя файла в папке artifacts/
+  file: str.optional(), // code / image / video / pdf: имя файла в папке artifacts/
   href: str.optional(), // link
   demo: z.boolean().optional(),
 });

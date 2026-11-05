@@ -36,10 +36,17 @@ export function ScreensGallery({ items, lang, slug }: { items: ArtifactVM[]; lan
       </div>
 
       <div style={{ position: 'relative', width: '100%', maxWidth: W }}>
-        <button type="button" onClick={() => { setOpen(true); track(`${slug} / screens`, a.title); }} aria-label={`${T.screensOpen}: ${a.title}`} title={T.screensOpen}
-          style={{ display: 'block', width: '100%', padding: 0, border: '1px solid var(--line)', background: 'var(--surface)', aspectRatio: '16 / 10', overflow: 'hidden', cursor: 'zoom-in' }}>
-          <img src={a.src ?? undefined} alt={a.title} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
-        </button>
+        {a.view === 'video' ? (
+          <div style={{ border: '1px solid var(--line)', background: 'var(--surface)', aspectRatio: '16 / 10', overflow: 'hidden' }}>
+            <video key={a.id} src={a.src ?? undefined} controls preload="metadata" playsInline
+              style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', background: '#000' }} />
+          </div>
+        ) : (
+          <button type="button" onClick={() => { setOpen(true); track(`${slug} / screens`, a.title); }} aria-label={`${T.screensOpen}: ${a.title}`} title={T.screensOpen}
+            style={{ display: 'block', width: '100%', padding: 0, border: '1px solid var(--line)', background: 'var(--surface)', aspectRatio: '16 / 10', overflow: 'hidden', cursor: 'zoom-in' }}>
+            <img src={a.src ?? undefined} alt={a.title} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
+          </button>
+        )}
         {n > 1 ? (
           <>
             <NavBtn side="left" label={T.screensPrev} onClick={() => go(-1)} />
@@ -59,7 +66,12 @@ export function ScreensGallery({ items, lang, slug }: { items: ArtifactVM[]; lan
               <button type="button" onClick={() => setCur(i)} aria-current={i === cur ? 'true' : undefined} aria-label={x.title} title={x.title}
                 style={{ display: 'block', width: 132, aspectRatio: '16 / 10', padding: 0, background: 'var(--surface)', cursor: 'pointer',
                   border: i === cur ? '2px solid var(--fg)' : '1px solid var(--line)', opacity: i === cur ? 1 : 0.7, transition: 'opacity 140ms var(--ease-out)' }}>
-                <img src={x.src ?? undefined} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top left', display: 'block' }} />
+                {x.view === 'video' ? (
+                  <video src={x.src ?? undefined} muted preload="metadata" tabIndex={-1}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top left', display: 'block', pointerEvents: 'none' }} />
+                ) : (
+                  <img src={x.src ?? undefined} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top left', display: 'block' }} />
+                )}
               </button>
             </li>
           ))}
@@ -126,8 +138,13 @@ function Lightbox({ items, cur, go, onClose, lang }: { items: ArtifactVM[]; cur:
       </div>
       <div onMouseDown={backdrop} style={{ position: 'relative', flex: '1 1 auto', minHeight: 0, minWidth: 0 }}>
         <div onMouseDown={backdrop} style={{ position: 'absolute', inset: '0 clamp(8px, 6vw, 88px)' }}>
-          <img key={a.id} src={a.src ?? undefined} alt={a.title} draggable={false}
-            style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain', userSelect: 'none' }} />
+          {a.view === 'video' ? (
+            <video key={a.id} src={a.src ?? undefined} controls autoPlay playsInline
+              style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }} />
+          ) : (
+            <img key={a.id} src={a.src ?? undefined} alt={a.title} draggable={false}
+              style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain', userSelect: 'none' }} />
+          )}
         </div>
         {items.length > 1 ? (
           <>
