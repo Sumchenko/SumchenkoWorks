@@ -29,8 +29,14 @@ export default function WorksCatalog({ lang, projects, categories, technologies,
 
   useEffect(() => {
     const p = new URLSearchParams(location.search);
-    setF({ q: p.get('q') || '', cat: p.get('cat') || 'all', tech: p.get('tech') || 'all' });
-  }, []);
+    const cat = p.get('cat');
+    const tech = p.get('tech');
+    setF({
+      q: p.get('q') ?? '',
+      cat: cat && categories.some((c) => c.id === cat) ? cat : EMPTY.cat,
+      tech: tech && technologies.some((t) => t.id === tech) ? tech : EMPTY.tech,
+    });
+  }, [categories, technologies]);
 
   const patch = (ch: Partial<Filters>) => {
     const next = { ...f, ...ch };
@@ -53,7 +59,7 @@ export default function WorksCatalog({ lang, projects, categories, technologies,
 
   return (
     <>
-      <SectionHead index={T.idx} title={T.title} meta={T.meta(n, projects.length)} />
+      <SectionHead as="h1" index={T.idx} title={T.title} meta={T.meta(n, projects.length)} />
       <p style={{ marginTop: 20, maxWidth: '64ch', color: 'var(--fg-2)', fontSize: 15 }}>{intro}</p>
       <div role="search" aria-label={T.filtersAria} style={{ display: 'flex', flexDirection: 'column', gap: 16, margin: '32px 0 24px', padding: '20px 0', borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'flex-end' }}>

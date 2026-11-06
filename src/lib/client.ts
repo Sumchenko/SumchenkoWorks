@@ -13,13 +13,28 @@ function iconSvg(name: string, size: number): string {
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
+/** Открывает нативное модальное окно и возвращает фокус после его закрытия. */
+export function openModal(dialog: HTMLDialogElement) {
+  const previousFocus = document.activeElement;
+  const root = document.documentElement;
+  const previousOverflow = root.style.overflow;
+  dialog.showModal();
+  root.style.overflow = 'hidden';
+  return () => {
+    dialog.close();
+    root.style.overflow = previousOverflow;
+    if (previousFocus instanceof HTMLElement) previousFocus.focus({ preventScroll: true });
+  };
+}
+
 /** Уведомление в правом нижнем углу. Заголовок, начинающийся с «!!», показывается как ошибка. */
 export function toast(title: string, msg = '', closeLabel = 'Close') {
-  let host = document.querySelector<HTMLElement>('.toast-host');
+  const root = document.querySelector('dialog.sw-modal:modal') ?? document.body;
+  let host = root.querySelector<HTMLElement>(':scope > .toast-host');
   if (!host) {
     host = document.createElement('div');
     host.className = 'toast-host';
-    document.body.appendChild(host);
+    root.appendChild(host);
   }
   host.innerHTML = '';
   const el = document.createElement('div');

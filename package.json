@@ -7,7 +7,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "tsc --noEmit -p ."
+    "check": "astro sync && tsc --noEmit -p ."
   },
   "dependencies": {
     "@astrojs/react": "^7.0.1",

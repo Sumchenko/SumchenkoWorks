@@ -6,8 +6,10 @@ import { PixelField } from '@/components/ds/PixelField';
 
 const { lang } = Astro.props as { lang: Lang };
 const T = t(lang).notFound;
+const path = lang === 'ru' ? '/404.html' : '/404/';
+const alternateHref = lang === 'ru' ? '/en/404/' : '/404.html';
 ---
-<Base lang={lang} path="/404/" title={T.meta} noindex>
+<Base lang={lang} path={path} alternateHref={alternateHref} title={T.meta} noindex>
   <div style="max-width:1440px; margin:0 auto; padding:clamp(48px,10vw,140px) clamp(20px,4vw,64px) var(--space-section); display:flex; flex-wrap:wrap; gap:48px; align-items:flex-end; justify-content:space-between">
     <div style="flex:1 1 420px; display:flex; flex-direction:column; gap:28px; align-items:flex-start">
       <span class="sw-label">{T.label}</span>

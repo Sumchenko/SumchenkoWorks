@@ -57,7 +57,7 @@ profile:
           - "Go: Chi, PostgreSQL"
           - "Python: FastAPI, aiogram"
           - "React, TypeScript"
-          - { ru: "Интеграции с LLM API: Groq, Gemini, Whisper", en: "LLM API integrations: Groq, Gemini, Whisper" }
+          - { ru: "Интеграции с LLM API (Groq, Gemini) и распознавание речи (Whisper)", en: "LLM API integrations (Groq, Gemini) and speech recognition (Whisper)" }
           - { ru: "Docker, CI/CD на GitHub Actions, деплой на VPS", en: "Docker, CI/CD with GitHub Actions, VPS deployment" }
       - title: { ru: "AI-разработка", en: "AI-assisted development" }
         items:

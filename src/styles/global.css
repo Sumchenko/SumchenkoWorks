@@ -95,6 +95,10 @@ main { flex: 1; outline: none; }
 .chips-wrap .sw-tag { white-space: normal; height: auto; min-height: 28px; padding-block: 6px; line-height: 1.35; max-width: 100%; }
 
 /* ---------- Окно: шапка на месте, прокручивается только тело ---------- */
+.sw-modal { box-sizing: border-box; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; border: 0; }
+.sw-modal:not([open]) { display: none; }
+.sw-modal::backdrop { background: transparent; }
+.sw-lightbox[open] { display: flex; }
 .sw-dialog { display: flex; flex-direction: column; overflow: hidden; }
 .sw-dialog__head, .sw-dialog__foot { flex: none; }
 .sw-dialog__body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }

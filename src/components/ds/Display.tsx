@@ -68,13 +68,13 @@ export function SpecList({ items = [], dashed = false, className = '' }:
   );
 }
 
-export function SectionHead({ index, title, meta, size = 'lg', className = '', titleId }:
-  { index: ReactNode; title: ReactNode; meta?: ReactNode; size?: 'lg' | 'sm'; className?: string; titleId?: string }) {
+export function SectionHead({ as: Heading = 'h2', index, title, meta, size = 'lg', className = '', titleId }:
+  { as?: 'h1' | 'h2'; index: ReactNode; title: ReactNode; meta?: ReactNode; size?: 'lg' | 'sm'; className?: string; titleId?: string }) {
   return (
     <div className={('sw-section-head ' + className).trim()} data-size={size}>
       <div className="sw-section-head__idx">{index}</div>
       <div className="sw-section-head__main">
-        <h2 className="sw-section-head__title" id={titleId}>{title}</h2>
+        <Heading className="sw-section-head__title" id={titleId}>{title}</Heading>
         {meta ? <div className="sw-section-head__meta">{meta}</div> : null}
       </div>
     </div>

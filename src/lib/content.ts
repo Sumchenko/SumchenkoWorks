@@ -61,7 +61,7 @@ export type Artifact = ArtifactData & {
   format: string;
   size: string;
   metaLine: string;
-  href: string;
+  pageHref: string;
   fileName: string | null;
   ext: string | null;
   md: string | null;
@@ -144,7 +144,7 @@ function buildArtifact(a: ArtifactData, p: { id: string; diagrams: Diagram[]; hr
     format: format ?? '',
     size: size ?? '',
     metaLine: [format, size].filter(Boolean).join(' · '),
-    href: `${p.href}?tab=artifacts&doc=${a.id}`,
+    pageHref: `${p.href}?tab=artifacts&doc=${a.id}`,
     fileName, ext, md, html, source, src, diagramData,
   };
 }

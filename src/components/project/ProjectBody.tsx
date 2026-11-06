@@ -200,7 +200,7 @@ export default function ProjectBody({ vm }: { vm: ProjectBodyVM }) {
           <p style={{ fontSize: 15, color: 'var(--fg-2)', maxWidth: '64ch' }}>{T.artifactsIntro}</p>
           <div style={{ display: 'flex', flexDirection: 'column', borderTop: '1px solid var(--line)' }}>
             {vm.artifacts.map((a) => (
-              <a key={a.id} href={a.href} onClick={openDoc(a.id)} className="row-link"
+              <a key={a.id} href={a.pageHref} onClick={openDoc(a.id)} className="row-link"
                 style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px 24px', padding: '16px 12px', borderBottom: '1px solid var(--line)' }}>
                 <div style={{ flex: '1 1 320px', display: 'flex', alignItems: 'center', gap: 16, minWidth: 0 }}>
                   <span aria-hidden="true" style={{ width: 40, height: 40, flex: 'none', display: 'grid', placeItems: 'center', border: '1px solid var(--line)' }}><Icon name={a.icon} size={24} /></span>

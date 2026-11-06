@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type TouchEvent } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type TouchEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { t, pad2, type Lang } from '@/i18n';
 import type { ArtifactVM } from '@/lib/vm';
 import { Icon } from '@/components/ds/Icon';
-import { track } from '@/lib/client';
+import { openModal, track } from '@/lib/client';
 
 /*
  * Галерея экранов в начале «Обзора»: превью со стрелками по бокам и миниатюры.
@@ -98,24 +98,19 @@ function NavBtn({ side, label, onClick, big }: { side: 'left' | 'right'; label: 
 function Lightbox({ items, cur, go, onClose, lang }: { items: ArtifactVM[]; cur: number; go: (d: number) => void; onClose: () => void; lang: Lang }) {
   const L = t(lang);
   const a = items[cur];
-  const closeRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const touch = useRef<number | null>(null);
 
-  useEffect(() => {
-    const prev = document.documentElement.style.overflow;
-    document.documentElement.style.overflow = 'hidden';
-    const back = document.activeElement as HTMLElement | null;
-    closeRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-      else if (e.key === 'ArrowLeft') go(-1);
-      else if (e.key === 'ArrowRight') go(1);
-      else return;
-      e.preventDefault();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => { window.removeEventListener('keydown', onKey); document.documentElement.style.overflow = prev; back?.focus(); };
-  }, [go, onClose]);
+  useLayoutEffect(() => {
+    if (dialogRef.current) return openModal(dialogRef.current);
+  }, []);
+
+  const onKey = (e: ReactKeyboardEvent) => {
+    if (e.key === 'ArrowLeft') go(-1);
+    else if (e.key === 'ArrowRight') go(1);
+    else return;
+    e.preventDefault();
+  };
 
   const onTouchStart = (e: TouchEvent) => { touch.current = e.touches[0].clientX; };
   const onTouchEnd = (e: TouchEvent) => {
@@ -127,11 +122,12 @@ function Lightbox({ items, cur, go, onClose, lang }: { items: ArtifactVM[]; cur:
   const backdrop = (e: { target: EventTarget; currentTarget: EventTarget }) => { if (e.target === e.currentTarget) onClose(); };
 
   return createPortal(
-    <div role="dialog" aria-modal="true" aria-label={a.title} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} onMouseDown={backdrop}
-      style={{ position: 'fixed', inset: 0, zIndex: 300, background: '#0b0b0b', color: '#f2f2f2', display: 'flex', flexDirection: 'column' }}>
+    <dialog ref={dialogRef} className="sw-modal sw-lightbox" aria-label={a.title} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} onMouseDown={backdrop}
+      onCancel={(e) => { e.preventDefault(); onClose(); }} onKeyDown={onKey}
+      style={{ position: 'fixed', inset: 0, padding: 0, background: '#0b0b0b', color: '#f2f2f2', flexDirection: 'column' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '12px 16px', flex: 'none' }}>
         <span className="sw-label" style={{ color: '#bdbdbd' }}>{pad2(cur + 1)} / {pad2(items.length)} · {a.code}</span>
-        <button ref={closeRef} type="button" onClick={onClose} aria-label={L.close} title={L.close}
+        <button type="button" onClick={onClose} aria-label={L.close} title={L.close}
           style={{ width: 40, height: 40, display: 'grid', placeItems: 'center', background: 'transparent', color: 'inherit', border: '1px solid #555', cursor: 'pointer' }}>
           <Icon name="close" size={20} />
         </button>
@@ -157,7 +153,7 @@ function Lightbox({ items, cur, go, onClose, lang }: { items: ArtifactVM[]; cur:
         <span style={{ fontSize: 16, fontWeight: 500 }}>{a.title}</span>
         {a.summary ? <span style={{ fontSize: 14, color: '#bdbdbd', maxWidth: '80ch', lineHeight: 1.5 }}>{a.summary}</span> : null}
       </div>
-    </div>,
+    </dialog>,
     document.body,
   );
 }

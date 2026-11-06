@@ -9,8 +9,8 @@ import Footer from '@/components/site/Footer.astro';
 import { altLang, localePath, t, type Lang } from '@/i18n';
 import { getContent } from '@/lib/content';
 
-type Props = { lang: Lang; path: string; title?: string; description?: string; isHome?: boolean; noindex?: boolean };
-const { lang, path, title, description, isHome = false, noindex = false } = Astro.props;
+type Props = { lang: Lang; path: string; title?: string; description?: string; isHome?: boolean; noindex?: boolean; alternateHref?: string };
+const { lang, path, title, description, isHome = false, noindex = false, alternateHref } = Astro.props;
 
 const T = t(lang);
 const c = getContent(lang);
@@ -72,7 +72,7 @@ const stats = import.meta.env.PROD;
 </head>
 <body>
   <a class="skip-link" href="#main">{T.skip}</a>
-  <SiteHeader client:load lang={lang} isHome={isHome} homeHref={localePath(lang, '/')} altHref={localePath(alt, path)} altLang={alt} />
+  <SiteHeader client:load lang={lang} isHome={isHome} homeHref={localePath(lang, '/')} altHref={alternateHref ?? localePath(alt, path)} altLang={alt} />
   <main id="main" tabindex="-1">
     <slot />
   </main>

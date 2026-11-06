@@ -4,18 +4,18 @@ code: P—05
 order: 5
 demo: false
 featured: true
-badge: { ru: "Хакатон · 6 место", en: "Hackathon · 6th place" }
+badge: { ru: "Хакатон · 6-е место", en: "Hackathon · 6th place" }
 title: { ru: "Голосовой ассистент регистратуры", en: "Clinic reception voice assistant" }
 summary:
   ru: "Хакатон «Точка сборки» 2026: ассистент отвечает на звонки поликлиники — записывает к врачу, обзванивает с напоминаниями и передаёт сложное регистратору. Команда из двух человек, моя зона — бэкенд и телефония."
-  en: A hackathon project ("Tochka Sborki" 2026) — a voice assistant that answers a polyclinic's calls, books appointments, makes reminder calls and hands complex cases to a human registrar. A team of two; my zone was the backend and telephony.
+  en: A hackathon project ("Tochka Sborki" 2026) — a voice assistant that answers a clinic's calls, books appointments, makes reminder calls and hands complex cases to reception staff. I was responsible for the backend and telephony on a team of two.
 category: dev
 status: done
 year: 2026
 period: '2026.10.13 → 2026.10.29'
 role:
   ru: BE-зона — бэкенд FastAPI, телефония Asterisk, панель регистратора; разработка с Claude Code
-  en: BE zone — the FastAPI backend, Asterisk telephony and the registrar panel; development with Claude Code
+  en: FastAPI backend, Asterisk telephony and the reception dashboard, developed with Claude Code
 tech: [python, fastapi, postgres, docker, llm, asterisk, prometheus]
 cover: d-ca-components
 links:
@@ -29,7 +29,7 @@ overview:
   en: "A patient calls and talks to the assistant as to a registrar. Speech is recognised locally; a finite-state machine drives the dialogue per the clinic's regulations, while the LLM only understands each utterance via function calling. The assistant finds free slots, books, reschedules and cancels appointments, makes reminder calls the day before, offers freed time to the first person on the waiting list and answers reference questions. A life-threatening phrase is a red flag: the assistant names 103/112 and transfers to a human; complex cases go to a registrar with a case card."
 purpose:
   ru: Командный проект хакатона «Точка сборки» 2026 (кейс регистратуры поликлиники), команда из двух человек. Моя BE-зона — бэкенд FastAPI, телефония Asterisk, панель регистратора и пульт тестирования; напарник вёл ML-зону — голос, диалог и LLM. Зоны связаны контрактом с OpenAPI-схемой, весь код писали через Claude Code.
-  en: A team project for the "Tochka Sborki" 2026 hackathon (a polyclinic reception desk case), built by two people. My BE zone was the FastAPI backend, Asterisk telephony, the registrar panel and the testing console; my teammate owned the ML zone — voice, dialogue and the LLM. The zones met in a contract with an OpenAPI schema; all the code was written with Claude Code.
+  en: Two of us built this clinic reception assistant for the "Tochka Sborki" 2026 hackathon. I handled the FastAPI backend, Asterisk telephony, the reception dashboard and the testing console. My teammate handled voice, dialogue and the LLM. The two parts communicate through an API described in OpenAPI. We wrote the code with Claude Code.
 goals:
   - { ru: "Отвечать на звонок сразу, без очереди на регистратуре", en: "Answer every call immediately, with no reception queue" }
   - { ru: "Записывать, переносить и отменять приём без регистратора", en: "Book, reschedule and cancel appointments without a registrar" }
@@ -45,10 +45,10 @@ features:
   - { ru: "Панель регистратора /panel и пульт тестирования /pult", en: "The registrar panel /panel and the testing console /pult" }
   - { ru: "Записи звонков, обезличенные стенограммы, журнал доступа к ПДн", en: "Call recordings, masked transcripts and a personal-data access log" }
 scenarios:
-  - title: { ru: "Запись к терапевту", en: "Booking a therapist" }
+  - title: { ru: "Запись к терапевту", en: "Booking an appointment with a primary care doctor" }
     actor: { ru: "Пациент", en: "Patient" }
     steps:
-      - { ru: "«Хочу записаться к терапевту на этой неделе»", en: "\"I'd like to see a therapist this week\"" }
+      - { ru: "«Хочу записаться к терапевту на этой неделе»", en: "\"I'd like to see a primary care doctor this week\"" }
       - { ru: "Идентификация по ФИО и дате рождения; проверка правил записи", en: "Identification by name and birth date; booking rules checked" }
       - { ru: "Ассистент называет свободные слоты, пациент выбирает день и время", en: "The assistant offers free slots; the patient picks a day and time" }
       - { ru: "«Вы записаны» звучит только после ответа МИС — с датой и кабинетом", en: "\"You are booked\" is said only after the HIS answers — with date and room" }
@@ -198,7 +198,7 @@ artifacts:
     file: screen-panel-transcript.png
     updated: '2026.11'
     title: { ru: "Стенограмма разговора", en: "Call transcript" }
-    summary: { ru: "Диалог записи к терапевту в журнале звонков: реплики ассистента и пациента с таймингами, кнопка «Пациент против записи».", en: "A therapist-booking dialogue in the call journal: assistant and patient lines with timings, and the \"patient against recording\" button." }
+    summary: { ru: "Диалог записи к терапевту в журнале звонков: реплики ассистента и пациента с таймингами, кнопка «Пациент против записи».", en: "The call log shows a patient booking an appointment with a primary care doctor. It includes a timestamped transcript and a button labeled \"Patient declined recording\"." }
   - id: screen-panel-journal
     code: UI-04
     type: ui
@@ -276,4 +276,4 @@ artifacts:
     file: agent-backend-api.openapi.json
     updated: '2026.11'
     title: { ru: "OpenAPI: контракт агент ↔ бэкенд", en: "OpenAPI: agent ↔ backend contract" }
-    summary: { ru: "Машиночитаемая схема 21 ручки контракта, выгружается из pydantic-схем бэкенда; по нему работают зоны ML и BE.", en: "The machine-readable schema of the contract's 21 endpoints, exported from the backend's pydantic models; both ML and BE zones work against it." }
+    summary: { ru: "Машиночитаемая схема 21 эндпоинта, выгружаемая из моделей Pydantic. По этой спецификации взаимодействуют бэкенд и голосовой агент.", en: "A machine-readable specification for the 21 endpoints used by the backend and the voice agent, exported from the backend's Pydantic models." }
