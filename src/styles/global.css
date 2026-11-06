@@ -58,12 +58,23 @@ main { flex: 1; outline: none; }
 .card-link:hover { color: inherit; }
 .card-actions { position: relative; z-index: 2; }
 
-.project-card-title,
-.project-page :is(h2, h3):not(.sw-doc *),
-.project-page .related-project-title {
+.project-page :is(h2, h3):not(.sw-doc *) {
   font-family: var(--font-pixel);
   font-weight: var(--weight-regular);
   overflow-wrap: anywhere;
+}
+.project-title,
+.project-card-title,
+.project-name,
+.sw-section-head--sans .sw-section-head__title {
+  font-family: var(--font-sans);
+  font-weight: var(--weight-medium);
+  overflow-wrap: anywhere;
+}
+.project-title, .sw-section-head--sans .sw-section-head__title {
+  font-size: var(--text-display-m);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--track-heading);
 }
 .project-card-title { font-size: 20px; line-height: 1.2; }
 

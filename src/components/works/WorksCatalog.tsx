@@ -59,7 +59,7 @@ export default function WorksCatalog({ lang, projects, categories, technologies,
 
   return (
     <>
-      <SectionHead as="h1" index={T.idx} title={T.title} meta={T.meta(n, projects.length)} />
+      <SectionHead as="h1" className="sw-section-head--sans" index={T.idx} title={T.title} meta={T.meta(n, projects.length)} />
       <p style={{ marginTop: 20, maxWidth: '64ch', color: 'var(--fg-2)', fontSize: 15 }}>{intro}</p>
       <div role="search" aria-label={T.filtersAria} style={{ display: 'flex', flexDirection: 'column', gap: 16, margin: '32px 0 24px', padding: '20px 0', borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'flex-end' }}>

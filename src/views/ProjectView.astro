@@ -41,7 +41,7 @@ const works = localePath(lang, '/works/');
           <Badge variant={badge.variant} dot={badge.dot} pulse={badge.pulse}>{badge.label}</Badge>
           {p.demo && <Badge variant="dashed" title={T.demoTitle}>{t(lang).card.demo}</Badge>}
         </div>
-        <h1 style="font-family:var(--font-pixel); font-size:var(--text-display-m); line-height:var(--lh-display); overflow-wrap:anywhere">{p.title}</h1>
+        <h1 class="project-title">{p.title}</h1>
         <p style="font-size:var(--text-lead); line-height:1.45; max-width:48ch">{p.summary}</p>
         {extLinks.length > 0 && (
           <div style="display:flex; flex-wrap:wrap; gap:8px">
@@ -62,7 +62,7 @@ const works = localePath(lang, '/works/');
         {related.map((r) => (
           <a href={r.href} class="row-link" style="display:grid; grid-template-columns:64px minmax(0,1fr) 32px; gap:var(--grid-gutter); align-items:center; padding:16px 12px; border-top:1px solid var(--line)">
             <span class="sw-label">{r.code}</span>
-            <span style="display:flex; flex-wrap:wrap; gap:4px 24px; align-items:baseline"><span class="related-project-title" style="font-size:18px; margin-right:auto">{r.title}</span><span class="sw-label">{r.categoryLabel} · {r.year}</span></span>
+            <span style="display:flex; flex-wrap:wrap; gap:4px 24px; align-items:baseline"><span class="project-name" style="font-size:18px; margin-right:auto">{r.title}</span><span class="sw-label">{r.categoryLabel} · {r.year}</span></span>
             <span aria-hidden="true" class="arrow-box"><Icon name="arrow-right" size={16} /></span>
           </a>
         ))}
@@ -72,7 +72,7 @@ const works = localePath(lang, '/works/');
     {next !== p ? (
       <div style="margin:var(--space-section) 0; border-top:1px solid var(--line); padding-top:24px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap">
         <span class="sw-label">{T.next(next.code)}</span>
-        <Button variant="secondary" href={next.href} iconEnd="arrow-right" style={{ maxWidth: '100%' }}>{next.title}</Button>
+        <Button variant="secondary" href={next.href} iconEnd="arrow-right" style={{ maxWidth: '100%' }}><span class="project-name">{next.title}</span></Button>
       </div>
     ) : <div style="height:var(--space-section)" />}
   </article>
