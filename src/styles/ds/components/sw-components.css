@@ -128,6 +128,7 @@ button.sw-tag:hover{border-color:var(--line-strong)}
 .sw-tab:hover{color:var(--fg)}
 .sw-tab[aria-selected="true"]{color:var(--fg)}
 .sw-tab[aria-selected="true"]::after{transform:scaleX(1)}
+.sw-tab__label{font-family:var(--font-pixel);font-size:15px;letter-spacing:normal}
 .sw-tab__idx{font-size:var(--text-micro);color:var(--fg-3)}
 .sw-tab__count{font-size:var(--text-micro);color:var(--fg-3)}
 .sw-tabs[data-variant="segmented"] .sw-tab{padding:0 14px;height:var(--control-sm);align-items:center}

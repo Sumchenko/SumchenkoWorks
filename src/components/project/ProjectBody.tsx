@@ -98,7 +98,7 @@ export default function ProjectBody({ vm }: { vm: ProjectBodyVM }) {
         <div {...panel('arch')} style={{ display: tab === 'arch' ? 'flex' : 'none', flexDirection: 'column', gap: 64, paddingTop: 40 }}>
           {A.components ? (
             <section aria-labelledby="h-comp" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <div style={{ display: 'flex', gap: 16, alignItems: 'baseline', flexWrap: 'wrap' }}><span className="sw-label">§ 2.1</span><h2 id="h-comp" style={{ fontSize: 'var(--text-h2)', fontWeight: 500 }}>{T.components}</h2></div>
+              <div style={{ display: 'flex', gap: 16, alignItems: 'baseline', flexWrap: 'wrap' }}><span className="sw-label">§ 2.1</span><h2 id="h-comp" style={{ fontSize: 'var(--text-h2)' }}>{T.components}</h2></div>
               {A.components.text ? <p style={{ fontSize: 17, lineHeight: 1.6, maxWidth: '64ch' }}>{A.components.text}</p> : null}
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)', alignItems: 'flex-start' }}>
                 <figure style={{ flex: '2 1 460px', margin: 0, minWidth: 0, border: '1px solid var(--line)', background: 'var(--surface)', padding: '48px 24px 40px', position: 'relative' }}>
@@ -127,14 +127,14 @@ export default function ProjectBody({ vm }: { vm: ProjectBodyVM }) {
 
           {A.flows.map((f) => (
             <section key={f.idx} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <div style={{ display: 'flex', gap: 16, alignItems: 'baseline', flexWrap: 'wrap' }}><span className="sw-label">§ {f.idx}</span><h2 style={{ fontSize: 'var(--text-h2)', fontWeight: 500 }}>{f.title}</h2></div>
+              <div style={{ display: 'flex', gap: 16, alignItems: 'baseline', flexWrap: 'wrap' }}><span className="sw-label">§ {f.idx}</span><h2 style={{ fontSize: 'var(--text-h2)' }}>{f.title}</h2></div>
               <div style={{ padding: 'clamp(20px,3vw,32px)', border: '1px solid var(--line)', background: 'var(--surface)' }}><FlowView diagram={f.diagram} lang={lang} /></div>
             </section>
           ))}
 
           {A.erd ? (
             <section aria-labelledby="h-data" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <div style={{ display: 'flex', gap: 16, alignItems: 'baseline' }}><span className="sw-label">§ {A.erd.idx}</span><h2 id="h-data" style={{ fontSize: 'var(--text-h2)', fontWeight: 500 }}>{T.dataModel}</h2></div>
+              <div style={{ display: 'flex', gap: 16, alignItems: 'baseline', flexWrap: 'wrap' }}><span className="sw-label">§ {A.erd.idx}</span><h2 id="h-data" style={{ fontSize: 'var(--text-h2)' }}>{T.dataModel}</h2></div>
               {A.erd.text ? <p style={{ fontSize: 17, lineHeight: 1.6, maxWidth: '64ch' }}>{A.erd.text}</p> : null}
               <ErdView diagram={A.erd.diagram} lang={lang} />
             </section>
@@ -142,7 +142,7 @@ export default function ProjectBody({ vm }: { vm: ProjectBodyVM }) {
 
           {A.api ? (
             <section aria-labelledby="h-api" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <div style={{ display: 'flex', gap: 16, alignItems: 'baseline' }}><span className="sw-label">§ {A.api.idx}</span><h2 id="h-api" style={{ fontSize: 'var(--text-h2)', fontWeight: 500 }}>{T.api}</h2></div>
+              <div style={{ display: 'flex', gap: 16, alignItems: 'baseline', flexWrap: 'wrap' }}><span className="sw-label">§ {A.api.idx}</span><h2 id="h-api" style={{ fontSize: 'var(--text-h2)' }}>{T.api}</h2></div>
               {A.api.endpoints.length ? (
                 <ul aria-label={T.endpoints} style={{ listStyle: 'none', margin: 0, padding: 0, borderTop: '1px solid var(--line)' }}>
                   {A.api.endpoints.map((e) => (
@@ -171,12 +171,12 @@ export default function ProjectBody({ vm }: { vm: ProjectBodyVM }) {
 
           {A.decisions ? (
             <section aria-labelledby="h-dec" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <div style={{ display: 'flex', gap: 16, alignItems: 'baseline' }}><span className="sw-label">§ {A.decisions.idx}</span><h2 id="h-dec" style={{ fontSize: 'var(--text-h2)', fontWeight: 500 }}>{T.decisions}</h2></div>
+              <div style={{ display: 'flex', gap: 16, alignItems: 'baseline', flexWrap: 'wrap' }}><span className="sw-label">§ {A.decisions.idx}</span><h2 id="h-dec" style={{ fontSize: 'var(--text-h2)' }}>{T.decisions}</h2></div>
               {A.decisions.items.map((d) => (
                 <div key={d.idx} style={{ display: 'flex', flexWrap: 'wrap', gap: '16px 24px', padding: 24, background: 'var(--surface)', border: '1px solid var(--line)' }}>
                   <div style={{ flex: '1 1 220px', display: 'flex', flexDirection: 'column', gap: 8 }}>
                     <span className="sw-label">{T.decision(d.idx)}</span>
-                    <h3 style={{ fontSize: 'var(--text-h3)', fontWeight: 500, lineHeight: 1.2 }}>{d.title}</h3>
+                    <h3 style={{ fontSize: 'var(--text-h3)', lineHeight: 1.2 }}>{d.title}</h3>
                   </div>
                   <dl style={{ flex: '2 1 320px', margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {([['choice', T.choice, false], ['why', T.why, true], ['pros', T.pros, false], ['cons', T.cons, true], ['alternatives', T.alternatives, true]] as const).map(([k, label, dim]) =>
@@ -232,7 +232,7 @@ function Row({ r, lang }: { r: OverviewRow; lang: ProjectBodyVM['lang'] }) {
   const T = t(lang).project;
   return (
     <section data-reveal="0" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px var(--grid-gutter)', padding: '28px 0', borderBottom: '1px solid var(--line)' }}>
-      <h2 style={{ flex: '0 0 220px', fontSize: 20, fontWeight: 500, lineHeight: 1.25 }}>{r.title}</h2>
+      <h2 style={{ flex: '0 1 220px', fontSize: 20, lineHeight: 1.25 }}>{r.title}</h2>
       <div style={{ flex: '1 1 480px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
         {r.kind === 'text' ? (
           <>

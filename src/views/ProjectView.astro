@@ -27,7 +27,7 @@ const next = c.projects[(idx + 1) % c.projects.length];
 const works = localePath(lang, '/works/');
 ---
 <Base lang={lang} path={`/works/${p.id}/`} title={`${p.title} · ${p.code}`} description={p.summary}>
-  <article style="max-width:1440px; margin:0 auto; padding:0 var(--grid-margin)">
+  <article class="project-page" style="max-width:1440px; margin:0 auto; padding:0 var(--grid-margin)">
     <nav aria-label={T.crumbsAria} style="padding-top:24px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between">
       <Button variant="ghost" size="sm" href={works} iconStart="arrow-left">{T.back}</Button>
       <span class="sw-label"><a href={works} style="color:inherit">{T.crumbs}</a> / {p.code}</span>
@@ -58,11 +58,11 @@ const works = localePath(lang, '/works/');
 
     {related.length > 0 && (
       <section aria-labelledby="h-rel" style="padding-top:var(--space-section); display:flex; flex-direction:column">
-        <h2 id="h-rel" class="sw-label" style="padding-bottom:12px">{T.related}</h2>
+        <h2 id="h-rel" style="font-size:20px; padding-bottom:12px">{T.related}</h2>
         {related.map((r) => (
           <a href={r.href} class="row-link" style="display:grid; grid-template-columns:64px minmax(0,1fr) 32px; gap:var(--grid-gutter); align-items:center; padding:16px 12px; border-top:1px solid var(--line)">
             <span class="sw-label">{r.code}</span>
-            <span style="display:flex; flex-wrap:wrap; gap:4px 24px; align-items:baseline"><span style="font-size:18px; font-weight:500; margin-right:auto">{r.title}</span><span class="sw-label">{r.categoryLabel} · {r.year}</span></span>
+            <span style="display:flex; flex-wrap:wrap; gap:4px 24px; align-items:baseline"><span class="related-project-title" style="font-size:18px; margin-right:auto">{r.title}</span><span class="sw-label">{r.categoryLabel} · {r.year}</span></span>
             <span aria-hidden="true" class="arrow-box"><Icon name="arrow-right" size={16} /></span>
           </a>
         ))}

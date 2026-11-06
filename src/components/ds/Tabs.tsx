@@ -34,7 +34,7 @@ export function TabList({ items, value, onChange, numbered = false, label, idPre
             onClick={() => onChange(t.id)}
           >
             {numbered ? <span className="sw-tab__idx">{String(i + 1).padStart(2, '0')}</span> : null}
-            <span>{t.label}</span>
+            <span className="sw-tab__label">{t.label}</span>
             {t.count != null ? <span className="sw-tab__count">{t.count}</span> : null}
           </button>
         ))}

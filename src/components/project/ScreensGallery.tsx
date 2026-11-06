@@ -31,7 +31,7 @@ export function ScreensGallery({ items, lang, slug }: { items: ArtifactVM[]; lan
     <section aria-label={T.screensAria} aria-roledescription="carousel" data-reveal="0" onKeyDown={onKey}
       style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '28px 0', borderBottom: '1px solid var(--line)' }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between', gap: '6px 24px', maxWidth: W }}>
-        <h2 style={{ fontSize: 20, fontWeight: 500, lineHeight: 1.25 }}>{T.screens}</h2>
+        <h2 style={{ fontSize: 20, lineHeight: 1.25 }}>{T.screens}</h2>
         <span className="sw-label" aria-live="polite">{pad2(cur + 1)} / {pad2(n)}</span>
       </div>
 

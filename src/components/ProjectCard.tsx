@@ -25,7 +25,7 @@ export function ProjectCard({ p, lang }: { p: CardVM; lang: Lang }) {
           <Badge variant={p.badge.variant} dot={p.badge.dot} pulse={p.badge.pulse}>{p.badge.label}</Badge>
         </div>
       </div>
-      <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 20, fontWeight: 500, lineHeight: 1.2 }}>
+      <h3 className="project-card-title">
         <a href={p.href} className="card-link">{p.title}</a>
       </h3>
       <p style={{ fontSize: 14, color: 'var(--fg-2)', lineHeight: 1.5 }}>{p.summary}</p>

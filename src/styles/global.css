@@ -58,6 +58,15 @@ main { flex: 1; outline: none; }
 .card-link:hover { color: inherit; }
 .card-actions { position: relative; z-index: 2; }
 
+.project-card-title,
+.project-page :is(h2, h3):not(.sw-doc *),
+.project-page .related-project-title {
+  font-family: var(--font-pixel);
+  font-weight: var(--weight-regular);
+  overflow-wrap: anywhere;
+}
+.project-card-title { font-size: 20px; line-height: 1.2; }
+
 /* Пунктирная линия-таймлайн над шагами (принципы, flow) */
 .dash-rail { position: relative; }
 .dash-rail::before { content: ''; position: absolute; top: 4px; left: 0; right: 0; border-top: 1px dashed var(--fg-3); }
