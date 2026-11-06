@@ -13,7 +13,7 @@ const alternateHref = lang === 'ru' ? '/en/404/' : '/404.html';
   <div style="max-width:1440px; margin:0 auto; padding:clamp(48px,10vw,140px) clamp(20px,4vw,64px) var(--space-section); display:flex; flex-wrap:wrap; gap:48px; align-items:flex-end; justify-content:space-between">
     <div style="flex:1 1 420px; display:flex; flex-direction:column; gap:28px; align-items:flex-start">
       <span class="sw-label">{T.label}</span>
-      <h1 style="font-family:var(--font-pixel); font-size:var(--text-display-l); line-height:.95; letter-spacing:-.01em" set:html={T.title} />
+      <h1 style="font-family:var(--font-pixel); font-size:var(--text-display-l); line-height:var(--lh-display)" set:html={T.title} />
       <p style="font-size:var(--text-lead); line-height:1.45; max-width:36ch">{T.text}</p>
       <div style="display:flex; flex-wrap:wrap; gap:8px">
         <Button href={localePath(lang, '/')} iconStart="home">{T.home}</Button>

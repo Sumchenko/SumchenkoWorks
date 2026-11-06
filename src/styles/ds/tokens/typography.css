@@ -1,13 +1,13 @@
 /* Sumchenko Works — typography tokens */
 :root{
---font-pixel:'Pixelify Sans',ui-monospace,monospace;
+--font-pixel:'Departure Mono',ui-monospace,monospace;
 --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
 --font-sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
 --font-display:var(--font-pixel);
 --font-ui:var(--font-mono);
 --font-body:var(--font-sans);
 
-/* Display (Pixelify Sans) — fluid */
+/* Display (Departure Mono) — fluid */
 --text-display-xl:clamp(56px,10vw,160px);
 --text-display-l:clamp(44px,7vw,104px);
 --text-display-m:clamp(36px,4.6vw,64px);
@@ -25,12 +25,12 @@
 --text-micro:11px;
 
 --lh-tight:1; /* @kind font */
---lh-display:.95; /* @kind font */
+--lh-display:1.05; /* @kind font */
 --lh-heading:1.15; /* @kind font */
 --lh-body:1.6; /* @kind font */
 --lh-ui:1.4; /* @kind font */
 
---track-display:-.01em; /* @kind font */
+--track-display:0; /* @kind font */
 --track-heading:-.005em; /* @kind font */
 --track-body:0; /* @kind font */
 --track-label:.08em; /* @kind font */

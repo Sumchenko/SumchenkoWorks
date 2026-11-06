@@ -41,7 +41,7 @@ const works = localePath(lang, '/works/');
           <Badge variant={badge.variant} dot={badge.dot} pulse={badge.pulse}>{badge.label}</Badge>
           {p.demo && <Badge variant="dashed" title={T.demoTitle}>{t(lang).card.demo}</Badge>}
         </div>
-        <h1 style="font-family:var(--font-pixel); font-size:var(--text-display-m); line-height:.95; letter-spacing:-.01em; overflow-wrap:anywhere">{p.title}</h1>
+        <h1 style="font-family:var(--font-pixel); font-size:var(--text-display-m); line-height:var(--lh-display); overflow-wrap:anywhere">{p.title}</h1>
         <p style="font-size:var(--text-lead); line-height:1.45; max-width:48ch">{p.summary}</p>
         {extLinks.length > 0 && (
           <div style="display:flex; flex-wrap:wrap; gap:8px">

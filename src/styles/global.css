@@ -31,8 +31,12 @@ main { flex: 1; outline: none; }
 .skip-link:focus { top: 8px; color: var(--inverse-fg); }
 
 /* ---------- Шапка ---------- */
-.sw-nav__brand-text { display: inline; }
+.sw-nav__brand-text { display: inline; text-transform: uppercase; }
 @media (min-width: 761px) and (max-width: 1099px) { .sw-nav__brand-text { display: none; } }
+@media (max-width: 760px) {
+  .sw-nav { gap: 12px; }
+  .sw-nav__brand-text { font-size: clamp(12px, 4vw, 18px); }
+}
 .sw-langbtn { font-family: var(--font-mono); font-size: var(--text-micro); letter-spacing: var(--track-label); text-decoration: none; }
 .sw-langbtn:hover { color: var(--fg); }
 /* иконки темы переключает CSS по [data-theme], поэтому кнопка верно выглядит ещё до загрузки JS */

@@ -28,9 +28,9 @@ const skillsPlaceholder = !!(P.skills.placeholder || P.tools.placeholder);
   <div class="sw-container">
     <section id="top" aria-labelledby="hero-title" style="padding-top:clamp(40px,7vw,96px)">
       <div style="display:flex; flex-wrap:wrap; gap:clamp(32px,4vw,56px) var(--grid-gutter); align-items:center">
-        <div style="flex:7 1 440px; display:flex; flex-direction:column; gap:24px">
+        <div style="flex:7 1 440px; min-width:0; display:flex; flex-direction:column; gap:24px">
           <span class="sw-label">{eyebrow}</span>
-          <h1 id="hero-title" style="font-family:var(--font-pixel); font-size:var(--text-display-l); line-height:.95; letter-spacing:-.01em" set:html={H.heroTitle} />
+          <h1 id="hero-title" style="font-family:var(--font-pixel); font-size:var(--text-display-l); line-height:var(--lh-display)" set:html={H.heroTitle} />
           <span class="sw-label" style="color:var(--fg)">{P.headline}</span>
           <p style="font-size:var(--text-lead); line-height:1.45; max-width:42ch">{P.summary}</p>
           <div style="display:flex; flex-wrap:wrap; gap:8px">
@@ -109,7 +109,7 @@ const skillsPlaceholder = !!(P.skills.placeholder || P.tools.placeholder);
       <div style="display:flex; flex-wrap:wrap; gap:40px var(--grid-gutter); border-top:1px solid var(--line); padding-top:28px">
         <div style="flex:5 1 360px; display:flex; flex-direction:column; gap:24px; align-items:flex-start">
           <span class="sw-label">{H.contactsIdx}</span>
-          <h2 id="h-contacts" style="font-family:var(--font-pixel); font-size:var(--text-display-m); line-height:.95" set:html={H.contactsTitle} />
+          <h2 id="h-contacts" style="font-family:var(--font-pixel); font-size:var(--text-display-m); line-height:var(--lh-display)" set:html={H.contactsTitle} />
           {email && (
             <button type="button" class="hover-dim" data-copy={email} data-copy-done={T.toast.emailCopied}
               style="display:inline-flex; align-items:center; gap:14px; font-family:var(--font-mono); font-size:clamp(16px,2vw,22px); color:var(--fg); background:none; border:0; border-bottom:1px solid var(--line-strong); padding:0 0 8px; cursor:pointer; max-width:100%; overflow-wrap:anywhere; text-align:left">

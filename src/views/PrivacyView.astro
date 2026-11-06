@@ -12,7 +12,7 @@ const html = marked.parse(texts[`/src/content/privacy.${lang}.md`] ?? '', { asyn
 <Base lang={lang} path="/privacy/" title={T.meta}>
   <div style="max-width:1440px; margin:0 auto; padding:clamp(40px,8vw,96px) clamp(20px,4vw,64px) var(--space-section); display:flex; flex-direction:column; gap:28px">
     <span class="sw-label">{T.label}</span>
-    <h1 style="font-family:var(--font-pixel); font-size:var(--text-display-m); line-height:1; letter-spacing:-.01em">{T.title}</h1>
+    <h1 style="font-family:var(--font-pixel); font-size:min(var(--text-display-m), 7vw); line-height:var(--lh-display); overflow-wrap:anywhere">{T.title}</h1>
     <div class="sw-doc" style="max-width:72ch; font-size:17px" set:html={html} />
   </div>
 </Base>
